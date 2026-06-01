@@ -289,7 +289,7 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
         expect(cellB.getNeighborAtPort(3)).toBeNull();
         expect(cellA.getNeighborAtPort(1)).toBeNull();
         expect((cellA as any).connections.get(1)).toBeUndefined();
-        expect((cellB as any).connections.get(3)).toBeUndefined());
+        expect((cellB as any).connections.get(3)).toBeUndefined();
       });
     });
   });
@@ -416,7 +416,7 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
         expect(c1.isExit(1)).toBe(true);
         expect(c3.isExit(3)).toBe(true);
         expect(c1.getNeighborAtPort(1)).toBeNull();
-        expect(c3.getNeighborAtPort(3)).toBeNull());
+        expect(c3.getNeighborAtPort(3)).toBeNull();
       });
 
       it('should maintain isolation after removal', () => {

@@ -14,4 +14,21 @@ module.exports = {
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
   },
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        // Inherit from tsconfig.app.json but override types to include jest
+        target: 'ES2023',
+        lib: ['ES2023', 'DOM'],
+        module: 'CommonJS',
+        moduleResolution: 'node',
+        skipLibCheck: true,
+        esModuleInterop: true,
+        allowSyntheticDefaultImports: true,
+        types: ['jest', 'node'],
+        strict: true,
+      },
+    },
+  },
 };
+
