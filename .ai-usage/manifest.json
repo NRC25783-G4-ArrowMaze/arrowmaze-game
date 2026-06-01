@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-01T10:30:00Z",
+    "lastUpdated": "2026-06-01T20:53:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -70,19 +70,86 @@
           "structure": "passed"
         },
         "notes": "Scaffold completo con estructura DDD y Clean Architecture parcialmente implementada. Listo para fase de desarrollo de componentes React."
+      },
+      {
+        "id": "2026-06-01-002",
+        "date": "2026-06-01",
+        "title": "Domain Layer port-based + Infrastructure & Application Layer (It.1 + It.2)",
+        "file": "2026-06-01-domain-infra-application-layer.md",
+        "tool": "Antigravity (Gemini / Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1850,
+          "files_created": 14,
+          "files_modified": 6,
+          "tests_passing": 91,
+          "test_suites": 5
+        },
+        "areas": [
+          "domain-layer",
+          "port-based-topology",
+          "tdd",
+          "bdd",
+          "clean-architecture",
+          "ports-and-adapters",
+          "infrastructure",
+          "application-use-cases"
+        ],
+        "layers": {
+          "domain": {
+            "status": "complete",
+            "entities": ["Cell", "Board"],
+            "valueObjects": ["Port"],
+            "services": ["TopologyValidator", "TopologyQueryService", "PathChecker"],
+            "tests": 48
+          },
+          "application": {
+            "status": "complete",
+            "ports": ["IBoardRepository"],
+            "useCases": ["LoadLevelUseCase (refactored)", "BuildBoardUseCase", "QueryTopologyUseCase"],
+            "dtos": ["CellDTO", "ConnectionDTO", "LoadLevelResult (updated)"],
+            "tests": 21
+          },
+          "infrastructure": {
+            "status": "partial",
+            "factories": ["BoardFactory + LevelData schema"],
+            "repositories": ["InMemoryBoardRepository", "InMemoryLevelRepository"],
+            "tests": 11,
+            "pending": "HttpBoardRepository (It.3)"
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "91/91 passed — 0 failures, 0 regressions",
+          "git_checks": "not_run",
+          "structure": "passed"
+        },
+        "decisions": [
+          "Topología port-based: Cell(P puertos pares) sin Direction/Position — grafo genérico",
+          "Ports & Adapters (opción C): InMemoryRepository para tests, HttpRepository para producción",
+          "LevelData schema mínimo y extensible — sin definición final del formato de nivel"
+        ],
+        "notes": "Migración completa del modelo Direction-grid al modelo port-based. 91 tests pasando. Infrastructure layer con InMemory repos listos para tests sin red. HttpBoardRepository pendiente para It.3."
       }
     ],
     "statistics": {
-      "totalReports": 1,
+      "totalReports": 2,
       "toolsUsed": [
-        "GitHub Copilot"
+        "GitHub Copilot",
+        "Antigravity (Gemini / Claude)"
       ],
       "modelsUsed": [
-        "Claude Haiku 4.5"
+        "Claude Haiku 4.5",
+        "Claude Sonnet 4.6 (Thinking)"
       ],
-      "totalLinesGenerated": 1200,
-      "totalFilesCreated": 35,
-      "averageCompletionTime": "~15 minutes"
+      "totalLinesGenerated": 3050,
+      "totalFilesCreated": 49,
+      "totalTestsPassing": 91,
+      "averageCompletionTime": "~35 minutes per session"
     }
   }
 }
+
