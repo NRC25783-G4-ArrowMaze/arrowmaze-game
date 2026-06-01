@@ -1,0 +1,88 @@
+{
+  "project": "arrow-maze-client",
+  "aiUsageRegistry": {
+    "version": "1.0",
+    "lastUpdated": "2026-06-01T10:30:00Z",
+    "entries": [
+      {
+        "id": "2026-06-01-001",
+        "date": "2026-06-01",
+        "title": "Initial Scaffold: Vite + React + TypeScript + Capacitor",
+        "file": "2026-06-01-initial-scaffold.md",
+        "tool": "GitHub Copilot",
+        "model": "Claude Haiku 4.5",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1200,
+          "files_created": 35,
+          "files_modified": 10,
+          "commits": 1
+        },
+        "areas": [
+          "scaffolding",
+          "architecture",
+          "ddd",
+          "clean-architecture",
+          "testing-config",
+          "git-lfs",
+          "capacitor"
+        ],
+        "layers": {
+          "domain": {
+            "status": "partial",
+            "entities": 5,
+            "valueObjects": 2,
+            "services": 1,
+            "events": 1
+          },
+          "application": {
+            "status": "partial",
+            "ports": 2,
+            "useCases": 1,
+            "dtos": 1
+          },
+          "data": {
+            "status": "partial",
+            "repositories": 2,
+            "datasources": 0,
+            "mappers": 0
+          },
+          "infrastructure": {
+            "status": "minimal",
+            "config": 1,
+            "services": 0,
+            "aop": 0,
+            "di": 0
+          },
+          "presentation": {
+            "status": "minimal",
+            "components": 0,
+            "screens": 0,
+            "hooks": 0
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run",
+          "git_checks": "passed",
+          "structure": "passed"
+        },
+        "notes": "Scaffold completo con estructura DDD y Clean Architecture parcialmente implementada. Listo para fase de desarrollo de componentes React."
+      }
+    ],
+    "statistics": {
+      "totalReports": 1,
+      "toolsUsed": [
+        "GitHub Copilot"
+      ],
+      "modelsUsed": [
+        "Claude Haiku 4.5"
+      ],
+      "totalLinesGenerated": 1200,
+      "totalFilesCreated": 35,
+      "averageCompletionTime": "~15 minutes"
+    }
+  }
+}
