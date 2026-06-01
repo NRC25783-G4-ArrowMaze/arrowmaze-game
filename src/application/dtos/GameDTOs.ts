@@ -1,18 +1,39 @@
-import { Direction } from '../../domain/entities/Direction';
-import { Position } from '../../domain/value-objects/Position';
-
-export interface MovePlayerRequest {
-  playerPosition: Position;
-  rotationDirection: 'CW' | 'CCW'; // Clockwise or Counter-clockwise
+/**
+ * CellDTO — representación serializable de una celda del grafo.
+ * No contiene posición cartesiana ni dirección; la topología se define por puertos.
+ */
+export interface CellDTO {
+  id: string;
+  portCount: number;
+  isOccupied: boolean;
 }
 
-export interface MovePlayerResult {
+/**
+ * ConnectionDTO — representa un enlace bidireccional entre dos puertos.
+ * fromCellId.fromPort ↔ toCellId.toPort
+ */
+export interface ConnectionDTO {
+  fromCellId: string;
+  fromPort: number;
+  toCellId: string;
+  toPort: number;
+}
+
+/**
+ * LoadLevelResult — resultado del caso de uso LoadLevel.
+ * Devuelve el grafo topológico completo del nivel.
+ */
+export interface LoadLevelResult {
   success: boolean;
-  newPosition: Position;
-  newDirection?: Direction;
+  levelId: string;
+  cells: CellDTO[];
+  connections: ConnectionDTO[];
   error?: string;
 }
 
+/**
+ * CompleteLevelResult — resultado del caso de uso CompleteLevel.
+ */
 export interface CompleteLevelResult {
   levelCompleted: boolean;
   score?: {
@@ -23,16 +44,3 @@ export interface CompleteLevelResult {
   error?: string;
 }
 
-export interface LoadLevelResult {
-  success: boolean;
-  levelId: string;
-  gridWidth: number;
-  gridHeight: number;
-  initialPlayer: Position;
-  cells: {
-    position: Position;
-    direction: Direction;
-    type: string;
-  }[];
-  error?: string;
-}
