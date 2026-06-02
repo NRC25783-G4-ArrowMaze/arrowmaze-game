@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-02T19:34:00Z",
+    "lastUpdated": "2026-06-02T20:15:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -100,22 +100,46 @@
         "layers": {
           "domain": {
             "status": "complete",
-            "entities": ["Cell", "Board"],
-            "valueObjects": ["Port"],
-            "services": ["TopologyValidator", "TopologyQueryService", "PathChecker"],
+            "entities": [
+              "Cell",
+              "Board"
+            ],
+            "valueObjects": [
+              "Port"
+            ],
+            "services": [
+              "TopologyValidator",
+              "TopologyQueryService",
+              "PathChecker"
+            ],
             "tests": 48
           },
           "application": {
             "status": "complete",
-            "ports": ["IBoardRepository"],
-            "useCases": ["LoadLevelUseCase (refactored)", "BuildBoardUseCase", "QueryTopologyUseCase"],
-            "dtos": ["CellDTO", "ConnectionDTO", "LoadLevelResult (updated)"],
+            "ports": [
+              "IBoardRepository"
+            ],
+            "useCases": [
+              "LoadLevelUseCase (refactored)",
+              "BuildBoardUseCase",
+              "QueryTopologyUseCase"
+            ],
+            "dtos": [
+              "CellDTO",
+              "ConnectionDTO",
+              "LoadLevelResult (updated)"
+            ],
             "tests": 21
           },
           "infrastructure": {
             "status": "partial",
-            "factories": ["BoardFactory + LevelData schema"],
-            "repositories": ["InMemoryBoardRepository", "InMemoryLevelRepository"],
+            "factories": [
+              "BoardFactory + LevelData schema"
+            ],
+            "repositories": [
+              "InMemoryBoardRepository",
+              "InMemoryLevelRepository"
+            ],
             "tests": 11,
             "pending": "HttpBoardRepository (It.3)"
           }
@@ -168,13 +192,89 @@
           "Usar pnpm como gestor de paquetes para agregar la devDependency"
         ],
         "notes": "Configurada la generación automatizada de UML con pnpm run gen-uml. Creado el documento doc/plantuml-generation.md con instrucciones completas."
+      },
+      {
+        "id": "2026-06-02-002",
+        "date": "2026-06-02",
+        "title": "Board Graph Engine — Architecture by Layer Documentation",
+        "file": "2026-06-02-board-graph-architecture.md",
+        "tool": "Claude (web.claude.ai)",
+        "model": "Claude Haiku 4.5",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "documentation_pages": 1,
+          "markdown_sections": 5,
+          "class_definitions_documented": 31,
+          "files_created": 2
+        },
+        "areas": [
+          "architecture-documentation",
+          "clean-architecture",
+          "domain-driven-design",
+          "class-design",
+          "design-decisions"
+        ],
+        "layers": {
+          "domain": {
+            "status": "documented",
+            "entities": [
+              "Cell",
+              "Board"
+            ],
+            "valueObjects": [
+              "Port",
+              "ArrowSegment",
+              "CellId",
+              "BoardId"
+            ],
+            "services": [
+              "ConnectionService"
+            ],
+            "exceptions": 7
+          },
+          "application": {
+            "status": "documented",
+            "useCases": 8,
+            "ports": 2,
+            "dtos": 9
+          },
+          "adapters": {
+            "status": "documented",
+            "controllers": 3,
+            "presenters": 3,
+            "mappers": 2
+          },
+          "infrastructure": {
+            "status": "documented",
+            "repositories": 2,
+            "stubs": [
+              "BoardStepDefinitions",
+              "GameEngineModule"
+            ]
+          }
+        },
+        "validation": {
+          "bdd_coverage": "100% — todos los escenarios Gherkin mapeados a clases",
+          "dependency_direction": "passed — respeta las 4 capas de Clean Architecture",
+          "completeness": "passed — 31 clases/conceptos documentados",
+          "design_decisions": "traced — 3 decisiones de diseño explicadas y justificadas"
+        },
+        "decisions": [
+          "ConnectionService en Capa 1 (Domain) en lugar de Capa 2: bidireccionalidad es regla de negocio, no orquestación",
+          "Port como Value Object embebido vs Entity: identidad relativa a su Cell padre, no autónoma",
+          "Validación de ArrowSegment en Cell.placeSegment(): invariante del dominio, no responsabilidad del caso de uso"
+        ],
+        "notes": "Documento README exhaustivo (ARCHITECTURE.md) que mapea la topología port-based BDD a una arquitectura limpia de 4 capas. Incluye diagramas ASCII y justificación de cada decisión. Acompañado de AI_USAGE_REPORT.md para trazabilidad auditable."
       }
     ],
     "statistics": {
-      "totalReports": 3,
+      "totalReports": 4,
       "toolsUsed": [
         "GitHub Copilot",
-        "Antigravity (Gemini / Claude)"
+        "Antigravity (Gemini / Claude)",
+        "Claude (web.claude.ai)"
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
@@ -182,10 +282,14 @@
         "Gemini 3.5 Flash (Medium)"
       ],
       "totalLinesGenerated": 3075,
-      "totalFilesCreated": 52,
+      "totalFilesCreated": 54,
       "totalTestsPassing": 91,
-      "averageCompletionTime": "~30 minutes per session"
+      "totalClassesDocumented": 31,
+      "averageCompletionTime": "~25 minutes per session"
+    },
+    "lastEntry": {
+      "id": "2026-06-02-002",
+      "summary": "Análisis exhaustivo del feature BDD del Board Graph Engine (5 bloques de escenarios) y mapeo a arquitectura Clean Architecture de 4 capas con documentación de cada clase, método, DTO y dependencia. Completamente trazable a requisitos BDD y decidibilidad justificada."
     }
   }
 }
-
