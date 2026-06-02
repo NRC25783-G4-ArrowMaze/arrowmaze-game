@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-01T20:53:00Z",
+    "lastUpdated": "2026-06-02T19:34:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -133,22 +133,58 @@
           "LevelData schema mínimo y extensible — sin definición final del formato de nivel"
         ],
         "notes": "Migración completa del modelo Direction-grid al modelo port-based. 91 tests pasando. Infrastructure layer con InMemory repos listos para tests sin red. HttpBoardRepository pendiente para It.3."
+      },
+      {
+        "id": "2026-06-02-001",
+        "date": "2026-06-02",
+        "title": "PlantUML Setup & Class Diagram Generation",
+        "file": "2026-06-02-plantuml-setup.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 25,
+          "files_created": 3,
+          "files_modified": 2,
+          "scripts_added": 1
+        },
+        "areas": [
+          "uml-modeling",
+          "plantuml",
+          "tooling",
+          "post-processing",
+          "documentation"
+        ],
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "passed",
+          "structure": "passed"
+        },
+        "decisions": [
+          "Usar tplant como extractor de UML a partir de clases TypeScript",
+          "Escribir postprocess-uml.js en NodeJS para sanear la salida y arreglar las firmas de funciones top-level que rompen PlantUML",
+          "Usar pnpm como gestor de paquetes para agregar la devDependency"
+        ],
+        "notes": "Configurada la generación automatizada de UML con pnpm run gen-uml. Creado el documento doc/plantuml-generation.md con instrucciones completas."
       }
     ],
     "statistics": {
-      "totalReports": 2,
+      "totalReports": 3,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)"
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
-        "Claude Sonnet 4.6 (Thinking)"
+        "Claude Sonnet 4.6 (Thinking)",
+        "Gemini 3.5 Flash (Medium)"
       ],
-      "totalLinesGenerated": 3050,
-      "totalFilesCreated": 49,
+      "totalLinesGenerated": 3075,
+      "totalFilesCreated": 52,
       "totalTestsPassing": 91,
-      "averageCompletionTime": "~35 minutes per session"
+      "averageCompletionTime": "~30 minutes per session"
     }
   }
 }

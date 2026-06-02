@@ -1,0 +1,229 @@
+@startuml
+interface CellDTO {
+    +id: string
+    +portCount: number
+    +isOccupied: boolean
+}
+interface ConnectionDTO {
+    +fromCellId: string
+    +fromPort: number
+    +toCellId: string
+    +toPort: number
+}
+interface LoadLevelResult {
+    +success: boolean
+    +levelId: string
+    +cells: CellDTO[]
+    +connections: ConnectionDTO[]
+    +error?: string
+}
+interface CompleteLevelResult {
+    +levelCompleted: boolean
+    +score?: { points: number; moves: number; time: number; }
+    +error?: string
+}
+class Port {
+    -index: number
+    +getIndex(): number
+}
+class Cell {
+    -id: string
+    -portCount: number
+    -ports: readonly Port[]
+    -connections: Map<number, { neighborCell: Cell; neighborPortIndex: number; }>
+    -arrowSegment: { isHead: boolean; cellId: string; }
+    -occupied: boolean
+    +getId(): string
+    +getPortCount(): number
+    +getPortAtIndex(index: number): Port
+    +getNeighborAtPort(portIndex: number): Cell
+    +isExit(portIndex: number): boolean
+    +canConnect(portIndex: number): boolean
+    +_getNeighborPortIndex(portIndex: number): number
+    +_connectToNeighbor(portIndex: number, neighborCell: Cell, neighborPortIndex: number): void
+    +_disconnectFromNeighbor(portIndex: number): void
+    +hasArrowSegment(): boolean
+    +isOccupied(): boolean
+    +getArrowSegment(): { isHead: boolean; cellId: string; }
+    +placeArrowSegment(segment: { isHead: boolean; cellId: string; }): void
+    +removeArrowSegment(): void
+}
+class TopologyValidator {
+    +{static} validateEvenPortCount(portCount: number): void
+    +{static} validatePortIndex(portIndex: number, portCount: number): void
+    +{static} validateNoSelfConnect(cellA: Cell, cellB: Cell): void
+}
+class Board {
+    -id: string
+    -cells: Map<string, Cell>
+    +getId(): string
+    +getAllCells(): Cell[]
+    +getCell(id: string): Cell
+    +addCell(cell: Cell): void
+    +removeCell(cellId: string): void
+    +connectPorts(cellA: Cell, portIndexA: number, cellB: Cell, portIndexB: number): void
+    +disconnectPort(cell: Cell, portIndex: number): void
+}
+interface IBoardRepository {
+    +getBoardForLevel(levelId: string): Promise<Board>
+}
+enum Difficulty {
+    EASY
+    MEDIUM
+    HARD
+}
+class Level {
+    -id: string
+    -name: string
+    -difficulty: Difficulty
+    -description: string
+    -gridWidth: number
+    -gridHeight: number
+    -timeLimit?: number
+    -moveLimit?: number
+    +getId(): string
+    +getName(): string
+    +getDifficulty(): Difficulty
+    +getDescription(): string
+    +getGridWidth(): number
+    +getGridHeight(): number
+    +getTimeLimit(): number
+    +getMoveLimit(): number
+}
+interface ILevelRepository {
+    +getLevel(levelId: string): Promise<Level>
+    +getAllLevels(): Promise<Level[]>
+    +getLevelsByDifficulty(difficulty: string): Promise<Level[]>
+}
+class Score {
+    +levelId: string
+    +points: number
+    +moves: number
+    +time: number
+    +date: Date
+    +isHighScore(other: Score): boolean
+    +toString(): string
+}
+interface IScoreRepository {
+    +saveScore(score: Score): Promise<void>
+    +getScores(levelId: string): Promise<Score[]>
+    +getHighScore(levelId: string): Promise<Score>
+    +getAllScores(): Promise<Score[]>
+}
+interface CellData {
+    +id: string
+    +portCount: number
+}
+interface ConnectionData {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelData {
+    +id: string
+    +name: string
+    +difficulty: string
+    +cells: CellData[]
+    +connections: ConnectionData[]
+}
+class BoardFactory {
+    +{static} fromLevelData(data: LevelData): Board
+}
+class BuildBoardUseCase {
+    +execute(levelData: LevelData): Board
+}
+class LoadLevelUseCase {
+    -levelRepository: ILevelRepository
+    -boardRepository: IBoardRepository
+    +execute(levelId: string): Promise<LoadLevelResult>
+    -extractCells(board: Board): CellDTO[]
+    -extractConnections(board: Board): ConnectionDTO[]
+}
+class TopologyQueryService {
+    +getNeighborCell(cell: Cell, portIndex: number): Cell
+    +isExit(cell: Cell, portIndex: number): boolean
+    +getAdjacentCells(cell: Cell): Cell[]
+}
+class PathChecker {
+    -{static} queryService: TopologyQueryService
+    +{static} canReachExit(startCell: Cell): boolean
+}
+class QueryTopologyUseCase {
+    -queryService: TopologyQueryService
+    +getAdjacentCells(board: Board, cellId: string): CellDTO[]
+    +isExitPort(board: Board, cellId: string, portIndex: number): boolean
+    +canReachExit(board: Board, cellId: string): boolean
+    -resolveCell(board: Board, cellId: string): Cell
+}
+class LocalLevelRepository implements ILevelRepository {
+    -levels: Map<string, Level>
+    +getLevel(levelId: string): Promise<Level>
+    +getAllLevels(): Promise<Level[]>
+    +getLevelsByDifficulty(difficulty: string): Promise<Level[]>
+    -initializeLevels(): void
+}
+class LocalScoreRepository implements IScoreRepository {
+    -scores: Score[]
+    -STORAGE_KEY: "arrow_maze_scores"
+    +saveScore(score: Score): Promise<void>
+    +getScores(levelId: string): Promise<Score[]>
+    +getHighScore(levelId: string): Promise<Score>
+    +getAllScores(): Promise<Score[]>
+    -persistScores(): void
+    -loadScores(): void
+}
+enum Direction {
+    UP
+    DOWN
+    LEFT
+    RIGHT
+}
+class Position {
+    +x: number
+    +y: number
+    +equals(other: Position): boolean
+    +toString(): string
+}
+class Player {
+    -position: Position
+    -moves: number
+    -startTime: Date
+    +getPosition(): Position
+    +setPosition(position: Position): void
+    +getMoves(): number
+    +getElapsedTime(): number
+    +resetMoves(): void
+    +resetTimer(): void
+}
+abstract class DomainEvent {
+    +timestamp: Date
+    +aggregateId: string
+}
+class PlayerMoved extends DomainEvent {
+    +from: Position
+    +to: Position
+    +moveNumber: number
+}
+class LevelCompleted extends DomainEvent {
+    +levelId: string
+    +moves: number
+    +elapsedTime: number
+}
+class GameOver extends DomainEvent {
+    +levelId: string
+    +reason: "TIME_LIMIT" | "MOVE_LIMIT" | "QUIT"
+}
+class InMemoryBoardRepository implements IBoardRepository {
+    -fixtures: Map<string, LevelData>
+    +getBoardForLevel(levelId: string): Promise<Board>
+    +addFixture(levelData: LevelData): void
+}
+class InMemoryLevelRepository implements ILevelRepository {
+    -levels: Map<string, Level>
+    +getLevel(levelId: string): Promise<Level>
+    +getAllLevels(): Promise<Level[]>
+    +getLevelsByDifficulty(difficulty: string): Promise<Level[]>
+    +addLevel(level: Level): void
+}
+@enduml
