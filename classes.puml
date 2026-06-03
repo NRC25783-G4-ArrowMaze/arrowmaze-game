@@ -1,39 +1,4 @@
 @startuml
-interface CellDTO {
-    +id: string
-    +portCount: number
-    +isOccupied: boolean
-}
-interface ConnectionDTO {
-    +fromCellId: string
-    +fromPort: number
-    +toCellId: string
-    +toPort: number
-}
-interface LoadLevelResult {
-    +success: boolean
-    +levelId: string
-    +cells: CellDTO[]
-    +connections: ConnectionDTO[]
-    +error?: string
-}
-interface CellData {
-    +id: string
-    +portCount: number
-}
-interface ConnectionData {
-    +fromCell: string
-    +fromPort: number
-    +toCell: string
-    +toPort: number
-}
-interface LevelData {
-    +id: string
-    +name: string
-    +difficulty: string
-    +cells: CellData[]
-    +connections: ConnectionData[]
-}
 class Port {
     -index: number
     +getIndex(): number
@@ -76,6 +41,60 @@ class Board {
     +connectPorts(cellA: Cell, portIndexA: number, cellB: Cell, portIndexB: number): void
     +disconnectPort(cell: Cell, portIndex: number): void
 }
+interface PlaceArrowInput {
+    +board: Board
+    +headCellId: string
+    +exitPort: number
+    +bodyCellIds?: string[]
+}
+interface ArrowSegmentDTO {
+    +cellId: string
+    +isHead: boolean
+    +fromPort: number
+    +toPort: number
+    +exitPort: number
+}
+interface PlaceArrowResult {
+    +success: boolean
+    +arrowLength: number
+    +segments: ArrowSegmentDTO[]
+    +error?: string
+}
+interface CellDTO {
+    +id: string
+    +portCount: number
+    +isOccupied: boolean
+}
+interface ConnectionDTO {
+    +fromCellId: string
+    +fromPort: number
+    +toCellId: string
+    +toPort: number
+}
+interface LoadLevelResult {
+    +success: boolean
+    +levelId: string
+    +cells: CellDTO[]
+    +connections: ConnectionDTO[]
+    +error?: string
+}
+interface CellData {
+    +id: string
+    +portCount: number
+}
+interface ConnectionData {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelData {
+    +id: string
+    +name: string
+    +difficulty: string
+    +cells: CellData[]
+    +connections: ConnectionData[]
+}
 interface IBoardBuilder {
     +build(data: LevelData): Board
 }
@@ -94,6 +113,39 @@ class LoadLevelUseCase {
     +execute(levelId: string): Promise<LoadLevelResult>
     -extractCells(board: Board): CellDTO[]
     -extractConnections(board: Board): ConnectionDTO[]
+}
+abstract class ArrowSegment {
+    +cell: Cell
+    +fromPort: number
+    +toPort: number
+    +prev: ArrowSegment
+    +next: ArrowSegment
+    +{abstract} isHead: boolean
+    +{abstract} exitPort: number
+    +getCellId(): string
+}
+class Head extends ArrowSegment {
+    +isHead: true
+    +exitPort: number
+}
+class Segment extends ArrowSegment {
+    +isHead: false
+    +exitPort: any
+}
+class ArrowPlacementError extends Error
+class ArrowCreationError extends Error
+class Arrow {
+    +head: Head
+    +length: number
+    +extend(nextCell: Cell): void
+    +destroy(): void
+    -_getTail(): ArrowSegment
+    -_findConnectingPort(fromCell: Cell, toCell: Cell): number
+    -_cellBelongsToSelf(cell: Cell): boolean
+}
+class PlaceArrowUseCase {
+    +execute(input: PlaceArrowInput): PlaceArrowResult
+    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
 }
 class TopologyQueryService {
     +getNeighborCell(cell: Cell, portIndex: number): Cell
