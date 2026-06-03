@@ -1,20 +1,11 @@
-import type { LevelData } from '../../infrastructure/factories/BoardFactory';
+import type { LevelData } from '../dtos/LevelData';
 
 /**
  * ILevelRepository — puerto de aplicación para obtener la topología de un nivel.
  *
- * Devuelve LevelData (schema serializable de celdas + conexiones) en lugar de
- * una entidad de dominio Level, ya que en esta feature el único concepto de
- * "nivel" es su estructura de grafo pasivo.
- *
- * Implementaciones:
- * - InMemoryBoardRepository (tests / dev)
- * - HttpLevelRepository      (producción)
+ * Devuelve LevelData (schema serializable de celdas + conexiones). El contrato
+ * LevelData vive en la capa de aplicación, no en infraestructura.
  */
 export interface ILevelRepository {
-  /**
-   * Obtiene el LevelData raw de un nivel por su ID.
-   * Lanza si el nivel no existe.
-   */
   getLevel(levelId: string): Promise<LevelData>;
 }

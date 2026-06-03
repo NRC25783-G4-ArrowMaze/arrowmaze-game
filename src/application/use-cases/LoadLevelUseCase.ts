@@ -1,37 +1,29 @@
-import type { ILevelRepository } from '../ports/ILevelRepository';
+import type { IBoardRepository } from '../ports/IBoardRepository';
 import type { LoadLevelResult, CellDTO, ConnectionDTO } from '../dtos/GameDTOs';
 import { Board } from '../../domain/entities/Board';
-import { BoardFactory } from '../../infrastructure/factories/BoardFactory';
 
 /**
- * LoadLevelUseCase — carga la topología de un nivel y la expone como DTOs port-based.
+ * LoadLevelUseCase — carga la topología de un nivel y la expone como DTOs.
  *
- * Orquesta un único repositorio:
- * - ILevelRepository → LevelData serializable (id, cells[], connections[])
- *
- * Construye el Board graph via BoardFactory y serializa el resultado
- * a DTOs sin exponer entidades de dominio hacia las capas externas.
- *
- * La carga es async para soportar implementaciones de repositorio remotas
- * (HTTP) sin cambios en la firma del caso de uso.
+ * Depende del puerto IBoardRepository (abstracción), que devuelve un Board
+ * de dominio ya construido. NO conoce infraestructura ni la BoardFactory:
+ * obtener el Board y construirlo es responsabilidad del repositorio inyectado.
+ * Esto respeta la Regla de Dependencia de Clean Architecture.
  */
 export class LoadLevelUseCase {
-  private readonly levelRepository: ILevelRepository;
+  private readonly boardRepository: IBoardRepository;
 
-  constructor(
-    levelRepository: ILevelRepository,
-  ) {
-    this.levelRepository = levelRepository;
+  constructor(boardRepository: IBoardRepository) {
+    this.boardRepository = boardRepository;
   }
 
   async execute(levelId: string): Promise<LoadLevelResult> {
     try {
-      const levelData = await this.levelRepository.getLevel(levelId);
-      const board = BoardFactory.fromLevelData(levelData);
+      const board = await this.boardRepository.getBoardForLevel(levelId);
 
       return {
         success: true,
-        levelId: levelData.id,
+        levelId: board.getId(),
         cells: this.extractCells(board),
         connections: this.extractConnections(board),
       };
@@ -69,7 +61,6 @@ export class LoadLevelUseCase {
 
         const neighborPortIndex = cell._getNeighborPortIndex(portIndex)!;
 
-        // Clave canónica para deduplicar (cada conexión aparece desde ambos lados)
         const sides = [
           `${cell.getId()}:${portIndex}`,
           `${neighbor.getId()}:${neighborPortIndex}`,
