@@ -1,73 +1,84 @@
-import { ILevelRepository } from '../../application/ports/ILevelRepository';
-import { LoadLevelResult } from '../dtos/GameDTOs';
+import type { IBoardRepository } from '../ports/IBoardRepository';
+import type { LoadLevelResult, CellDTO, ConnectionDTO } from '../dtos/GameDTOs';
 import { Board } from '../../domain/entities/Board';
-import { Cell, CellType } from '../../domain/entities/Cell';
-import { Direction } from '../../domain/entities/Direction';
-import { Position } from '../../domain/value-objects/Position';
 
+/**
+ * LoadLevelUseCase — carga la topología de un nivel y la expone como DTOs.
+ *
+ * Depende del puerto IBoardRepository (abstracción), que devuelve un Board
+ * de dominio ya construido. NO conoce infraestructura ni la BoardFactory:
+ * obtener el Board y construirlo es responsabilidad del repositorio inyectado.
+ * Esto respeta la Regla de Dependencia de Clean Architecture.
+ */
 export class LoadLevelUseCase {
-  constructor(private levelRepository: ILevelRepository) {}
+  private readonly boardRepository: IBoardRepository;
+
+  constructor(boardRepository: IBoardRepository) {
+    this.boardRepository = boardRepository;
+  }
 
   async execute(levelId: string): Promise<LoadLevelResult> {
     try {
-      const level = await this.levelRepository.getLevel(levelId);
-
-      // Create board
-      const board = new Board(level.getGridWidth(), level.getGridHeight());
-
-      // For now, create a simple grid with arrows pointing right
-      // In a real scenario, this would come from a JSON config file
-      const cells = [];
-      for (let y = 0; y < level.getGridHeight(); y++) {
-        for (let x = 0; x < level.getGridWidth(); x++) {
-          const position = new Position(x, y);
-          let cellType = CellType.NORMAL;
-
-          // Set starting position
-          if (x === 0 && y === 0) {
-            cellType = CellType.NORMAL;
-          }
-          // Set exit
-          if (
-            x === level.getGridWidth() - 1 &&
-            y === level.getGridHeight() - 1
-          ) {
-            cellType = CellType.EXIT;
-          }
-
-          const cell = new Cell(
-            position,
-            Direction.RIGHT,
-            cellType
-          );
-          board.setCell(cell);
-
-          cells.push({
-            position,
-            direction: cell.getDirection(),
-            type: cellType,
-          });
-        }
-      }
+      const board = await this.boardRepository.getBoardForLevel(levelId);
 
       return {
         success: true,
-        levelId: level.getId(),
-        gridWidth: level.getGridWidth(),
-        gridHeight: level.getGridHeight(),
-        initialPlayer: new Position(0, 0),
-        cells: cells as any,
+        levelId: board.getId(),
+        cells: this.extractCells(board),
+        connections: this.extractConnections(board),
       };
     } catch (error) {
       return {
         success: false,
         levelId,
-        gridWidth: 0,
-        gridHeight: 0,
-        initialPlayer: new Position(0, 0),
         cells: [],
+        connections: [],
         error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
+  }
+
+  // ─────────────────────────────────────────────
+  // HELPERS PRIVADOS
+  // ─────────────────────────────────────────────
+
+  private extractCells(board: Board): CellDTO[] {
+    return board.getAllCells().map(cell => ({
+      id: cell.getId(),
+      portCount: cell.getPortCount(),
+      isOccupied: cell.isOccupied(),
+    }));
+  }
+
+  private extractConnections(board: Board): ConnectionDTO[] {
+    const connections: ConnectionDTO[] = [];
+    const seen = new Set<string>();
+
+    for (const cell of board.getAllCells()) {
+      for (let portIndex = 0; portIndex < cell.getPortCount(); portIndex++) {
+        const neighbor = cell.getNeighborAtPort(portIndex);
+        if (!neighbor) continue;
+
+        const neighborPortIndex = cell._getNeighborPortIndex(portIndex)!;
+
+        const sides = [
+          `${cell.getId()}:${portIndex}`,
+          `${neighbor.getId()}:${neighborPortIndex}`,
+        ].sort();
+        const key = `${sides[0]}↔${sides[1]}`;
+
+        if (!seen.has(key)) {
+          seen.add(key);
+          connections.push({
+            fromCellId: cell.getId(),
+            fromPort: portIndex,
+            toCellId: neighbor.getId(),
+            toPort: neighborPortIndex,
+          });
+        }
+      }
+    }
+
+    return connections;
   }
 }

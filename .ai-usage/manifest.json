@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-01T10:30:00Z",
+    "lastUpdated": "2026-06-03T03:15:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -70,19 +70,352 @@
           "structure": "passed"
         },
         "notes": "Scaffold completo con estructura DDD y Clean Architecture parcialmente implementada. Listo para fase de desarrollo de componentes React."
+      },
+      {
+        "id": "2026-06-01-002",
+        "date": "2026-06-01",
+        "title": "Domain Layer port-based + Infrastructure & Application Layer (It.1 + It.2)",
+        "file": "2026-06-01-domain-infra-application-layer.md",
+        "tool": "Antigravity (Gemini / Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1850,
+          "files_created": 14,
+          "files_modified": 6,
+          "tests_passing": 91,
+          "test_suites": 5
+        },
+        "areas": [
+          "domain-layer",
+          "port-based-topology",
+          "tdd",
+          "bdd",
+          "clean-architecture",
+          "ports-and-adapters",
+          "infrastructure",
+          "application-use-cases"
+        ],
+        "layers": {
+          "domain": {
+            "status": "complete",
+            "entities": [
+              "Cell",
+              "Board"
+            ],
+            "valueObjects": [
+              "Port"
+            ],
+            "services": [
+              "TopologyValidator",
+              "TopologyQueryService",
+              "PathChecker"
+            ],
+            "tests": 48
+          },
+          "application": {
+            "status": "complete",
+            "ports": [
+              "IBoardRepository"
+            ],
+            "useCases": [
+              "LoadLevelUseCase (refactored)",
+              "BuildBoardUseCase",
+              "QueryTopologyUseCase"
+            ],
+            "dtos": [
+              "CellDTO",
+              "ConnectionDTO",
+              "LoadLevelResult (updated)"
+            ],
+            "tests": 21
+          },
+          "infrastructure": {
+            "status": "partial",
+            "factories": [
+              "BoardFactory + LevelData schema"
+            ],
+            "repositories": [
+              "InMemoryBoardRepository",
+              "InMemoryLevelRepository"
+            ],
+            "tests": 11,
+            "pending": "HttpBoardRepository (It.3)"
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "91/91 passed — 0 failures, 0 regressions",
+          "git_checks": "not_run",
+          "structure": "passed"
+        },
+        "decisions": [
+          "Topología port-based: Cell(P puertos pares) sin Direction/Position — grafo genérico",
+          "Ports & Adapters (opción C): InMemoryRepository para tests, HttpRepository para producción",
+          "LevelData schema mínimo y extensible — sin definición final del formato de nivel"
+        ],
+        "notes": "Migración completa del modelo Direction-grid al modelo port-based. 91 tests pasando. Infrastructure layer con InMemory repos listos para tests sin red. HttpBoardRepository pendiente para It.3."
+      },
+      {
+        "id": "2026-06-02-001",
+        "date": "2026-06-02",
+        "title": "PlantUML Setup & Class Diagram Generation",
+        "file": "2026-06-02-plantuml-setup.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 25,
+          "files_created": 3,
+          "files_modified": 2,
+          "scripts_added": 1
+        },
+        "areas": [
+          "uml-modeling",
+          "plantuml",
+          "tooling",
+          "post-processing",
+          "documentation"
+        ],
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "passed",
+          "structure": "passed"
+        },
+        "decisions": [
+          "Usar tplant como extractor de UML a partir de clases TypeScript",
+          "Escribir postprocess-uml.js en NodeJS para sanear la salida y arreglar las firmas de funciones top-level que rompen PlantUML",
+          "Usar pnpm como gestor de paquetes para agregar la devDependency"
+        ],
+        "notes": "Configurada la generación automatizada de UML con pnpm run gen-uml. Creado el documento doc/plantuml-generation.md con instrucciones completas."
+      },
+      {
+        "id": "2026-06-02-002",
+        "date": "2026-06-02",
+        "title": "Board Graph Engine — Architecture by Layer Documentation",
+        "file": "2026-06-02-board-graph-architecture.md",
+        "tool": "Claude (web.claude.ai)",
+        "model": "Claude Haiku 4.5",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "documentation_pages": 1,
+          "markdown_sections": 5,
+          "class_definitions_documented": 31,
+          "files_created": 2
+        },
+        "areas": [
+          "architecture-documentation",
+          "clean-architecture",
+          "domain-driven-design",
+          "class-design",
+          "design-decisions"
+        ],
+        "layers": {
+          "domain": {
+            "status": "documented",
+            "entities": [
+              "Cell",
+              "Board"
+            ],
+            "valueObjects": [
+              "Port",
+              "ArrowSegment",
+              "CellId",
+              "BoardId"
+            ],
+            "services": [
+              "ConnectionService"
+            ],
+            "exceptions": 7
+          },
+          "application": {
+            "status": "documented",
+            "useCases": 8,
+            "ports": 2,
+            "dtos": 9
+          },
+          "adapters": {
+            "status": "documented",
+            "controllers": 3,
+            "presenters": 3,
+            "mappers": 2
+          },
+          "infrastructure": {
+            "status": "documented",
+            "repositories": 2,
+            "stubs": [
+              "BoardStepDefinitions",
+              "GameEngineModule"
+            ]
+          }
+        },
+        "validation": {
+          "bdd_coverage": "100% — todos los escenarios Gherkin mapeados a clases",
+          "dependency_direction": "passed — respeta las 4 capas de Clean Architecture",
+          "completeness": "passed — 31 clases/conceptos documentados",
+          "design_decisions": "traced — 3 decisiones de diseño explicadas y justificadas"
+        },
+        "decisions": [
+          "ConnectionService en Capa 1 (Domain) en lugar de Capa 2: bidireccionalidad es regla de negocio, no orquestación",
+          "Port como Value Object embebido vs Entity: identidad relativa a su Cell padre, no autónoma",
+          "Validación de ArrowSegment en Cell.placeSegment(): invariante del dominio, no responsabilidad del caso de uso"
+        ],
+        "notes": "Documento README exhaustivo (ARCHITECTURE.md) que mapea la topología port-based BDD a una arquitectura limpia de 4 capas. Incluye diagramas ASCII y justificación de cada decisión. Acompañado de AI_USAGE_REPORT.md para trazabilidad auditable."
+      },
+      {
+        "id": "2026-06-02-003",
+        "date": "2026-06-02",
+        "title": "Auditoría, limpieza y refactorización — alineación con feature BDD",
+        "file": "2026-06-02-cleanup-and-refactor-feature1.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "files_deleted": 12,
+          "files_modified": 4,
+          "dtos_removed": 1,
+          "lines_of_code_net": -800
+        },
+        "areas": [
+          "code-audit",
+          "dead-code-removal",
+          "refactoring",
+          "domain-alignment",
+          "ports-and-adapters",
+          "clean-architecture"
+        ],
+        "layers": {
+          "domain": {
+            "status": "cleaned",
+            "deleted": ["Direction", "Level", "Player", "Position", "Score", "GameEvents"],
+            "retained": ["Cell", "Board", "Port", "TopologyValidator", "TopologyQueryService", "PathChecker"]
+          },
+          "application": {
+            "status": "refactored",
+            "refactored": ["ILevelRepository", "LoadLevelUseCase"],
+            "updated": ["IBoardRepository", "GameDTOs"],
+            "deleted": ["IScoreRepository"]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "extended": ["InMemoryBoardRepository — ahora implementa IBoardRepository + ILevelRepository"],
+            "deleted": ["InMemoryLevelRepository"]
+          },
+          "data": {
+            "status": "cleaned",
+            "deleted": ["LocalLevelRepository", "LocalScoreRepository"]
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run — pendiente verificar LoadLevelUseCase.spec.ts tras refactorización",
+          "import_check": "passed — 0 referencias rotas post-limpieza",
+          "structure": "passed — 13 archivos alineados con doc/feature1.md"
+        },
+        "decisions": [
+          "Eliminar todo código sin cobertura BDD en lugar de mantenerlo como infraestructura futura",
+          "Reinterpretar ILevelRepository como contrato de LevelData (topología) en vez de entidad Level",
+          "InMemoryBoardRepository implementa ambos contratos (IBoardRepository + ILevelRepository) sin duplicación"
+        ],
+        "notes": "Sesión de auditoría: Direction.ts identificado como primer artefacto huérfano, desencadenando limpieza en cascada de 12 archivos. Restauración de LoadLevelUseCase/ILevelRepository derivó en refactorización limpia orientada a LevelData como fuente de verdad de topología."
+      },
+      {
+        "id": "2026-06-02-004",
+        "date": "2026-06-02",
+        "title": "Feature 1 Documentation: Board as Node Graph",
+        "file": "2026-06-02-feature1.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "documentation_pages": 1,
+          "files_created": 1,
+          "files_modified": 2
+        },
+        "areas": [
+          "documentation",
+          "technical-spec",
+          "uml-modeling",
+          "mermaid"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "passed"
+        },
+        "decisions": [
+          "Escribir especificación técnica detallada en español para Feature 1",
+          "Utilizar diagramas de clase Mermaid incrustados en Markdown para mayor claridad"
+        ],
+        "notes": "Redactada especificación completa y diagrama de clases de Feature 1."
+      },
+      {
+        "id": "2026-06-02-005",
+        "date": "2026-06-02",
+        "title": "TypeScript Strict Compilation & Vite Env Fixes",
+        "file": "2026-06-02-fix-typescript-compilation.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Low)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "files_modified": 6
+        },
+        "areas": [
+          "typescript",
+          "compiler-fixes",
+          "verbatimModuleSyntax",
+          "erasableSyntaxOnly",
+          "vite-env"
+        ],
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "passed"
+        },
+        "decisions": [
+          "Migrar a imports explícitos 'import type' / 'type' inline para verbatimModuleSyntax",
+          "Eliminar parameter properties en constructor en favor de asignaciones de campo explícitas por erasableSyntaxOnly",
+          "Migrar de process.env a import.meta.env en api-config.ts para corregir tipos en Vite"
+        ],
+        "notes": "Corregidos 12 errores de compilación TypeScript. Build de Vite verificado con éxito."
       }
     ],
     "statistics": {
-      "totalReports": 1,
+      "totalReports": 7,
       "toolsUsed": [
-        "GitHub Copilot"
+        "GitHub Copilot",
+        "Antigravity (Gemini / Claude)",
+        "Antigravity (Claude)",
+        "Antigravity (Gemini)",
+        "Claude (web.claude.ai)"
       ],
       "modelsUsed": [
-        "Claude Haiku 4.5"
+        "Claude Haiku 4.5",
+        "Claude Sonnet 4.6 (Thinking)",
+        "Gemini 3.5 Flash (Medium)",
+        "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 1200,
-      "totalFilesCreated": 35,
-      "averageCompletionTime": "~15 minutes"
+      "totalLinesGenerated": 3075,
+      "totalFilesCreated": 56,
+      "totalFilesDeleted": 12,
+      "totalTestsPassing": 91,
+      "totalClassesDocumented": 31,
+      "averageCompletionTime": "~20 minutes per session"
+    },
+    "lastEntry": {
+      "id": "2026-06-02-005",
+      "summary": "Resolución de 12 errores de compilación TypeScript estrictos (verbatimModuleSyntax y erasableSyntaxOnly) y migración de process.env a import.meta.env en api-config.ts."
     }
   }
 }

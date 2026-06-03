@@ -10,17 +10,23 @@ import { Port } from '../value-objects/Port';
  * - Occupancy state (arrow segment placement)
  * 
  * INVARIANTS:
- * - portCount must be even and immutable
- * - All ports start as exits (no neighbors)
- * - Ports can only be connected via Board.connectPorts()
- * - Each port can connect to at most one neighbor
+ * - portCount must be even and immutable (readonly)
+ * - ports array is frozen (cannot push/splice)
+ * - Each Port object is frozen (cannot mutate index)
+ * - Connections are managed exclusively via Board.connectPorts() / Board.disconnectPort()
+ * - Each port connects to at most one neighbor (bijection)
  * - Connections must be bidirectional
  */
 export class Cell {
   private readonly id: string;
   private readonly portCount: number;
-  private readonly ports: Port[];
-  private readonly connections: Map<number, { neighborCell: Cell; neighborPortIndex: number }> = new Map();
+  private readonly ports: ReadonlyArray<Port>;
+
+  /**
+   * Package-private: connection registry.
+   * Exposed as `(cell as any).connections` in tests for low-level assertions.
+   */
+  private readonly connections: Map<number, { neighborCell: Cell; neighborPortIndex: number }>;
   
   // Arrow segment occupation state
   private arrowSegment: { isHead: boolean; cellId: string } | null = null;
@@ -36,17 +42,30 @@ export class Cell {
 
     this.id = id;
     this.portCount = portCount;
-    
-    // Create immutable ports array
+
+    // Each Port is frozen inside its own constructor.
+    // We also freeze the array so push/splice throw in strict mode.
     this.ports = Object.freeze(
       Array.from({ length: portCount }, (_, i) => new Port(i))
     );
 
-    // Freeze port objects
-    this.ports.forEach(port => Object.freeze(port));
+    this.connections = new Map();
 
-    // Freeze this cell's properties
-    Object.freeze(this);
+    // Make id and portCount non-writable and non-configurable at the JS runtime level
+    // so that `(cell as any).portCount = X` throws in strict mode (Jest runs in strict mode).
+    // We cannot use Object.freeze(this) because connections/arrowSegment/occupied must mutate.
+    Object.defineProperty(this, 'portCount', {
+      value: portCount,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
+    Object.defineProperty(this, 'id', {
+      value: id,
+      writable: false,
+      enumerable: true,
+      configurable: false,
+    });
   }
 
   // ─────────────────────────────────────────────
@@ -73,8 +92,8 @@ export class Cell {
   // ─────────────────────────────────────────────
 
   /**
-   * Get the neighbor cell at a specific port index
-   * Returns null if the port is an exit (no neighbor)
+   * Get the neighbor cell at a specific port index.
+   * Returns null if the port is an exit (no neighbor).
    */
   getNeighborAtPort(portIndex: number): Cell | null {
     const connection = this.connections.get(portIndex);
@@ -82,24 +101,24 @@ export class Cell {
   }
 
   /**
-   * Check if a port is an exit (no neighbor connected)
+   * Check if a port is an exit (no neighbor connected).
    */
   isExit(portIndex: number): boolean {
     if (portIndex < 0 || portIndex >= this.portCount) {
-      throw new Error(`TopologyError: port index out of range`);
+      throw new Error('TopologyError: port index out of range');
     }
     return !this.connections.has(portIndex);
   }
 
   /**
-   * Check if a port can be connected (is currently an exit)
+   * Check if a port can be connected (is currently an exit).
    */
   canConnect(portIndex: number): boolean {
     return this.isExit(portIndex);
   }
 
   /**
-   * Get the neighbor port index (if connected)
+   * Get the neighbor port index for a connected port.
    */
   _getNeighborPortIndex(portIndex: number): number | null {
     const connection = this.connections.get(portIndex);
@@ -112,21 +131,19 @@ export class Cell {
   // ─────────────────────────────────────────────
 
   /**
-   * Internal: Connect this port to a neighbor cell at a specific neighbor port index
-   * Called only by Board during connection operations
+   * Internal: Register a bidirectional connection for this port.
+   * Called exclusively by Board.connectPorts().
    */
   _connectToNeighbor(portIndex: number, neighborCell: Cell, neighborPortIndex: number): void {
     if (!this.canConnect(portIndex)) {
       throw new Error(`ConnectionError: port ${portIndex} of cell ${this.id} is already occupied`);
     }
-    this.connections.set(portIndex, {
-      neighborCell,
-      neighborPortIndex,
-    });
+    this.connections.set(portIndex, { neighborCell, neighborPortIndex });
   }
 
   /**
-   * Internal: Disconnect a port and revert to exit state
+   * Internal: Sever the connection on this port (revert to exit).
+   * Called exclusively by Board.disconnectPort() and Board.removeCell().
    */
   _disconnectFromNeighbor(portIndex: number): void {
     this.connections.delete(portIndex);
@@ -149,15 +166,13 @@ export class Cell {
   }
 
   /**
-   * Place an arrow segment on this cell
-   * - Head segments can only be placed on isolated cells or as start of a chain
-   * - Body segments require at least two connected cells
+   * Place an arrow segment on this cell.
+   * - Head segments can be placed on any cell.
+   * - Body segments require at least 2 connected ports.
    */
   placeArrowSegment(segment: { isHead: boolean; cellId: string }): void {
     if (!segment.isHead) {
-      // Body segment requires at least 2 connected ports
-      const connectedPorts = Array.from(this.connections.keys());
-      if (connectedPorts.length < 2) {
+      if (this.connections.size < 2) {
         throw new Error('ArrowPlacementError: body segment requires at least two connected cells');
       }
     }
