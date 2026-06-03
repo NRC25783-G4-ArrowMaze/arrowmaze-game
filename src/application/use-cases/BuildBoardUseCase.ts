@@ -1,5 +1,5 @@
 import { Board } from '../../domain/entities/Board';
-import { BoardFactory, LevelData } from '../../infrastructure/factories/BoardFactory';
+import { BoardFactory, type LevelData } from '../../infrastructure/factories/BoardFactory';
 
 /**
  * BuildBoardUseCase — caso de uso que construye un Board a partir de datos raw de nivel.

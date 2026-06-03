@@ -1,4 +1,4 @@
-import { LevelData } from '../../infrastructure/factories/BoardFactory';
+import type { LevelData } from '../../infrastructure/factories/BoardFactory';
 
 /**
  * ILevelRepository — puerto de aplicación para obtener la topología de un nivel.

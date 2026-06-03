@@ -1,5 +1,5 @@
-import { ILevelRepository } from '../ports/ILevelRepository';
-import { LoadLevelResult, CellDTO, ConnectionDTO } from '../dtos/GameDTOs';
+import type { ILevelRepository } from '../ports/ILevelRepository';
+import type { LoadLevelResult, CellDTO, ConnectionDTO } from '../dtos/GameDTOs';
 import { Board } from '../../domain/entities/Board';
 import { BoardFactory } from '../../infrastructure/factories/BoardFactory';
 
@@ -16,9 +16,13 @@ import { BoardFactory } from '../../infrastructure/factories/BoardFactory';
  * (HTTP) sin cambios en la firma del caso de uso.
  */
 export class LoadLevelUseCase {
+  private readonly levelRepository: ILevelRepository;
+
   constructor(
-    private readonly levelRepository: ILevelRepository,
-  ) {}
+    levelRepository: ILevelRepository,
+  ) {
+    this.levelRepository = levelRepository;
+  }
 
   async execute(levelId: string): Promise<LoadLevelResult> {
     try {

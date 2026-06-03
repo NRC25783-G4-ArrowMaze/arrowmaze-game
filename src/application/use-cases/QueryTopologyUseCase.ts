@@ -1,5 +1,5 @@
 import { Board } from '../../domain/entities/Board';
-import { CellDTO } from '../dtos/GameDTOs';
+import type { CellDTO } from '../dtos/GameDTOs';
 import { TopologyQueryService } from '../../domain/services/TopologyQueryService';
 import { PathChecker } from '../../domain/services/PathChecker';
 

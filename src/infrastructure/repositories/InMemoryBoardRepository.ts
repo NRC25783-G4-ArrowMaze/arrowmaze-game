@@ -1,7 +1,7 @@
 import { Board } from '../../domain/entities/Board';
-import { IBoardRepository } from '../../application/ports/IBoardRepository';
-import { ILevelRepository } from '../../application/ports/ILevelRepository';
-import { BoardFactory, LevelData } from '../factories/BoardFactory';
+import type { IBoardRepository } from '../../application/ports/IBoardRepository';
+import type { ILevelRepository } from '../../application/ports/ILevelRepository';
+import { BoardFactory, type LevelData } from '../factories/BoardFactory';
 
 /**
  * InMemoryBoardRepository — implementación in-memory de IBoardRepository e ILevelRepository.

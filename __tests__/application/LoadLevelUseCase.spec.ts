@@ -1,21 +1,10 @@
 import { LoadLevelUseCase } from '../../src/application/use-cases/LoadLevelUseCase';
-import { InMemoryLevelRepository } from '../../src/infrastructure/repositories/InMemoryLevelRepository';
 import { InMemoryBoardRepository } from '../../src/infrastructure/repositories/InMemoryBoardRepository';
-import { Level, Difficulty } from '../../src/domain/entities/Level';
 import { LevelData } from '../../src/infrastructure/factories/BoardFactory';
 
 // ─────────────────────────────────────────────
 // FIXTURES
 // ─────────────────────────────────────────────
-
-const LEVEL_META = new Level(
-  'level-1',
-  'Tutorial',
-  Difficulty.EASY,
-  'First level',
-  4,
-  4,
-);
 
 const LEVEL_TOPOLOGY: LevelData = {
   id: 'level-1',
@@ -33,9 +22,8 @@ const LEVEL_TOPOLOGY: LevelData = {
 };
 
 function makeUseCase() {
-  const levelRepo = new InMemoryLevelRepository([LEVEL_META]);
-  const boardRepo = new InMemoryBoardRepository([LEVEL_TOPOLOGY]);
-  return new LoadLevelUseCase(levelRepo, boardRepo);
+  const repo = new InMemoryBoardRepository([LEVEL_TOPOLOGY]);
+  return new LoadLevelUseCase(repo);
 }
 
 // ─────────────────────────────────────────────
@@ -121,10 +109,9 @@ describe('LoadLevelUseCase', () => {
       expect(result.connections).toEqual([]);
     });
 
-    it('should return success: false when board repo has no topology for level', async () => {
-      const levelRepo = new InMemoryLevelRepository([LEVEL_META]);
-      const boardRepo = new InMemoryBoardRepository([]); // no topology loaded
-      const useCase = new LoadLevelUseCase(levelRepo, boardRepo);
+    it('should return success: false when repo has no topology for level', async () => {
+      const repo = new InMemoryBoardRepository([]); // no topology loaded
+      const useCase = new LoadLevelUseCase(repo);
 
       const result = await useCase.execute('level-1');
       expect(result.success).toBe(false);
@@ -132,3 +119,4 @@ describe('LoadLevelUseCase', () => {
     });
   });
 });
+

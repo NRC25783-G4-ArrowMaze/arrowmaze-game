@@ -326,31 +326,96 @@
           "InMemoryBoardRepository implementa ambos contratos (IBoardRepository + ILevelRepository) sin duplicación"
         ],
         "notes": "Sesión de auditoría: Direction.ts identificado como primer artefacto huérfano, desencadenando limpieza en cascada de 12 archivos. Restauración de LoadLevelUseCase/ILevelRepository derivó en refactorización limpia orientada a LevelData como fuente de verdad de topología."
+      },
+      {
+        "id": "2026-06-02-004",
+        "date": "2026-06-02",
+        "title": "Feature 1 Documentation: Board as Node Graph",
+        "file": "2026-06-02-feature1.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Medium)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "documentation_pages": 1,
+          "files_created": 1,
+          "files_modified": 2
+        },
+        "areas": [
+          "documentation",
+          "technical-spec",
+          "uml-modeling",
+          "mermaid"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "passed"
+        },
+        "decisions": [
+          "Escribir especificación técnica detallada en español para Feature 1",
+          "Utilizar diagramas de clase Mermaid incrustados en Markdown para mayor claridad"
+        ],
+        "notes": "Redactada especificación completa y diagrama de clases de Feature 1."
+      },
+      {
+        "id": "2026-06-02-005",
+        "date": "2026-06-02",
+        "title": "TypeScript Strict Compilation & Vite Env Fixes",
+        "file": "2026-06-02-fix-typescript-compilation.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Gemini 3.5 Flash (Low)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "files_modified": 6
+        },
+        "areas": [
+          "typescript",
+          "compiler-fixes",
+          "verbatimModuleSyntax",
+          "erasableSyntaxOnly",
+          "vite-env"
+        ],
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "passed"
+        },
+        "decisions": [
+          "Migrar a imports explícitos 'import type' / 'type' inline para verbatimModuleSyntax",
+          "Eliminar parameter properties en constructor en favor de asignaciones de campo explícitas por erasableSyntaxOnly",
+          "Migrar de process.env a import.meta.env en api-config.ts para corregir tipos en Vite"
+        ],
+        "notes": "Corregidos 12 errores de compilación TypeScript. Build de Vite verificado con éxito."
       }
     ],
     "statistics": {
-      "totalReports": 5,
+      "totalReports": 7,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
         "Antigravity (Claude)",
+        "Antigravity (Gemini)",
         "Claude (web.claude.ai)"
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
         "Claude Sonnet 4.6 (Thinking)",
-        "Gemini 3.5 Flash (Medium)"
+        "Gemini 3.5 Flash (Medium)",
+        "Gemini 3.5 Flash (Low)"
       ],
       "totalLinesGenerated": 3075,
-      "totalFilesCreated": 54,
+      "totalFilesCreated": 56,
       "totalFilesDeleted": 12,
       "totalTestsPassing": 91,
       "totalClassesDocumented": 31,
-      "averageCompletionTime": "~25 minutes per session"
+      "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-02-003",
-      "summary": "Auditoría de alineación BDD: eliminación de 12 archivos huérfanos (Direction, Level, Player, Position, Score, GameEvents + cascada de ports/repos), refactorización de ILevelRepository/LoadLevelUseCase para trabajar con LevelData como contrato de topología, e InMemoryBoardRepository extendido para implementar ambos puertos sin duplicación."
+      "id": "2026-06-02-005",
+      "summary": "Resolución de 12 errores de compilación TypeScript estrictos (verbatimModuleSyntax y erasableSyntaxOnly) y migración de process.env a import.meta.env en api-config.ts."
     }
   }
 }
