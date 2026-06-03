@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs",
     "test:watch": "jest --config jest.config.cjs --watch",
-    "gen-uml": "tplant --input 'src/**/*.ts' --output classes.puml && node postprocess-uml.js"
+    "gen-uml": "tplant --input \"src/**/*.ts\" --output classes.puml && node postprocess-uml.js"
   },
   "dependencies": {
     "axios": "^1.16.1",

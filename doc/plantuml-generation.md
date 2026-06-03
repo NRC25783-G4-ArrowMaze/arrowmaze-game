@@ -35,5 +35,5 @@ Si tienes **Java** y **Graphviz** instalado en tu sistema local (`sudo apt insta
 Por ejemplo, para exportar directamente a formato SVG:
 
 ```bash
-pnpm exec tplant --input 'src/**/*.ts' --output classes.svg && node postprocess-uml.js
+pnpm exec tplant --input "src/**/*.ts" --output classes.svg && node postprocess-uml.js
 ```
