@@ -11,7 +11,7 @@ import { TopologyQueryService } from './TopologyQueryService';
  * A cell with at least one exit port is considered a border/exit cell.
  */
 export class PathChecker {
-  private static queryService = new TopologyQueryService();
+  private static readonly queryService = new TopologyQueryService();
 
   /**
    * Returns true if, starting from startCell, BFS can reach a Cell that has
