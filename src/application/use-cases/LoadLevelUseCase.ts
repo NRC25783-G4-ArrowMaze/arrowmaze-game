@@ -1,34 +1,33 @@
 import { ILevelRepository } from '../ports/ILevelRepository';
-import { IBoardRepository } from '../ports/IBoardRepository';
 import { LoadLevelResult, CellDTO, ConnectionDTO } from '../dtos/GameDTOs';
 import { Board } from '../../domain/entities/Board';
+import { BoardFactory } from '../../infrastructure/factories/BoardFactory';
 
 /**
- * LoadLevelUseCase — carga los metadatos y la topología del board de un nivel.
+ * LoadLevelUseCase — carga la topología de un nivel y la expone como DTOs port-based.
  *
- * Orquesta dos repositorios:
- * - ILevelRepository  → metadatos del nivel (nombre, dificultad, límites)
- * - IBoardRepository  → grafo topológico (celdas + conexiones)
+ * Orquesta un único repositorio:
+ * - ILevelRepository → LevelData serializable (id, cells[], connections[])
  *
- * Devuelve un LoadLevelResult con DTOs port-based, sin exponer entidades de dominio.
+ * Construye el Board graph via BoardFactory y serializa el resultado
+ * a DTOs sin exponer entidades de dominio hacia las capas externas.
+ *
+ * La carga es async para soportar implementaciones de repositorio remotas
+ * (HTTP) sin cambios en la firma del caso de uso.
  */
 export class LoadLevelUseCase {
   constructor(
     private readonly levelRepository: ILevelRepository,
-    private readonly boardRepository: IBoardRepository,
   ) {}
 
   async execute(levelId: string): Promise<LoadLevelResult> {
     try {
-      // Carga en paralelo: metadatos + topología
-      const [level, board] = await Promise.all([
-        this.levelRepository.getLevel(levelId),
-        this.boardRepository.getBoardForLevel(levelId),
-      ]);
+      const levelData = await this.levelRepository.getLevel(levelId);
+      const board = BoardFactory.fromLevelData(levelData);
 
       return {
         success: true,
-        levelId: level.getId(),
+        levelId: levelData.id,
         cells: this.extractCells(board),
         connections: this.extractConnections(board),
       };
@@ -88,4 +87,3 @@ export class LoadLevelUseCase {
     return connections;
   }
 }
-

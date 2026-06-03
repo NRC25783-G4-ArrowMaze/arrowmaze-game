@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-02T20:15:00Z",
+    "lastUpdated": "2026-06-03T03:15:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -267,13 +267,73 @@
           "Validación de ArrowSegment en Cell.placeSegment(): invariante del dominio, no responsabilidad del caso de uso"
         ],
         "notes": "Documento README exhaustivo (ARCHITECTURE.md) que mapea la topología port-based BDD a una arquitectura limpia de 4 capas. Incluye diagramas ASCII y justificación de cada decisión. Acompañado de AI_USAGE_REPORT.md para trazabilidad auditable."
+      },
+      {
+        "id": "2026-06-02-003",
+        "date": "2026-06-02",
+        "title": "Auditoría, limpieza y refactorización — alineación con feature BDD",
+        "file": "2026-06-02-cleanup-and-refactor-feature1.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "files_deleted": 12,
+          "files_modified": 4,
+          "dtos_removed": 1,
+          "lines_of_code_net": -800
+        },
+        "areas": [
+          "code-audit",
+          "dead-code-removal",
+          "refactoring",
+          "domain-alignment",
+          "ports-and-adapters",
+          "clean-architecture"
+        ],
+        "layers": {
+          "domain": {
+            "status": "cleaned",
+            "deleted": ["Direction", "Level", "Player", "Position", "Score", "GameEvents"],
+            "retained": ["Cell", "Board", "Port", "TopologyValidator", "TopologyQueryService", "PathChecker"]
+          },
+          "application": {
+            "status": "refactored",
+            "refactored": ["ILevelRepository", "LoadLevelUseCase"],
+            "updated": ["IBoardRepository", "GameDTOs"],
+            "deleted": ["IScoreRepository"]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "extended": ["InMemoryBoardRepository — ahora implementa IBoardRepository + ILevelRepository"],
+            "deleted": ["InMemoryLevelRepository"]
+          },
+          "data": {
+            "status": "cleaned",
+            "deleted": ["LocalLevelRepository", "LocalScoreRepository"]
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run — pendiente verificar LoadLevelUseCase.spec.ts tras refactorización",
+          "import_check": "passed — 0 referencias rotas post-limpieza",
+          "structure": "passed — 13 archivos alineados con doc/feature1.md"
+        },
+        "decisions": [
+          "Eliminar todo código sin cobertura BDD en lugar de mantenerlo como infraestructura futura",
+          "Reinterpretar ILevelRepository como contrato de LevelData (topología) en vez de entidad Level",
+          "InMemoryBoardRepository implementa ambos contratos (IBoardRepository + ILevelRepository) sin duplicación"
+        ],
+        "notes": "Sesión de auditoría: Direction.ts identificado como primer artefacto huérfano, desencadenando limpieza en cascada de 12 archivos. Restauración de LoadLevelUseCase/ILevelRepository derivó en refactorización limpia orientada a LevelData como fuente de verdad de topología."
       }
     ],
     "statistics": {
-      "totalReports": 4,
+      "totalReports": 5,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
+        "Antigravity (Claude)",
         "Claude (web.claude.ai)"
       ],
       "modelsUsed": [
@@ -283,13 +343,14 @@
       ],
       "totalLinesGenerated": 3075,
       "totalFilesCreated": 54,
+      "totalFilesDeleted": 12,
       "totalTestsPassing": 91,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~25 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-02-002",
-      "summary": "Análisis exhaustivo del feature BDD del Board Graph Engine (5 bloques de escenarios) y mapeo a arquitectura Clean Architecture de 4 capas con documentación de cada clase, método, DTO y dependencia. Completamente trazable a requisitos BDD y decidibilidad justificada."
+      "id": "2026-06-02-003",
+      "summary": "Auditoría de alineación BDD: eliminación de 12 archivos huérfanos (Direction, Level, Player, Position, Score, GameEvents + cascada de ports/repos), refactorización de ILevelRepository/LoadLevelUseCase para trabajar con LevelData como contrato de topología, e InMemoryBoardRepository extendido para implementar ambos puertos sin duplicación."
     }
   }
 }

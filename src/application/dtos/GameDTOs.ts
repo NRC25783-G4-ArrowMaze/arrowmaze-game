@@ -31,16 +31,3 @@ export interface LoadLevelResult {
   error?: string;
 }
 
-/**
- * CompleteLevelResult — resultado del caso de uso CompleteLevel.
- */
-export interface CompleteLevelResult {
-  levelCompleted: boolean;
-  score?: {
-    points: number;
-    moves: number;
-    time: number;
-  };
-  error?: string;
-}
-

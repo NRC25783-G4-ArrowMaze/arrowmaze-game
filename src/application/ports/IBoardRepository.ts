@@ -1,15 +1,15 @@
 import { Board } from '../../domain/entities/Board';
 
 /**
- * IBoardRepository — puerto de aplicación para obtener el Board graph de un nivel.
+ * IBoardRepository — puerto de aplicación para obtener el Board graph ya construido.
  *
- * Separado de ILevelRepository porque:
- * - ILevelRepository maneja metadatos (nombre, dificultad, límites)
- * - IBoardRepository maneja la topología del grafo (celdas + conexiones)
+ * Complementa ILevelRepository:
+ * - ILevelRepository devuelve LevelData raw (schema serializable)
+ * - IBoardRepository devuelve un Board de dominio ya construido y validado
  *
  * Implementaciones:
- * - InMemoryBoardRepository (tests / dev)
- * - HttpBoardRepository      (producción)
+ * - InMemoryBoardRepository (tests / dev): implementa ambos contratos sobre fixtures
+ * - HttpBoardRepository      (producción): construye el Board desde una API remota
  */
 export interface IBoardRepository {
   /**

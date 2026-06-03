@@ -1,29 +1,46 @@
 import { Board } from '../../domain/entities/Board';
 import { IBoardRepository } from '../../application/ports/IBoardRepository';
+import { ILevelRepository } from '../../application/ports/ILevelRepository';
 import { BoardFactory, LevelData } from '../factories/BoardFactory';
 
 /**
- * InMemoryBoardRepository — implementación in-memory de IBoardRepository.
+ * InMemoryBoardRepository — implementación in-memory de IBoardRepository e ILevelRepository.
  *
- * Almacena fixtures de LevelData y los convierte a Board bajo demanda via BoardFactory.
+ * Almacena fixtures de LevelData y los sirve de dos formas:
+ * - Como ILevelRepository: devuelve el LevelData raw (usado por LoadLevelUseCase)
+ * - Como IBoardRepository: construye y devuelve el Board via BoardFactory
+ *
  * Diseñado para:
  * - Tests de integración sin red
  * - Desarrollo local (MVP)
  *
- * Para producción, usar HttpBoardRepository (Iteración 3).
+ * Para producción, usar HttpLevelRepository / HttpBoardRepository.
  */
-export class InMemoryBoardRepository implements IBoardRepository {
+export class InMemoryBoardRepository implements IBoardRepository, ILevelRepository {
   private readonly fixtures: Map<string, LevelData>;
 
   constructor(fixtures: LevelData[] = []) {
     this.fixtures = new Map(fixtures.map(f => [f.id, f]));
   }
 
-  async getBoardForLevel(levelId: string): Promise<Board> {
+  // ─────────────────────────────────────────────
+  // ILevelRepository
+  // ─────────────────────────────────────────────
+
+  async getLevel(levelId: string): Promise<LevelData> {
     const data = this.fixtures.get(levelId);
     if (!data) {
       throw new Error(`BoardRepositoryError: level '${levelId}' not found`);
     }
+    return data;
+  }
+
+  // ─────────────────────────────────────────────
+  // IBoardRepository
+  // ─────────────────────────────────────────────
+
+  async getBoardForLevel(levelId: string): Promise<Board> {
+    const data = await this.getLevel(levelId);
     // BoardFactory propaga errores de dominio directamente
     return BoardFactory.fromLevelData(data);
   }
