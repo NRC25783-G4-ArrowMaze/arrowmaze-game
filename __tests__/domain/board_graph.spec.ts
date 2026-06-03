@@ -137,13 +137,17 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
       });
     });
 
-    describe('Scenario: Celda única rechaza un segmento de cuerpo de flecha', () => {
-      it('should reject body segment (not head) on single cell', () => {
+    describe('Scenario: Celda única acepta un segmento de cuerpo de flecha (Arrow valida topología)', () => {
+      it('should allow placing body segment on any cell — topology validation belongs to Arrow', () => {
+        // Per design decision Q5: Cell is a passive container. The old validation
+        // (connections.size < 2 for body segments) was removed because:
+        // 1. The tail segment of an arrow legitimately occupies a cell with only 1 connection
+        // 2. Arrow.extend() validates connectivity before calling placeArrowSegment()
         const cell = new Cell('c1', 4);
         const bodySegment = { isHead: false, cellId: 'c1' };
-        expect(() => cell.placeArrowSegment(bodySegment)).toThrow(
-          'ArrowPlacementError: body segment requires at least two connected cells'
-        );
+        expect(() => cell.placeArrowSegment(bodySegment)).not.toThrow();
+        expect(cell.hasArrowSegment()).toBe(true);
+        expect(cell.getArrowSegment()?.isHead).toBe(false);
       });
     });
   });

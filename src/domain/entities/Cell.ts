@@ -167,16 +167,11 @@ export class Cell {
 
   /**
    * Place an arrow segment on this cell.
-   * - Head segments can be placed on any cell.
-   * - Body segments require at least 2 connected ports.
+   * Connectivity validation is the responsibility of the Arrow entity
+   * (which calls extend() before invoking this method). Cell is a passive
+   * container and does not enforce topology rules here.
    */
   placeArrowSegment(segment: { isHead: boolean; cellId: string }): void {
-    if (!segment.isHead) {
-      if (this.connections.size < 2) {
-        throw new Error('ArrowPlacementError: body segment requires at least two connected cells');
-      }
-    }
-
     this.arrowSegment = segment;
     this.occupied = true;
   }
