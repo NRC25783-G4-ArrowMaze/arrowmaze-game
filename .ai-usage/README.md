@@ -9,6 +9,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-01 | Bootstrap del proyecto (Vite + React + TypeScript + Capacitor, estructura de carpetas, dominio DDD inicial) | [`2026-06-01-initial-scaffold.md`](./2026-06-01-initial-scaffold.md) | Claude Haiku 4.5 |
 | 2026-06-01 | Capa de Dominio basada en puertos e Infraestructura/Aplicación (TDD) | [`2026-06-01-domain-infra-application-layer.md`](./2026-06-01-domain-infra-application-layer.md) | Claude Sonnet 4.6 |
 | 2026-06-02 | Configuración de PlantUML y generador de diagramas de clase | [`2026-06-02-plantuml-setup.md`](./2026-06-02-plantuml-setup.md) | Gemini 3.5 Flash |
+| 2026-06-03 | Implementación de la funcionalidad de colocación de flechas (Arrow Placement) | [`2026-06-03-arrow-placement-feature.md`](./2026-06-03-arrow-placement-feature.md) | Gemini 3.5 Flash (Low) |
 
 ---
 
@@ -32,10 +33,10 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 3
-- **Última actualización:** 2026-06-02
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (1), Gemini 3.5 Flash (1), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (2)
+- **Total de reportes:** 4
+- **Última actualización:** 2026-06-03
+- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (1), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (3)
 
 ---
 
