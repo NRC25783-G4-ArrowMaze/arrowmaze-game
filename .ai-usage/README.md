@@ -10,6 +10,8 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-01 | Capa de Dominio basada en puertos e Infraestructura/Aplicación (TDD) | [`2026-06-01-domain-infra-application-layer.md`](./2026-06-01-domain-infra-application-layer.md) | Claude Sonnet 4.6 |
 | 2026-06-02 | Configuración de PlantUML y generador de diagramas de clase | [`2026-06-02-plantuml-setup.md`](./2026-06-02-plantuml-setup.md) | Gemini 3.5 Flash |
 | 2026-06-03 | Implementación de la funcionalidad de colocación de flechas (Arrow Placement) | [`2026-06-03-arrow-placement-feature.md`](./2026-06-03-arrow-placement-feature.md) | Gemini 3.5 Flash (Low) |
+| 2026-06-03 | Rediseño del modelo de ArrowSegment para corregir inconsistencias | [`2026-06-03-arrow-segment-redesign.md`](./2026-06-03-arrow-segment-redesign.md) | Claude Sonnet 4.6 |
+| 2026-06-04 | Propagación del refactor del dominio de ArrowSegment a aplicación e infra | [`2026-06-04-refactor-arrow-propagation.md`](./2026-06-04-refactor-arrow-propagation.md) | Claude Sonnet 4.6 |
 
 ---
 
@@ -33,10 +35,10 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 4
-- **Última actualización:** 2026-06-03
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (1), Gemini 3.5 Flash (2), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (3)
+- **Total de reportes:** 6
+- **Última actualización:** 2026-06-04
+- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (3), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5)
 
 ---
 

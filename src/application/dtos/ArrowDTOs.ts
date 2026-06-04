@@ -20,13 +20,18 @@ export interface PlaceArrowInput {
 /**
  * Projection of a single ArrowSegment for external consumers.
  * Mirrors the internal linked-list node without exposing domain internals.
+ *
+ * Port semantics (aligned with domain refactor):
+ * - exitPort: only non-null for Head. Defines the arrow's directional intent.
+ * - entryPort: only non-null for Segment. The port through which the arrow entered this cell.
  */
 export interface ArrowSegmentDTO {
   cellId: string;
   isHead: boolean;
-  fromPort: number | null;
-  toPort: number | null;
+  /** Non-null only for the Head segment. */
   exitPort: number | null;
+  /** Non-null only for body Segment nodes. */
+  entryPort: number | null;
 }
 
 /**

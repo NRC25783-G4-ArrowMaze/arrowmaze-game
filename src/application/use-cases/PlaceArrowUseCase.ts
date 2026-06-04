@@ -1,5 +1,7 @@
 import { Arrow } from '../../domain/entities/Arrow';
 import { ArrowSegment } from '../../domain/entities/ArrowSegment';
+import { Head } from '../../domain/entities/Head';
+import { Segment } from '../../domain/entities/Segment';
 import type { PlaceArrowInput, PlaceArrowResult, ArrowSegmentDTO } from '../dtos/ArrowDTOs';
 
 /**
@@ -69,13 +71,22 @@ export class PlaceArrowUseCase {
     const result: ArrowSegmentDTO[] = [];
     let current: ArrowSegment | null = head;
     while (current !== null) {
-      result.push({
-        cellId: current.getCellId(),
-        isHead: current.isHead,
-        fromPort: current.fromPort,
-        toPort: current.toPort,
-        exitPort: current.exitPort,
-      });
+      if (current instanceof Head) {
+        result.push({
+          cellId: current.getCellId(),
+          isHead: true,
+          exitPort: current.exitPort,
+          entryPort: null,
+        });
+      } else {
+        const seg = current as Segment;
+        result.push({
+          cellId: seg.getCellId(),
+          isHead: false,
+          exitPort: null,
+          entryPort: seg.entryPort,
+        });
+      }
       current = current.next;
     }
     return result;
