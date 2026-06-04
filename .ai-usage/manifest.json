@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-03T16:36:00Z",
+    "lastUpdated": "2026-06-03T22:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -455,10 +455,57 @@
           "Relajar validaciones estáticas en Cell.ts para delegarlas en la lógica de camino/conectores de Arrow."
         ],
         "notes": "Funcionalidad de Arrow Placement completamente implementada y probada bajo Clean Architecture con 112 tests pasando en total (17 nuevos de Arrow)."
+      },
+      {
+        "id": "2026-06-03-002",
+        "date": "2026-06-03",
+        "title": "ArrowSegment Domain Entity Redesign",
+        "file": "2026-06-03-arrow-segment-redesign.md",
+        "tool": "Antigravity (Gemini / Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 70,
+          "files_created": 1,
+          "files_modified": 5,
+          "tests_passing": 112,
+          "test_suites": 6
+        },
+        "areas": [
+          "domain-layer",
+          "clean-architecture",
+          "refactoring",
+          "design-inconsistencies",
+          "arrow-segment"
+        ],
+        "layers": {
+          "domain": {
+            "status": "complete",
+            "entities": [
+              "ArrowSegment (refactored)",
+              "Segment (refactored)",
+              "Head (refactored)",
+              "Arrow (refactored)"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "112/112 passed — 0 failures, 0 regressions",
+          "structure": "passed"
+        },
+        "decisions": [
+          "Simplificar ArrowSegment para quitarle del todo fromPort, toPort y abstract exitPort.",
+          "Asignar entryPort a Segment solo al nacer de manera de lectura únicamente (readonly).",
+          "La cabeza no hereda entryPort y mantiene exitPort de manera única."
+        ],
+        "notes": "Se corrigieron las inconsistencias de diseño conceptual en el modelo de flechas. Las pruebas pasaron completamente tras adaptar las aserciones a la nueva interfaz limpia."
       }
     ],
     "statistics": {
-      "totalReports": 8,
+      "totalReports": 9,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -472,16 +519,17 @@
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 3700,
-      "totalFilesCreated": 64,
+      "totalLinesGenerated": 3770,
+      "totalFilesCreated": 65,
       "totalFilesDeleted": 12,
       "totalTestsPassing": 112,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-03-001",
-      "summary": "Implementación de la funcionalidad de colocación de flechas (Arrow Placement) con 17 escenarios BDD aprobados y 112/112 tests pasando."
+      "id": "2026-06-03-002",
+      "summary": "Rediseño limpio de ArrowSegment y Segment para que cada clase maneje de manera estricta sus puertos respectivos."
     }
   }
+}
 }

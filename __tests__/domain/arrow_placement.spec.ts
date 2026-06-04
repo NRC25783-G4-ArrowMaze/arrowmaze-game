@@ -194,17 +194,15 @@ describe('Bloque 2 — Lógica de colocación y auto-enrutamiento (Happy Path)',
   test('Scenario 10: La Flecha calcula lógicamente sus puertos internos en una trayectoria lineal', () => {
     // Flecha sobre [C1(head, exitPort:1), C2, C3]
     // C1[port1] → C2[port3]: entramos a C2 por port3
-    // fromPort de C2 = (1 + 4/2) % 4 = 3
-    // C2[port1] → C3[port3]: salimos de C2 por port1, toPort de C2 = 1
+    // entryPort de C2 = (1 + 4/2) % 4 = 3
     const { C1, C2, C3 } = buildStandardBoard();
 
     const arrow = new Arrow(C1, 1);
     arrow.extend(C2);
     arrow.extend(C3);
 
-    const segC2 = arrow.head.next!;
-    expect(segC2.fromPort).toBe(3); // Dedujo que entró desde C1 por port3
-    expect(segC2.toPort).toBe(1);   // Dedujo que sale hacia C3 por port1
+    const segC2 = arrow.head.next! as import('../../src/domain/entities/Segment').Segment;
+    expect(segC2.entryPort).toBe(3); // Dedujo que entró desde C1 por port3
   });
 
   test('Scenario 11: La Flecha calcula lógicamente sus puertos internos en una curva', () => {
@@ -222,12 +220,13 @@ describe('Bloque 2 — Lógica de colocación y auto-enrutamiento (Happy Path)',
     arrow.extend(C2);
     arrow.extend(C6);
 
-    const segC2 = arrow.head.next!;
-    expect(segC2.fromPort).toBe(3); // Entró recta desde C1 (opuesto a port1 = port3)
-    expect(segC2.toPort).toBe(2);   // Dobló hacia C6 (port2)
+    const segC2 = arrow.head.next! as import('../../src/domain/entities/Segment').Segment;
+    const segC6 = arrow.head.next!.next! as import('../../src/domain/entities/Segment').Segment;
+    expect(segC2.entryPort).toBe(3); // Entró recta desde C1: opuesto de port1 = (1+2)%4 = 3
+    expect(segC6.entryPort).toBe(0); // Entró curva desde C2: opuesto de port2 = (2+2)%4 = 0
   });
 
-  test('Scenario 12: La Flecha determina que su segmento de cola no tiene puerto de salida', () => {
+  test('Scenario 12: La Flecha determina el puerto de entrada del segmento de cola', () => {
     // [C1(head, exitPort:1), C2, C3] — C3 es la cola
     const { C1, C2, C3 } = buildStandardBoard();
 
@@ -235,10 +234,10 @@ describe('Bloque 2 — Lógica de colocación y auto-enrutamiento (Happy Path)',
     arrow.extend(C2);
     arrow.extend(C3);
 
-    const tail = arrow.head.next!.next!; // C3
+    const tail = arrow.head.next!.next! as import('../../src/domain/entities/Segment').Segment;
     expect(tail.getCellId()).toBe('C3');
-    expect(tail.fromPort).toBe(3); // (1+2)%4=3, entró por port3
-    expect(tail.toPort).toBeNull(); // es cola, sin toPort
+    expect(tail.entryPort).toBe(3); // (1+2)%4=3, entró por port3
+    // La cola no tiene "puerto de salida" — ese concepto no existe en Segment
   });
 
 });
@@ -344,31 +343,36 @@ describe('Bloque 4 — Invariantes matemáticos de la entidad', () => {
     arrow.extend(C2);
     arrow.extend(C3);
 
-    // C1 (cabeza) reporta exitPort = 1
+    // C1 (cabeza) tiene exitPort
     expect(arrow.head.exitPort).toBe(1);
-    // C2 (cuerpo) reporta exitPort = null
-    expect(arrow.head.next!.exitPort).toBeNull();
-    // C3 (cola) reporta exitPort = null
-    expect(arrow.head.next!.next!.exitPort).toBeNull();
+    // Los segmentos de cuerpo (Segment) tienen entryPort, no exitPort
+    const segC2 = arrow.head.next! as import('../../src/domain/entities/Segment').Segment;
+    const segC3 = arrow.head.next!.next! as import('../../src/domain/entities/Segment').Segment;
+    expect(segC2.entryPort).toBe(3);
+    expect(segC3.entryPort).toBe(3);
   });
 
-  test('Scenario 19: La Flecha obedece la aritmética modular para calcular su fromPort', () => {
+  test('Scenario 19: La Flecha obedece la aritmética modular para calcular su entryPort', () => {
     // C1[port1] → C2[port3]: (1 + 4/2) % 4 = 3
     const { C1, C2 } = buildStandardBoard();
 
     const arrow = new Arrow(C1, 1);
     arrow.extend(C2);
 
-    const segC2 = arrow.head.next!;
-    expect(segC2.fromPort).toBe(3); // (1 + 2) % 4 = 3
+    const segC2 = arrow.head.next! as import('../../src/domain/entities/Segment').Segment;
+    expect(segC2.entryPort).toBe(3); // (1 + 2) % 4 = 3
   });
 
-  test('Scenario 20: La cabeza carece de fromPort al no tener un segmento que la preceda', () => {
-    const { C1 } = buildStandardBoard();
+  test('Scenario 20: La cabeza no tiene entryPort porque no tiene predecesor', () => {
+    const { C1, C2 } = buildStandardBoard();
 
     const arrow = new Arrow(C1, 1);
+    arrow.extend(C2);
 
-    expect(arrow.head.fromPort).toBeNull();
+    // Head no tiene entryPort — la propiedad no existe en el tipo Head
+    // Solo Segment tiene entryPort; Head solo tiene exitPort
+    expect(arrow.head.exitPort).toBeDefined();
+    expect('entryPort' in arrow.head).toBe(false);
   });
 
   test('Scenario 21: Al ser removida, la Flecha limpia su rastro en los contenedores pasivos', () => {
