@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-03T22:00:00Z",
+    "lastUpdated": "2026-06-04T14:15:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -502,10 +502,54 @@
           "La cabeza no hereda entryPort y mantiene exitPort de manera única."
         ],
         "notes": "Se corrigieron las inconsistencias de diseño conceptual en el modelo de flechas. Las pruebas pasaron completamente tras adaptar las aserciones a la nueva interfaz limpia."
+      },
+      {
+        "id": "2026-06-04-001",
+        "date": "2026-06-04",
+        "title": "Propagación de refactor del dominio de ArrowSegment a aplicación e infra",
+        "file": "2026-06-04-refactor-arrow-propagation.md",
+        "tool": "Antigravity (Gemini / Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 30,
+          "files_created": 1,
+          "files_modified": 3,
+          "files_deleted": 1
+        },
+        "areas": [
+          "application-layer",
+          "dtos",
+          "use-cases",
+          "refactoring",
+          "uml-modeling",
+          "clean-architecture"
+        ],
+        "layers": {
+          "application": {
+            "status": "complete",
+            "useCases": [
+              "PlaceArrowUseCase (refactored)"
+            ],
+            "dtos": [
+              "ArrowSegmentDTO (updated)"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "tests": "112/112 passed"
+        },
+        "decisions": [
+          "Reflejar entryPort y exitPort en ArrowSegmentDTO",
+          "Usar instanceof Head / casting a Segment en PlaceArrowUseCase._projectChain"
+        ],
+        "notes": "Se propagó el diseño limpio del dominio a las capas externas, corrigiendo errores de compilación TypeScript y actualizando el diagrama de clases UML."
       }
     ],
     "statistics": {
-      "totalReports": 9,
+      "totalReports": 10,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -519,16 +563,16 @@
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 3770,
-      "totalFilesCreated": 65,
-      "totalFilesDeleted": 12,
+      "totalLinesGenerated": 3800,
+      "totalFilesCreated": 66,
+      "totalFilesDeleted": 13,
       "totalTestsPassing": 112,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-03-002",
-      "summary": "Rediseño limpio de ArrowSegment y Segment para que cada clase maneje de manera estricta sus puertos respectivos."
+      "id": "2026-06-04-001",
+      "summary": "Propagación del refactor de ArrowSegment a las capas externas de aplicación e infraestructura."
     }
   }
 }
