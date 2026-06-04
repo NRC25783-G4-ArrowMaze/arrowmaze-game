@@ -71,10 +71,9 @@ export class Arrow {
    * 2. nextCell is not already occupied by a different entity
    * 3. nextCell is not occupied by THIS arrow (self-collision)
    *
-   * Then calculates ports:
+   * Then calculates the new segment's entryPort:
    * - portFromTailToNext: the port index on tail.cell that connects to nextCell
-   * - fromPort of new segment: (portFromTailToNext + portCount/2) mod portCount
-   * - toPort of tail: portFromTailToNext (set retrospectively)
+   * - entryPort of new segment: (portFromTailToNext + portCount/2) mod portCount
    *
    * @param nextCell - The cell the new Segment will occupy
    * @throws {ArrowPlacementError} on connectivity, occupancy, or self-collision violations
@@ -105,18 +104,14 @@ export class Arrow {
 
     // ── 3. Port arithmetic ─────────────────────
     const portCount = tail.cell.getPortCount();
-    const fromPort = (portFromTailToNext + portCount / 2) % portCount;
+    const entryPort = (portFromTailToNext + portCount / 2) % portCount;
 
-    // ── 4. Update tail's toPort (retrospective) ─
-    tail.toPort = portFromTailToNext;
-
-    // ── 5. Create and link new segment ─────────
-    const newSegment = new Segment(nextCell);
-    newSegment.fromPort = fromPort;
+    // ── 4. Create and link new segment ─────────
+    const newSegment = new Segment(nextCell, entryPort);
     newSegment.prev = tail;
     tail.next = newSegment;
 
-    // ── 6. Notify cell ─────────────────────────
+    // ── 5. Notify cell ─────────────────────────
     nextCell.placeArrowSegment({ isHead: false, cellId: nextCell.getId() });
   }
 

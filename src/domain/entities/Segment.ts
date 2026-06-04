@@ -4,23 +4,29 @@ import { ArrowSegment } from './ArrowSegment';
 /**
  * Segment — A body segment of the Arrow linked list.
  *
- * Invariants enforced at construction time:
- * - isHead = false    (constant)
- * - exitPort = null   (direction intent is exclusive to Head)
+ * Invariants:
+ * - isHead = false  (constant)
+ * - entryPort is readonly and set at construction time by Arrow.extend()
  *
- * fromPort and toPort are null at construction and are assigned by
- * Arrow.extend() as the chain is assembled:
- * - fromPort: set when this Segment is added (computed from predecessor's port)
- * - toPort:   set when the NEXT Segment after this one is added
+ * A Segment knows only one thing about its position in the flow:
+ * the port through which the arrow entered this cell (entryPort).
+ * It does NOT know where the arrow goes next — that is the next
+ * Segment's concern, and Arrow's responsibility to traverse.
  *
- * next = null until Arrow.extend() appends a following segment.
- * prev is set by Arrow.extend() when this segment is linked into the chain.
+ * prev / next are set by Arrow.extend() when the chain is assembled.
  */
 export class Segment extends ArrowSegment {
   readonly isHead = false as const;
-  readonly exitPort = null;
 
-  constructor(cell: Cell) {
+  /**
+   * The port index on this cell through which the arrow entered.
+   * Computed by Arrow.extend() using opposite-port arithmetic.
+   * Example: if the predecessor exited via port 1, entryPort = (1 + portCount/2) % portCount.
+   */
+  readonly entryPort: number;
+
+  constructor(cell: Cell, entryPort: number) {
     super(cell);
+    this.entryPort = entryPort;
   }
 }
