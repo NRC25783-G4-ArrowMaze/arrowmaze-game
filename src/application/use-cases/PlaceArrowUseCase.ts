@@ -1,6 +1,6 @@
 import { Arrow } from '../../domain/entities/Arrow';
 import { ArrowSegment } from '../../domain/entities/ArrowSegment';
-import { PlaceArrowInput, PlaceArrowResult, ArrowSegmentDTO } from '../dtos/ArrowDTOs';
+import type { PlaceArrowInput, PlaceArrowResult, ArrowSegmentDTO } from '../dtos/ArrowDTOs';
 
 /**
  * PlaceArrowUseCase — Application use case for placing an Arrow on the board.
