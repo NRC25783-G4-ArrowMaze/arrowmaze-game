@@ -3,6 +3,7 @@ import { ArrowSegment } from '../../domain/entities/ArrowSegment';
 import { Head } from '../../domain/entities/Head';
 import { Segment } from '../../domain/entities/Segment';
 import type { PlaceArrowInput, PlaceArrowResult, ArrowSegmentDTO } from '../dtos/ArrowDTOs';
+import { ArrowPlacementError } from '../../domain/errors/ArrowErrors';
 
 /**
  * PlaceArrowUseCase — Application use case for placing an Arrow on the board.
@@ -17,45 +18,43 @@ import type { PlaceArrowInput, PlaceArrowResult, ArrowSegmentDTO } from '../dtos
  * This use case contains no business logic itself.
  */
 export class PlaceArrowUseCase {
-  execute(input: PlaceArrowInput): PlaceArrowResult {
+ execute(input: PlaceArrowInput): PlaceArrowResult {
     const { board, headCellId, exitPort, bodyCellIds = [] } = input;
 
+    // Declaramos arrow fuera del try para poder limpiarlo en el catch.
+    // Se queda null si ni siquiera llegamos a crear la flecha.
+    let arrow: Arrow | null = null;
+
     try {
-      // Step 1 — Resolve head cell
+      // Step 1 — Resolver celda del head
       const headCell = board.getCell(headCellId);
       if (!headCell) {
-        return {
-          success: false,
-          arrowLength: 0,
-          segments: [],
-          error: `ArrowPlacementError: head cell '${headCellId}' not found on board`,
-        };
+        throw new ArrowPlacementError(`head cell '${headCellId}' not found on board`);
       }
 
-      // Step 2 — Instantiate Arrow (places Head)
-      const arrow = new Arrow(headCell, exitPort);
+      // Step 2 — Instanciar Arrow (coloca el Head)
+      arrow = new Arrow(headCell, exitPort);
 
-      // Step 3 — Extend with body cells
+      // Step 3 — Extender con celdas del cuerpo
       for (const cellId of bodyCellIds) {
         const cell = board.getCell(cellId);
         if (!cell) {
-          return {
-            success: false,
-            arrowLength: arrow.length,
-            segments: this._projectChain(arrow.head),
-            error: `ArrowPlacementError: body cell '${cellId}' not found on board`,
-          };
+          throw new ArrowPlacementError(`body cell '${cellId}' not found on board`);
         }
         arrow.extend(cell);
       }
 
-      // Step 4 — Project and return
+      // Step 4 — Proyectar y retornar éxito
       return {
         success: true,
         arrowLength: arrow.length,
         segments: this._projectChain(arrow.head),
       };
     } catch (err: unknown) {
+      // ROLLBACK: si alcanzamos a crear la flecha, liberamos cada celda que ocupó.
+      if (arrow !== null) {
+        arrow.destroy();
+      }
       const message = err instanceof Error ? err.message : String(err);
       return {
         success: false,
