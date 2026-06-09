@@ -294,23 +294,52 @@
         "layers": {
           "domain": {
             "status": "cleaned",
-            "deleted": ["Direction", "Level", "Player", "Position", "Score", "GameEvents"],
-            "retained": ["Cell", "Board", "Port", "TopologyValidator", "TopologyQueryService", "PathChecker"]
+            "deleted": [
+              "Direction",
+              "Level",
+              "Player",
+              "Position",
+              "Score",
+              "GameEvents"
+            ],
+            "retained": [
+              "Cell",
+              "Board",
+              "Port",
+              "TopologyValidator",
+              "TopologyQueryService",
+              "PathChecker"
+            ]
           },
           "application": {
             "status": "refactored",
-            "refactored": ["ILevelRepository", "LoadLevelUseCase"],
-            "updated": ["IBoardRepository", "GameDTOs"],
-            "deleted": ["IScoreRepository"]
+            "refactored": [
+              "ILevelRepository",
+              "LoadLevelUseCase"
+            ],
+            "updated": [
+              "IBoardRepository",
+              "GameDTOs"
+            ],
+            "deleted": [
+              "IScoreRepository"
+            ]
           },
           "infrastructure": {
             "status": "extended",
-            "extended": ["InMemoryBoardRepository — ahora implementa IBoardRepository + ILevelRepository"],
-            "deleted": ["InMemoryLevelRepository"]
+            "extended": [
+              "InMemoryBoardRepository — ahora implementa IBoardRepository + ILevelRepository"
+            ],
+            "deleted": [
+              "InMemoryLevelRepository"
+            ]
           },
           "data": {
             "status": "cleaned",
-            "deleted": ["LocalLevelRepository", "LocalScoreRepository"]
+            "deleted": [
+              "LocalLevelRepository",
+              "LocalScoreRepository"
+            ]
           }
         },
         "validation": {
@@ -575,5 +604,4 @@
       "summary": "Propagación del refactor de ArrowSegment a las capas externas de aplicación e infraestructura."
     }
   }
-}
 }
