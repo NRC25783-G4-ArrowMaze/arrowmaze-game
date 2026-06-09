@@ -130,17 +130,51 @@ class Segment extends ArrowSegment {
 }
 class ArrowPlacementError extends Error
 class ArrowCreationError extends Error
+class ArrowCinematicError extends Error
+enum AdvanceOutcome {
+    advanced
+    blocked
+    destroyed
+}
+interface AdvanceResult {
+    +outcome: AdvanceOutcome
+    +freedCellIds: readonly string[]
+    +occupiedCellIds: readonly string[]
+}
 class Arrow {
+    -_head: Head
+    -_inFlight: boolean
     +head: Head
     +length: number
     +extend(nextCell: Cell): void
     +destroy(): void
+    +advance(): AdvanceResult
+    -_collectChain(): ArrowSegment[]
+    -_calculateTargets(chain: ArrowSegment[]): object[]
+    -_commitAdvance(chain, targets): AdvanceResult
     -_getTail(): ArrowSegment
     -_findConnectingPort(fromCell: Cell, toCell: Cell): number
     -_cellBelongsToSelf(cell: Cell): boolean
 }
 class PlaceArrowUseCase {
     +execute(input: PlaceArrowInput): PlaceArrowResult
+    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
+}
+interface AdvanceArrowInput {
+    +board: Board
+    +arrow: Arrow
+}
+interface AdvanceResultDTO {
+    +success: boolean
+    +outcome: AdvanceOutcome
+    +segments: ArrowSegmentDTO[]
+    +freedCellIds: string[]
+    +occupiedCellIds: string[]
+    +arrowLength: number
+    +error?: string
+}
+class AdvanceArrowUseCase {
+    +execute(input: AdvanceArrowInput): AdvanceResultDTO
     -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
 }
 class TopologyQueryService {

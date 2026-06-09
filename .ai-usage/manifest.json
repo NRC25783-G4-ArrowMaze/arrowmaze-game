@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-04T14:15:00Z",
+    "lastUpdated": "2026-06-09T21:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -575,10 +575,63 @@
           "Usar instanceof Head / casting a Segment en PlaceArrowUseCase._projectChain"
         ],
         "notes": "Se propagó el diseño limpio del dominio a las capas externas, corrigiendo errores de compilación TypeScript y actualizando el diagrama de clases UML."
+      },
+      {
+        "id": "2026-06-09-001",
+        "date": "2026-06-09",
+        "title": "Arrow Movement Engine (Domain & Application)",
+        "file": "2026-06-09-arrow-movement-engine.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 400,
+          "files_created": 4,
+          "files_modified": 3,
+          "tests_passing": 131,
+          "test_suites": 9
+        },
+        "areas": [
+          "domain-layer",
+          "application-layer",
+          "clean-architecture",
+          "arrow-movement",
+          "cinematic-engine",
+          "unit-testing"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "entities": ["Arrow (modified)"],
+            "valueObjects": ["AdvanceResult", "AdvanceOutcome"],
+            "exceptions": ["ArrowCinematicError"],
+            "tests": 10
+          },
+          "application": {
+            "status": "extended",
+            "useCases": ["AdvanceArrowUseCase"],
+            "dtos": ["AdvanceArrowInput", "AdvanceResultDTO"],
+            "tests": 5
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "131/131 passed — 0 failures, 0 regressions",
+          "structure": "passed"
+        },
+        "decisions": [
+          "AdvanceResult es Value Object, DTO en Capa 2",
+          "La flecha gestiona in-flight nativamente con flag privado",
+          "Algoritmo matemático predecible Head-push sin mutar la topología activa por error",
+          "Prioridad de rollback inmutable si se encuentra el destino bloqueado"
+        ],
+        "notes": "Motor de avance cinemático implementado en dominio y application layer. Todos los tests BDD en verde (131/131 total tests passing)."
       }
     ],
     "statistics": {
-      "totalReports": 10,
+      "totalReports": 11,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -592,16 +645,16 @@
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 3800,
-      "totalFilesCreated": 66,
+      "totalLinesGenerated": 4200,
+      "totalFilesCreated": 70,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 112,
+      "totalTestsPassing": 131,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-04-001",
-      "summary": "Propagación del refactor de ArrowSegment a las capas externas de aplicación e infraestructura."
+      "id": "2026-06-09-001",
+      "summary": "Motor cinemático lógico de flechas en dominio y orquestación del caso de uso. Tests completos (131)."
     }
   }
 }
