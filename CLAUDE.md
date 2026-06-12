@@ -103,3 +103,11 @@ The format template is defined in `.claude/skills/ai-usage-reporter/SKILL.md`.
 4. Verify all scenarios pass: `pnpm test`
 5. Update `classes.puml`: `pnpm gen-uml`
 6. Document AI usage in `.ai-usage/`
+
+## Execution Contract (Antigravity → Claude Code)
+
+- This repo uses spec-driven development. Plans arrive pre-approved in `doc/<feature>_plan.md`.
+- Execute plans literally. If a step is ambiguous or unspecified: STOP and ask. Never infer design decisions.
+- Default model for implementation: Haiku. If blocked twice on the same step, report back — the plan returns to Antigravity for re-specification.
+- Never run `git commit` / `git push`. Suggest conventional commit messages at the end.
+- AI usage entries must include: `tool`, `phase`, `model`, `feature`, `linked_session`.
