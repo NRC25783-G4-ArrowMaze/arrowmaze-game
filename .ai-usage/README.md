@@ -12,6 +12,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-03 | Implementación de la funcionalidad de colocación de flechas (Arrow Placement) | [`2026-06-03-arrow-placement-feature.md`](./2026-06-03-arrow-placement-feature.md) | Gemini 3.5 Flash (Low) |
 | 2026-06-03 | Rediseño del modelo de ArrowSegment para corregir inconsistencias | [`2026-06-03-arrow-segment-redesign.md`](./2026-06-03-arrow-segment-redesign.md) | Claude Sonnet 4.6 |
 | 2026-06-04 | Propagación del refactor del dominio de ArrowSegment a aplicación e infra | [`2026-06-04-refactor-arrow-propagation.md`](./2026-06-04-refactor-arrow-propagation.md) | Claude Sonnet 4.6 |
+| 2026-06-12 | Complementar carpeta .claude con CLAUDE.md y comandos personalizados | [`2026-06-12-claude-folder-rules-complement.md`](./2026-06-12-claude-folder-rules-complement.md) | Claude Sonnet 4.6 |
 
 ---
 
@@ -35,10 +36,10 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 6
-- **Última actualización:** 2026-06-04
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (3), Gemini 3.5 Flash (2), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5)
+- **Total de reportes:** 7
+- **Última actualización:** 2026-06-12
+- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (4), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Claude Code (1)
 
 ---
 

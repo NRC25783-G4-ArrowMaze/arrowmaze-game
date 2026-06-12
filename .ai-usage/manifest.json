@@ -628,33 +628,70 @@
           "Prioridad de rollback inmutable si se encuentra el destino bloqueado"
         ],
         "notes": "Motor de avance cinemático implementado en dominio y application layer. Todos los tests BDD en verde (131/131 total tests passing)."
+      },
+      {
+        "id": "2026-06-12-001",
+        "date": "2026-06-12",
+        "title": "Complementar carpeta .claude con CLAUDE.md y comandos personalizados",
+        "file": "2026-06-12-claude-folder-rules-complement.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Sonnet 4.6",
+        "author": "@Jrgil20",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 134,
+          "files_created": 3,
+          "files_modified": 0,
+          "commits": 1
+        },
+        "areas": [
+          "documentation",
+          "claude-code-config",
+          "project-conventions",
+          "custom-commands",
+          "ai-usage-protocol"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run",
+          "structure": "passed — revisión manual contra doc/, features/, .ai-usage/"
+        },
+        "decisions": [
+          "CLAUDE.md en la raíz del repositorio (no dentro de .claude/) para detección automática por Claude Code",
+          "Incluir protocolo de AI usage dentro de CLAUDE.md con referencia al skill existente",
+          "Dos comandos personalizados: /run-tests y /new-feature para las operaciones más frecuentes"
+        ],
+        "notes": "Consolidación de reglas dispersas del repositorio en CLAUDE.md. Sin modificación de código fuente ni tests."
       }
     ],
     "statistics": {
-      "totalReports": 11,
+      "totalReports": 12,
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
         "Antigravity (Claude)",
         "Antigravity (Gemini)",
-        "Claude (web.claude.ai)"
+        "Claude (web.claude.ai)",
+        "Claude Code (claude.ai/code)"
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
         "Claude Sonnet 4.6 (Thinking)",
+        "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 4200,
-      "totalFilesCreated": 70,
+      "totalLinesGenerated": 4334,
+      "totalFilesCreated": 73,
       "totalFilesDeleted": 13,
       "totalTestsPassing": 131,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-09-001",
-      "summary": "Motor cinemático lógico de flechas en dominio y orquestación del caso de uso. Tests completos (131)."
+      "id": "2026-06-12-001",
+      "summary": "CLAUDE.md y comandos personalizados (.claude/commands/) para consolidar reglas del proyecto."
     }
   }
 }
