@@ -13,6 +13,8 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-03 | Rediseño del modelo de ArrowSegment para corregir inconsistencias | [`2026-06-03-arrow-segment-redesign.md`](./2026-06-03-arrow-segment-redesign.md) | Claude Sonnet 4.6 |
 | 2026-06-04 | Propagación del refactor del dominio de ArrowSegment a aplicación e infra | [`2026-06-04-refactor-arrow-propagation.md`](./2026-06-04-refactor-arrow-propagation.md) | Claude Sonnet 4.6 |
 | 2026-06-12 | Complementar carpeta .claude con CLAUDE.md y comandos personalizados | [`2026-06-12-claude-folder-rules-complement.md`](./2026-06-12-claude-folder-rules-complement.md) | Claude Sonnet 4.6 |
+| 2026-06-12 | Planning del roadmap maestro: análisis de 13 features (A1–A5, B1–B3, C1–C4, D1–D2), 5 fases, 7 open questions | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
+| 2026-06-12 | README.md del proyecto: reemplaza template Vite por documentación real (arquitectura, features, comandos) | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
 
 ---
 
@@ -36,10 +38,10 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 7
+- **Total de reportes:** 9
 - **Última actualización:** 2026-06-12
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (4), Gemini 3.5 Flash (2), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Claude Code (1)
+- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (4), Claude Sonnet 4.6 Thinking (2), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Antigravity (Claude) (2), Claude Code (1)
 
 ---
 

@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-09T21:00:00Z",
+    "lastUpdated": "2026-06-12T22:05:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -663,10 +663,88 @@
           "Dos comandos personalizados: /run-tests y /new-feature para las operaciones más frecuentes"
         ],
         "notes": "Consolidación de reglas dispersas del repositorio en CLAUDE.md. Sin modificación de código fuente ni tests."
+      },
+      {
+        "id": "2026-06-12-002",
+        "date": "2026-06-12",
+        "title": "Planning del Roadmap Maestro — Análisis de 13 features (A1–A5, B1–B3, C1–C4, D1–D2)",
+        "file": "2026-06-12-master-roadmap-planning.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "master-roadmap",
+        "linked_session": null,
+        "status": "in-progress",
+        "deliverables": {
+          "lines_of_code": 0,
+          "files_created": 2,
+          "files_modified": 2,
+          "plan_sections": 5,
+          "open_questions": 7
+        },
+        "areas": [
+          "roadmap",
+          "planning",
+          "architecture-analysis",
+          "feature-mapping",
+          "dependency-graph"
+        ],
+        "featuresAnalyzed": {
+          "complete": ["A1", "A2", "A3"],
+          "partial": ["C2"],
+          "pending": ["A4", "A5", "B1", "B2", "B3", "C1", "C3", "C4", "D1", "D2"]
+        },
+        "phases": [
+          { "phase": 1, "features": ["A4", "A5", "C2", "C1"], "layer": "domain+application" },
+          { "phase": 2, "features": ["D1"], "layer": "infrastructure" },
+          { "phase": 3, "features": ["B1", "B3", "B2"], "layer": "presentation" },
+          { "phase": 4, "features": ["C3", "C4"], "layer": "presentation" },
+          { "phase": 5, "features": ["D2"], "layer": "infrastructure" }
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run — sesion de planning, sin cambios de codigo",
+          "structure": "passed — analysis against real code"
+        },
+        "notes": "Plan maestro generado tras analisis de 131 tests pasando, 9 suites, 13 features. Pendiente aprobacion del plan y respuesta a 7 open questions antes de iniciar Fase 1 (A4)."
+      },
+      {
+        "id": "2026-06-12-003",
+        "date": "2026-06-12",
+        "title": "README.md del proyecto Arrow Maze — documentación real del repositorio",
+        "file": "2026-06-12-master-roadmap-planning.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "documentation",
+        "linked_session": "2026-06-12-002",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "files_created": 1,
+          "files_modified": 0,
+          "documentation_pages": 1
+        },
+        "areas": [
+          "documentation",
+          "readme",
+          "project-overview"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "not_run",
+          "tests": "not_run — cambio de documentacion",
+          "structure": "passed"
+        },
+        "notes": "README.md reemplazado: template Vite eliminado, reemplazado por documentacion real del proyecto con arquitectura, features, conceptos de dominio, comandos y links a docs tecnicos."
       }
     ],
     "statistics": {
-      "totalReports": 12,
+      "totalReports": 14,
+      "lastUpdated": "2026-06-12T22:05:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -683,15 +761,15 @@
         "Gemini 3.5 Flash (Low)"
       ],
       "totalLinesGenerated": 4334,
-      "totalFilesCreated": 73,
+      "totalFilesCreated": 74,
       "totalFilesDeleted": 13,
       "totalTestsPassing": 131,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-12-001",
-      "summary": "CLAUDE.md y comandos personalizados (.claude/commands/) para consolidar reglas del proyecto."
+      "id": "2026-06-12-003",
+      "summary": "README.md real del proyecto: arquitectura, features, comandos y documentacion tecnica."
     }
   }
 }
