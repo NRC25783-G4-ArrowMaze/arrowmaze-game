@@ -740,11 +740,69 @@
           "structure": "passed"
         },
         "notes": "README.md reemplazado: template Vite eliminado, reemplazado por documentacion real del proyecto con arquitectura, features, conceptos de dominio, comandos y links a docs tecnicos."
+      },
+      {
+        "id": "2026-06-13-001",
+        "date": "2026-06-13",
+        "title": "A4 — Game End Detection: GameSession + PlayMoveUseCase",
+        "file": "2026-06-13-game-end-detection-a4.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Sonnet 4.6",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "A4",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 420,
+          "files_created": 6,
+          "files_modified": 4,
+          "tests_new": 23,
+          "tests_passing": 154,
+          "test_suites": 11
+        },
+        "areas": [
+          "domain-layer",
+          "application-layer",
+          "clean-architecture",
+          "game-session",
+          "game-end-detection",
+          "tdd",
+          "bdd"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "entities": ["GameSession"],
+            "errors": ["NoMovesRemainingError", "GameAlreadyFinishedError"],
+            "types": ["GameStatus"],
+            "tests": 12
+          },
+          "application": {
+            "status": "extended",
+            "useCases": ["PlayMoveUseCase"],
+            "dtos": ["PlayMoveInput", "PlayMoveResult", "LevelData (allowedMoves added)"],
+            "tests": 11
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "passed — archivos nuevos sin errores",
+          "tests": "154/154 passed — 23 nuevos, 0 regresiones",
+          "gen_uml": "passed — classes.puml actualizado",
+          "structure": "passed — separación de capas respetada"
+        },
+        "decisions": [
+          "allowedMoves como campo obligatorio (no opcional) en LevelData — consistente con el plan pre-aprobado",
+          "Técnica de corrupción de cadena para probar success=false sin mocks — ArrowCinematicError inducida desconectando puerto post-extend",
+          "WON check antes de LOST en evaluateStatus — garantiza precedencia cuando movesRemaining=0 y board vacío simultaneamente"
+        ],
+        "notes": "Implementación literal del plan feature4_plan.md. TDD estricto: errores → entidad → tests dominio → DTOs → tests aplicación → use case. 154 tests en verde. Branch: feature4/game-end-detection."
       }
     ],
     "statistics": {
-      "totalReports": 14,
-      "lastUpdated": "2026-06-12T22:05:00Z",
+      "totalReports": 15,
+      "lastUpdated": "2026-06-13T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -760,16 +818,16 @@
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 4334,
-      "totalFilesCreated": 74,
+      "totalLinesGenerated": 4754,
+      "totalFilesCreated": 80,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 131,
+      "totalTestsPassing": 154,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session"
     },
     "lastEntry": {
-      "id": "2026-06-12-003",
-      "summary": "README.md real del proyecto: arquitectura, features, comandos y documentacion tecnica."
+      "id": "2026-06-13-001",
+      "summary": "A4 Game End Detection: GameSession aggregate root + PlayMoveUseCase, 154 tests en verde."
     }
   }
 }

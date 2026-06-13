@@ -10,6 +10,7 @@ const LEVEL_TOPOLOGY: LevelData = {
   id: 'level-1',
   name: 'Tutorial',
   difficulty: 'EASY',
+  allowedMoves: 10,
   cells: [
     { id: 'c1', portCount: 4 },
     { id: 'c2', portCount: 4 },

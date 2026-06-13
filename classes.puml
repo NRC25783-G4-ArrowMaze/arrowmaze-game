@@ -91,27 +91,9 @@ interface LevelData {
     +id: string
     +name: string
     +difficulty: string
+    +allowedMoves: number
     +cells: CellData[]
     +connections: ConnectionData[]
-}
-interface IBoardBuilder {
-    +build(data: LevelData): Board
-}
-interface IBoardRepository {
-    +getBoardForLevel(levelId: string): Promise<Board>
-}
-interface ILevelRepository {
-    +getLevel(levelId: string): Promise<LevelData>
-}
-class BuildBoardUseCase {
-    -builder: IBoardBuilder
-    +execute(levelData: LevelData): Board
-}
-class LoadLevelUseCase {
-    -boardRepository: IBoardRepository
-    +execute(levelId: string): Promise<LoadLevelResult>
-    -extractCells(board: Board): CellDTO[]
-    -extractConnections(board: Board): ConnectionDTO[]
 }
 abstract class ArrowSegment {
     +cell: Cell
@@ -131,11 +113,6 @@ class Segment extends ArrowSegment {
 class ArrowPlacementError extends Error
 class ArrowCreationError extends Error
 class ArrowCinematicError extends Error
-enum AdvanceOutcome {
-    advanced
-    blocked
-    destroyed
-}
 interface AdvanceResult {
     +outcome: AdvanceOutcome
     +freedCellIds: readonly string[]
@@ -150,15 +127,11 @@ class Arrow {
     +destroy(): void
     +advance(): AdvanceResult
     -_collectChain(): ArrowSegment[]
-    -_calculateTargets(chain: ArrowSegment[]): object[]
-    -_commitAdvance(chain, targets): AdvanceResult
+    -_calculateTargets(chain: ArrowSegment[]): { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]
+    -_commitAdvance(chain: ArrowSegment[], targets: { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]): AdvanceResult
     -_getTail(): ArrowSegment
     -_findConnectingPort(fromCell: Cell, toCell: Cell): number
     -_cellBelongsToSelf(cell: Cell): boolean
-}
-class PlaceArrowUseCase {
-    +execute(input: PlaceArrowInput): PlaceArrowResult
-    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
 }
 interface AdvanceArrowInput {
     +board: Board
@@ -173,9 +146,58 @@ interface AdvanceResultDTO {
     +arrowLength: number
     +error?: string
 }
+class NoMovesRemainingError extends Error
+class GameAlreadyFinishedError extends Error
+class GameSession {
+    -_movesRemaining: number
+    -_status: GameStatus
+    +movesRemaining: number
+    +status: GameStatus
+    +consumeMove(): void
+    +evaluateStatus(board: Board): GameStatus
+}
+interface PlayMoveInput {
+    +session: GameSession
+    +board: Board
+    +arrow: Arrow
+}
+interface PlayMoveResult {
+    +success: boolean
+    +outcome?: "advanced" | "blocked" | "destroyed"
+    +movesRemaining: number
+    +gameStatus: GameStatus
+    +error?: string
+}
+interface IBoardBuilder {
+    +build(data: LevelData): Board
+}
+interface IBoardRepository {
+    +getBoardForLevel(levelId: string): Promise<Board>
+}
+interface ILevelRepository {
+    +getLevel(levelId: string): Promise<LevelData>
+}
 class AdvanceArrowUseCase {
     +execute(input: AdvanceArrowInput): AdvanceResultDTO
     -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
+}
+class BuildBoardUseCase {
+    -builder: IBoardBuilder
+    +execute(levelData: LevelData): Board
+}
+class LoadLevelUseCase {
+    -boardRepository: IBoardRepository
+    +execute(levelId: string): Promise<LoadLevelResult>
+    -extractCells(board: Board): CellDTO[]
+    -extractConnections(board: Board): ConnectionDTO[]
+}
+class PlaceArrowUseCase {
+    +execute(input: PlaceArrowInput): PlaceArrowResult
+    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
+}
+class PlayMoveUseCase {
+    -advanceUseCase: AdvanceArrowUseCase
+    +execute(input: PlayMoveInput): PlayMoveResult
 }
 class TopologyQueryService {
     +getNeighborCell(cell: Cell, portIndex: number): Cell
