@@ -1,5 +1,4 @@
-import type { GameStatus } from '../../domain/entities/GameSession';
-import type { GameSession } from '../../domain/entities/GameSession';
+import type { GameStatus, GameSession } from '../../domain/entities/GameSession';
 import type { Board } from '../../domain/entities/Board';
 import type { Arrow } from '../../domain/entities/Arrow';
 
