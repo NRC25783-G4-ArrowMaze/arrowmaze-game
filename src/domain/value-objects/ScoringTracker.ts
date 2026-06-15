@@ -1,17 +1,12 @@
 import { SCORING_CONSTANTS } from './ScoringConstants';
 
 export class ScoringTracker {
-  private _ticksUsed: number;
-  private _totalFails: number;
-  private _consecutiveFails: number;
-  private _accumulatedPenalty: number;
+  private _ticksUsed: number = 0;
+  private _totalFails: number = 0;
+  private _consecutiveFails: number = 0;
+  private _accumulatedPenalty: number = 0;
 
-  constructor() {
-    this._ticksUsed = 0;
-    this._totalFails = 0;
-    this._consecutiveFails = 0;
-    this._accumulatedPenalty = 0;
-  }
+  
 
   get ticksUsed(): number { return this._ticksUsed; }
   get totalFails(): number { return this._totalFails; }

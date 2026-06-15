@@ -51,7 +51,7 @@ export class PlayMoveUseCase {
       outcome: advanceResult.outcome,
       movesRemaining: session.movesRemaining,
       gameStatus: session.status,
-      ...(session.score !== null ? { score: session.score.finalScore } : {}),
+      ...(session.score === null ? {} : { score: session.score.finalScore }),
     };
   }
 }
