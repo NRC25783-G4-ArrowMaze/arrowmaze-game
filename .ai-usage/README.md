@@ -15,6 +15,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-12 | Complementar carpeta .claude con CLAUDE.md y comandos personalizados | [`2026-06-12-claude-folder-rules-complement.md`](./2026-06-12-claude-folder-rules-complement.md) | Claude Sonnet 4.6 |
 | 2026-06-12 | Planning del roadmap maestro: análisis de 13 features (A1–A5, B1–B3, C1–C4, D1–D2), 5 fases, 7 open questions | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
 | 2026-06-12 | README.md del proyecto: reemplaza template Vite por documentación real (arquitectura, features, comandos) | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
+| 2026-06-13 | Implementación de GameSession (aggregate root) y PlayMoveUseCase (A4 — detección de fin de partida) | [`2026-06-13-game-end-detection-a4.md`](./2026-06-13-game-end-detection-a4.md) | Claude Sonnet 4.6 |
 
 ---
 
@@ -38,10 +39,10 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 9
-- **Última actualización:** 2026-06-12
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (4), Claude Sonnet 4.6 Thinking (2), Gemini 3.5 Flash (2), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Antigravity (Claude) (2), Claude Code (1)
+- **Total de reportes:** 10
+- **Última actualización:** 2026-06-13
+- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (5), Claude Sonnet 4.6 Thinking (2), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Antigravity (Claude) (2), Claude Code (2)
 
 ---
 

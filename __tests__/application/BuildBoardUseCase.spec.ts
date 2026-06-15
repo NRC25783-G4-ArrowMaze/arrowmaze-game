@@ -5,6 +5,7 @@ const VALID_DATA: LevelData = {
   id: 'test-board',
   name: 'Test',
   difficulty: 'EASY',
+  allowedMoves: 10,
   cells: [
     { id: 'a', portCount: 4 },
     { id: 'b', portCount: 4 },
@@ -44,6 +45,7 @@ describe('BuildBoardUseCase', () => {
         id: 'empty-connections',
         name: 'Empty',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'solo', portCount: 4 }],
         connections: [],
       };
@@ -59,6 +61,7 @@ describe('BuildBoardUseCase', () => {
         id: 'bad',
         name: 'Bad',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'x', portCount: 3 }],
         connections: [],
       };
@@ -73,6 +76,7 @@ describe('BuildBoardUseCase', () => {
         id: 'self',
         name: 'Self',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'loop', portCount: 4 }],
         connections: [{ fromCell: 'loop', fromPort: 0, toCell: 'loop', toPort: 2 }],
       };
@@ -87,6 +91,7 @@ describe('BuildBoardUseCase', () => {
         id: 'ghost',
         name: 'Ghost',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'real', portCount: 4 }],
         connections: [{ fromCell: 'ghost', fromPort: 0, toCell: 'real', toPort: 0 }],
       };

@@ -8,6 +8,7 @@ const SIMPLE_CHAIN: LevelData = {
   id: 'level-simple',
   name: 'Simple Chain',
   difficulty: 'EASY',
+  allowedMoves: 10,
   cells: [
     { id: 'c1', portCount: 4 },
     { id: 'c2', portCount: 4 },
@@ -23,6 +24,7 @@ const HEX_LEVEL: LevelData = {
   id: 'level-hex',
   name: 'Hexagonal',
   difficulty: 'MEDIUM',
+  allowedMoves: 10,
   cells: [
     { id: 'h1', portCount: 6 },
     { id: 'h2', portCount: 6 },
@@ -90,6 +92,7 @@ describe('BoardFactory', () => {
         id: 'isolated',
         name: 'Isolated',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'solo', portCount: 4 }],
         connections: [],
       };
@@ -112,6 +115,7 @@ describe('BoardFactory', () => {
         id: 'bad',
         name: 'Bad',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'odd', portCount: 5 }],
         connections: [],
       };
@@ -125,6 +129,7 @@ describe('BoardFactory', () => {
         id: 'self',
         name: 'Self Loop',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'loop', portCount: 4 }],
         connections: [{ fromCell: 'loop', fromPort: 0, toCell: 'loop', toPort: 2 }],
       };
@@ -138,6 +143,7 @@ describe('BoardFactory', () => {
         id: 'oor',
         name: 'Out of Range',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [
           { id: 'a', portCount: 4 },
           { id: 'b', portCount: 4 },
@@ -154,6 +160,7 @@ describe('BoardFactory', () => {
         id: 'missing',
         name: 'Missing Cell',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'a', portCount: 4 }],
         connections: [{ fromCell: 'ghost', fromPort: 0, toCell: 'a', toPort: 0 }],
       };
@@ -167,6 +174,7 @@ describe('BoardFactory', () => {
         id: 'missing2',
         name: 'Missing Cell 2',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [{ id: 'a', portCount: 4 }],
         connections: [{ fromCell: 'a', fromPort: 0, toCell: 'phantom', toPort: 0 }],
       };
@@ -180,6 +188,7 @@ describe('BoardFactory', () => {
         id: 'dup',
         name: 'Duplicate',
         difficulty: 'EASY',
+        allowedMoves: 5,
         cells: [
           { id: 'same', portCount: 4 },
           { id: 'same', portCount: 4 },

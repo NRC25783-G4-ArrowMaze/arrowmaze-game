@@ -26,6 +26,7 @@ export interface LevelData {
   id: string;
   name: string;
   difficulty: string;
+  allowedMoves: number;
   cells: CellData[];
   connections: ConnectionData[];
 }
