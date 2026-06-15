@@ -862,10 +862,76 @@
           "structure": "passed — plan validated against checklist pre-handoff"
         },
         "notes": "Sesión de planning para A5. 8 preguntas de diseño resueltas, plan de 16 pasos TDD generado en doc/game-session-scoring_implementation_plan.md. Pendiente implementación por Claude Code (Haiku)."
+      },
+      {
+        "id": "2026-06-14-002",
+        "date": "2026-06-14",
+        "title": "A5 — Game Session Scoring: Evaluation & Implementation",
+        "file": "2026-06-14-game-session-scoring-evaluation-implementation.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (evaluation) + Sonnet 4.6 (impl init) + Haiku 4.5 (impl final)",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "A5",
+        "linked_session": "2026-06-14-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1240,
+          "files_created": 7,
+          "files_modified": 3,
+          "tests_new": 71,
+          "tests_passing": 214,
+          "test_suites": 15,
+          "commits": 1
+        },
+        "areas": [
+          "domain-layer",
+          "application-layer",
+          "value-objects",
+          "aggregate-composition",
+          "scoring-system",
+          "clean-architecture",
+          "tdd",
+          "bdd",
+          "plan-evaluation",
+          "addendum-generation"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "valueObjects": ["ScoringConstants", "ScoringTracker", "Score"],
+            "entities": ["GameSession (modified)"],
+            "tests": 48
+          },
+          "application": {
+            "status": "extended",
+            "useCases": ["PlayMoveUseCase (modified)"],
+            "dtos": ["SessionDTOs (modified)"],
+            "tests": 23
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "lint": "passed — 0 errores en archivos nuevos/modificados",
+          "tests": "214/214 passed — 71 nuevos, 0 regresiones",
+          "gen_uml": "passed — classes.puml actualizado",
+          "structure": "passed — separación de capas respetada"
+        },
+        "decisions": [
+          "Mantener scoring 100% RAM-resident (sin persistencia, repos ni infrastructure)",
+          "Aplicar correcciones bloqueantes del addendum B-1 (aritmética) y B-2 (testabilidad)",
+          "Object.freeze en Score + expect().toThrow(TypeError) para test de immutabilidad en strict mode",
+          "Tests de 'registro de outcomes' asertan sobre finalScore observable (no contadores internos)"
+        ],
+        "addendumFindings": {
+          "bloqueantes": ["B-1 aritmética en test use-case (1300→1498)", "B-2 testabilidad de contadores internos ocultos"],
+          "menores": ["M-1 Object.freeze + @ts-expect-error", "M-2 flawlessVictory=false cobertura", "M-3 Grupo 4 tautológico", "M-4 Score.compute acople opcional"]
+        },
+        "notes": "Implementación literalTDD: evaluación del plan (hallazgos B-1, B-2) → addendum con correcciones → implementación según plan + correcciones → validación exhaustiva. 214 tests en verde, requisito crítico (RAM-resident) confirmado. Branch: feature5/game-session-scoring."
       }
     ],
     "statistics": {
-      "totalReports": 16,
+      "totalReports": 17,
       "lastUpdated": "2026-06-14T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -877,21 +943,24 @@
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
+        "Claude Opus 4.8",
         "Claude Sonnet 4.6 (Thinking)",
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 4754,
-      "totalFilesCreated": 81,
+      "totalLinesGenerated": 5994,
+      "totalFilesCreated": 88,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 154,
+      "totalTestsPassing": 214,
+      "totalTestSuites": 15,
       "totalClassesDocumented": 31,
-      "averageCompletionTime": "~20 minutes per session"
+      "averageCompletionTime": "~20 minutes per session",
+      "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-14-001",
-      "summary": "A5 Game Session Scoring: planning completo, 8 decisiones de diseño, plan de 16 pasos TDD, pendiente implementación por Claude Code."
+      "id": "2026-06-14-002",
+      "summary": "A5 Game Session Scoring: Evaluación con addendum + implementación completa (214/214 tests ✅, RAM-resident confirmado)."
     }
   }
 }

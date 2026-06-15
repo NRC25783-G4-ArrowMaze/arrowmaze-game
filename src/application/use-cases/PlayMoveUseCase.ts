@@ -39,15 +39,19 @@ export class PlayMoveUseCase {
     // Step 4 — Consume move
     session.consumeMove();
 
+    // Step 4.5 — Record outcome for scoring
+    session.recordMoveOutcome(advanceResult.outcome !== 'blocked');
+
     // Step 5 — Re-evaluate status
     session.evaluateStatus(board);
 
-    // Step 6 — Return
+    // Step 6 — Return (include score when WON)
     return {
       success: true,
       outcome: advanceResult.outcome,
       movesRemaining: session.movesRemaining,
       gameStatus: session.status,
+      ...(session.score !== null ? { score: session.score.finalScore } : {}),
     };
   }
 }
