@@ -1,5 +1,5 @@
 import { type IBoardBuilder } from '../ports/IBoardBuilder';
-import type { LevelArrowDTO, LevelDataDTO, LevelConnectionDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelArrowDTO, LevelDataDTO, LevelConnectionDTO, LevelCellDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
 import { Board } from '../../domain/entities/Board';
 import { Cell } from '../../domain/entities/Cell';
 import { LevelDataError, ConnectionError, BoardRegistryError } from '../../domain/errors/BoardErrors';
@@ -49,7 +49,7 @@ export class LevelDataBoardBuilder implements IBoardBuilder {
     }
   }
 
-  private validateCellData(cellData: any): void {
+  private validateCellData(cellData: LevelCellDTO): void {
     if (typeof cellData.portCount !== 'number') {
       throw new LevelDataError("portCount must be a number");
     }
