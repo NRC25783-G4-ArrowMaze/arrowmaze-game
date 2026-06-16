@@ -1,6 +1,6 @@
 import { Board } from '../../domain/entities/Board';
-import type { LevelData } from '../dtos/LevelData';
-import type { IBoardBuilder } from '../services/IBoardBuilder';
+import type { LevelDataDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { IBoardBuilder } from '../ports/IBoardBuilder';
 
 /**
  * BuildBoardUseCase — caso de uso que construye un Board a partir de LevelData.
@@ -24,7 +24,7 @@ export class BuildBoardUseCase {
    * @throws `ConnectionError` si alguna conexión viola invariantes
    * @throws `BoardFactoryError` si se referencia una celda inexistente
    */
-  execute(levelData: LevelData): Board {
+  execute(levelData: LevelDataDTO): Board {
     return this.builder.build(levelData);
   }
 }

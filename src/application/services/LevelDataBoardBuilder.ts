@@ -1,4 +1,4 @@
-import { type IBoardBuilder } from '../services/IBoardBuilder';
+import { type IBoardBuilder } from '../ports/IBoardBuilder';
 import type { LevelArrowDTO, LevelDataDTO, LevelConnectionDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
 import { Board } from '../../domain/entities/Board';
 import { Cell } from '../../domain/entities/Cell';
