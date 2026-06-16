@@ -343,7 +343,7 @@ export class Arrow {
     // toward the next surviving segment's new cell.
     // If the head is alone (single-head), exitPort = opposite of its entryPort in new cell.
     if (newSegments.length > 0 && newSegments[0] instanceof Head) {
-      const newHead = newSegments[0] as Head;
+      const newHead = newSegments[0];
       if (newSegments.length > 1) {
         const nextSeg = newSegments[1];
         const portToNext = this._findConnectingPort(newHead.cell, nextSeg.cell);
