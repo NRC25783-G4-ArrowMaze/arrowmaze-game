@@ -1,6 +1,6 @@
 import { Board } from '../../domain/entities/Board';
 import type { LevelData } from '../dtos/LevelData';
-import type { IBoardBuilder } from '../ports/IBoardBuilder';
+import type { IBoardBuilder } from '../services/IBoardBuilder';
 
 /**
  * BuildBoardUseCase — caso de uso que construye un Board a partir de LevelData.

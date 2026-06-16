@@ -1,6 +1,6 @@
 import { Board } from '../../domain/entities/Board';
 import { Cell } from '../../domain/entities/Cell';
-import type { IBoardBuilder } from '../../application/ports/IBoardBuilder';
+import type { IBoardBuilder } from '../../application/services/IBoardBuilder';
 import type { LevelData } from '../../application/dtos/LevelData';
 
 // Re-export del contrato para compatibilidad con imports existentes.
