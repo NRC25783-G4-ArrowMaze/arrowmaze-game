@@ -304,7 +304,7 @@ export class Arrow {
     const newSegments: ArrowSegment[] = [];
 
     for (let i = 0; i < targets.length; i++) {
-      const { segment, exitDir, targetCell } = targets[i];
+      const { exitDir, targetCell } = targets[i];
 
       if (targetCell === null) {
         // This segment flows into a sink — it is purged

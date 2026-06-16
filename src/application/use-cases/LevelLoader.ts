@@ -1,13 +1,8 @@
 import { type IBoardBuilder } from '../ports/IBoardBuilder';
 import { type IArrowBuilder } from '../ports/IArrowBuilder';
 import type { LevelDataDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
-import { Board } from '../../domain/entities/Board';
-import { Arrow } from '../../domain/entities/Arrow';
+import type { LoadedLevel } from '../../domain/repositories/ILevelRepository';
 
-export interface LoadedLevel {
-  board: Board;
-  arrows: Arrow[];
-}
 
 export class LevelLoader {
   private readonly boardBuilder: IBoardBuilder;

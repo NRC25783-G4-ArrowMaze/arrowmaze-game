@@ -1,55 +1,58 @@
-import { Board } from '../../domain/entities/Board';
-import type { IBoardRepository } from '../../application/ports/IBoardRepository';
-import type { ILevelRepository } from '../../application/ports/ILevelRepository';
-import { BoardFactory, type LevelData } from '../factories/BoardFactory';
+import type { ILoadedLevelRepository, LoadedLevel } from '../../domain/repositories/ILevelRepository';
+import type { LevelDataDTO } from '../shared/contracts/LevelDataDTOs';
+import { type LevelLoader } from '../../application/use-cases/LevelLoader';
 
-/**
- * InMemoryBoardRepository — implementación in-memory de IBoardRepository e ILevelRepository.
- *
- * Almacena fixtures de LevelData y los sirve de dos formas:
- * - Como ILevelRepository: devuelve el LevelData raw (usado por LoadLevelUseCase)
- * - Como IBoardRepository: construye y devuelve el Board via BoardFactory
- *
- * Diseñado para:
- * - Tests de integración sin red
- * - Desarrollo local (MVP)
- *
- * Para producción, usar HttpLevelRepository / HttpBoardRepository.
- */
-export class InMemoryBoardRepository implements IBoardRepository, ILevelRepository {
-  private readonly fixtures: Map<string, LevelData>;
+// ─────────────────────────────────────────────
+// INTERFACES (Puedes moverlas a la capa de Domain/Application ports)
+// ─────────────────────────────────────────────
 
-  constructor(fixtures: LevelData[] = []) {
+export interface ILevelRepository {
+  getLevel(levelId: string): Promise<LevelDataDTO>;
+}
+
+
+// ─────────────────────────────────────────────
+// IMPLEMENTACIÓN EN MEMORIA
+// ─────────────────────────────────────────────
+
+export class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepository {
+  private readonly fixtures: Map<string, LevelDataDTO>;
+  private readonly levelLoader: LevelLoader
+  constructor(levelLoader: LevelLoader,
+    fixtures: LevelDataDTO[] = []
+  ) {
+    this.levelLoader = this.levelLoader = levelLoader;
     this.fixtures = new Map(fixtures.map(f => [f.id, f]));
   }
 
   // ─────────────────────────────────────────────
-  // ILevelRepository
+  // ILevelRepository (Retorna Raw Data)
   // ─────────────────────────────────────────────
 
-  async getLevel(levelId: string): Promise<LevelData> {
+  async getLevel(levelId: string): Promise<LevelDataDTO> {
     const data = this.fixtures.get(levelId);
     if (!data) {
-      throw new Error(`BoardRepositoryError: level '${levelId}' not found`);
+      throw new Error(`LevelRepositoryError: level '${levelId}' not found`);
     }
     return data;
   }
 
   // ─────────────────────────────────────────────
-  // IBoardRepository
+  // ILoadedLevelRepository (Retorna Entidades de Dominio)
   // ─────────────────────────────────────────────
 
-  async getBoardForLevel(levelId: string): Promise<Board> {
+  async getLoadedLevel(levelId: string): Promise<LoadedLevel> {
     const data = await this.getLevel(levelId);
-    // BoardFactory propaga errores de dominio directamente
-    return BoardFactory.fromLevelData(data);
+    
+    // El repositorio delega la validación y el ensamblaje a la capa de Aplicación
+    return this.levelLoader.load(data);
   }
 
   /**
    * Añade o reemplaza un fixture en tiempo de ejecución.
    * Útil para configurar escenarios de tests individuales.
    */
-  addFixture(levelData: LevelData): void {
+  addFixture(levelData: LevelDataDTO): void {
     this.fixtures.set(levelData.id, levelData);
   }
 }
