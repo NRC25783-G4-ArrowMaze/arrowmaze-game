@@ -13,5 +13,6 @@ export interface PlayMoveResult {
   outcome?: 'advanced' | 'blocked' | 'destroyed';
   movesRemaining: number;
   gameStatus: GameStatus;
+  score?: number;   // presente solo cuando gameStatus === 'WON'
   error?: string;
 }

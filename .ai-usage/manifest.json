@@ -798,11 +798,141 @@
           "WON check antes de LOST en evaluateStatus — garantiza precedencia cuando movesRemaining=0 y board vacío simultaneamente"
         ],
         "notes": "Implementación literal del plan feature4_plan.md. TDD estricto: errores → entidad → tests dominio → DTOs → tests aplicación → use case. 154 tests en verde. Branch: feature4/game-end-detection."
+      },
+      {
+        "id": "2026-06-14-001",
+        "date": "2026-06-14",
+        "title": "A5 — Game Session Scoring: Planning",
+        "file": "2026-06-14-game-session-scoring-a5-planning.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "A5",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "files_created": 1,
+          "files_modified": 0,
+          "plan_sections": 8,
+          "open_questions_resolved": 8
+        },
+        "areas": [
+          "planning",
+          "scoring-system",
+          "domain-layer",
+          "value-objects",
+          "game-session",
+          "clean-architecture",
+          "tdd",
+          "bdd"
+        ],
+        "designDecisions": [
+          "ScoringConstants como objeto congelado en domain/value-objects/ — agnóstico a tecnología",
+          "ScoringTracker como componente interno mutable del aggregate GameSession (composición)",
+          "Score como VO inmutable con factory Score.compute(tracker) — se crea una única vez al transicionar a WON",
+          "blocked = falla (incrementa racha); advanced/destroyed = éxito (resetean racha consecutiva)",
+          "Punto de inserción en PlayMoveUseCase: paso 4.5 session.recordMoveOutcome() entre consumeMove() y evaluateStatus()",
+          "PlayMoveResult.score?: number opcional — presente solo cuando gameStatus === 'WON'",
+          "Sin GetScoreUseCase — basta exponer session.score como propiedad del aggregate",
+          "Constructor GameSession sin nuevos parámetros — impacto cero en tests existentes"
+        ],
+        "plannedDeliverables": {
+          "new_files": [
+            "src/domain/value-objects/ScoringConstants.ts",
+            "src/domain/value-objects/ScoringTracker.ts",
+            "src/domain/value-objects/Score.ts",
+            "__tests__/domain/ScoringTracker.spec.ts",
+            "__tests__/domain/Score.spec.ts",
+            "__tests__/domain/GameSessionScoring.spec.ts",
+            "__tests__/application/PlayMoveScoring.spec.ts"
+          ],
+          "modified_files": [
+            "src/domain/entities/GameSession.ts",
+            "src/application/dtos/SessionDTOs.ts",
+            "src/application/use-cases/PlayMoveUseCase.ts"
+          ],
+          "implementation_steps": 16
+        },
+        "validation": {
+          "build": "not_run — planning only",
+          "lint": "not_run — planning only",
+          "tests": "not_run — planning only",
+          "structure": "passed — plan validated against checklist pre-handoff"
+        },
+        "notes": "Sesión de planning para A5. 8 preguntas de diseño resueltas, plan de 16 pasos TDD generado en doc/game-session-scoring_implementation_plan.md. Pendiente implementación por Claude Code (Haiku)."
+      },
+      {
+        "id": "2026-06-14-002",
+        "date": "2026-06-14",
+        "title": "A5 — Game Session Scoring: Evaluation & Implementation",
+        "file": "2026-06-14-game-session-scoring-evaluation-implementation.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (evaluation) + Sonnet 4.6 (impl init) + Haiku 4.5 (impl final)",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "A5",
+        "linked_session": "2026-06-14-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1240,
+          "files_created": 7,
+          "files_modified": 3,
+          "tests_new": 71,
+          "tests_passing": 214,
+          "test_suites": 15,
+          "commits": 1
+        },
+        "areas": [
+          "domain-layer",
+          "application-layer",
+          "value-objects",
+          "aggregate-composition",
+          "scoring-system",
+          "clean-architecture",
+          "tdd",
+          "bdd",
+          "plan-evaluation",
+          "addendum-generation"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "valueObjects": ["ScoringConstants", "ScoringTracker", "Score"],
+            "entities": ["GameSession (modified)"],
+            "tests": 48
+          },
+          "application": {
+            "status": "extended",
+            "useCases": ["PlayMoveUseCase (modified)"],
+            "dtos": ["SessionDTOs (modified)"],
+            "tests": 23
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "lint": "passed — 0 errores en archivos nuevos/modificados",
+          "tests": "214/214 passed — 71 nuevos, 0 regresiones",
+          "gen_uml": "passed — classes.puml actualizado",
+          "structure": "passed — separación de capas respetada"
+        },
+        "decisions": [
+          "Mantener scoring 100% RAM-resident (sin persistencia, repos ni infrastructure)",
+          "Aplicar correcciones bloqueantes del addendum B-1 (aritmética) y B-2 (testabilidad)",
+          "Object.freeze en Score + expect().toThrow(TypeError) para test de immutabilidad en strict mode",
+          "Tests de 'registro de outcomes' asertan sobre finalScore observable (no contadores internos)"
+        ],
+        "addendumFindings": {
+          "bloqueantes": ["B-1 aritmética en test use-case (1300→1498)", "B-2 testabilidad de contadores internos ocultos"],
+          "menores": ["M-1 Object.freeze + @ts-expect-error", "M-2 flawlessVictory=false cobertura", "M-3 Grupo 4 tautológico", "M-4 Score.compute acople opcional"]
+        },
+        "notes": "Implementación literalTDD: evaluación del plan (hallazgos B-1, B-2) → addendum con correcciones → implementación según plan + correcciones → validación exhaustiva. 214 tests en verde, requisito crítico (RAM-resident) confirmado. Branch: feature5/game-session-scoring."
       }
     ],
     "statistics": {
-      "totalReports": 15,
-      "lastUpdated": "2026-06-13T00:00:00Z",
+      "totalReports": 17,
+      "lastUpdated": "2026-06-14T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -813,21 +943,24 @@
       ],
       "modelsUsed": [
         "Claude Haiku 4.5",
+        "Claude Opus 4.8",
         "Claude Sonnet 4.6 (Thinking)",
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)"
       ],
-      "totalLinesGenerated": 4754,
-      "totalFilesCreated": 80,
+      "totalLinesGenerated": 5994,
+      "totalFilesCreated": 88,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 154,
+      "totalTestsPassing": 214,
+      "totalTestSuites": 15,
       "totalClassesDocumented": 31,
-      "averageCompletionTime": "~20 minutes per session"
+      "averageCompletionTime": "~20 minutes per session",
+      "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-13-001",
-      "summary": "A4 Game End Detection: GameSession aggregate root + PlayMoveUseCase, 154 tests en verde."
+      "id": "2026-06-14-002",
+      "summary": "A5 Game Session Scoring: Evaluación con addendum + implementación completa (214/214 tests ✅, RAM-resident confirmado)."
     }
   }
 }
