@@ -1,5 +1,6 @@
 import { Cell } from './Cell';
 import { TopologyValidator } from '../services/TopologyValidator';
+import { BoardRegistryError, BoardMutationError } from '../errors/BoardErrors';
 
 /**
  * Board - Domain Entity acting as the passive container for the graph topology.
@@ -48,7 +49,7 @@ export class Board {
    */
   addCell(cell: Cell): void {
     if (this.cells.has(cell.getId())) {
-      throw new Error('BoardRegistryError: cell ID already exists in this board');
+      throw new BoardRegistryError('cell ID already exists in this board');
     }
     this.cells.set(cell.getId(), cell);
   }
@@ -63,7 +64,7 @@ export class Board {
     if (!cell) return;
 
     if (cell.isOccupied()) {
-      throw new Error('BoardMutationError: cannot remove an occupied cell');
+      throw new BoardMutationError('cannot remove an occupied cell');
     }
 
     // Cascade isolation: for every connected port on this cell,

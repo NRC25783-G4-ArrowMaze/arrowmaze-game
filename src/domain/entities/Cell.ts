@@ -1,4 +1,5 @@
 import { Port } from '../value-objects/Port';
+import { TopologyError, ConnectionError } from '../errors/BoardErrors';
 
 /**
  * Cell - Domain Entity representing a node in the board graph
@@ -34,10 +35,10 @@ export class Cell {
 
   constructor(id: string, portCount: number) {
     if (!Number.isInteger(portCount) || portCount <= 0) {
-      throw new Error('Port count must be a positive integer');
+      throw new TopologyError('port count must be a positive integer');
     }
     if (portCount % 2 !== 0) {
-      throw new Error('TopologyError: port count must be an even number');
+      throw new TopologyError('port count must be an even number');
     }
 
     this.id = id;
@@ -60,6 +61,8 @@ export class Cell {
       enumerable: true,
       configurable: false,
     });
+
+    
     Object.defineProperty(this, 'id', {
       value: id,
       writable: false,
@@ -82,7 +85,7 @@ export class Cell {
 
   getPortAtIndex(index: number): Port {
     if (index < 0 || index >= this.portCount) {
-      throw new Error(`TopologyError: port index out of range [0, ${this.portCount - 1}]`);
+      throw new TopologyError(`port index out of range [0, ${this.portCount - 1}]`);
     }
     return this.ports[index];
   }
@@ -100,12 +103,20 @@ export class Cell {
     return connection ? connection.neighborCell : null;
   }
 
+  getConnection(portIndex: number): { neighbor: Cell; neighborPortIndex: number } | null {
+    if (portIndex < 0 || portIndex >= this.portCount) {
+      throw new TopologyError(`port index out of range [0, ${this.portCount - 1}]`);
+    }
+    const connection = this.connections.get(portIndex);
+    return connection ? { neighbor: connection.neighborCell, neighborPortIndex: connection.neighborPortIndex } : null;
+  }
+
   /**
    * Check if a port is an exit (no neighbor connected).
    */
   isExit(portIndex: number): boolean {
     if (portIndex < 0 || portIndex >= this.portCount) {
-      throw new Error('TopologyError: port index out of range');
+      throw new TopologyError('port index out of range');
     }
     return !this.connections.has(portIndex);
   }
@@ -136,7 +147,7 @@ export class Cell {
    */
   _connectToNeighbor(portIndex: number, neighborCell: Cell, neighborPortIndex: number): void {
     if (!this.canConnect(portIndex)) {
-      throw new Error(`ConnectionError: port ${portIndex} of cell ${this.id} is already occupied`);
+      throw new ConnectionError(`port ${portIndex} of cell ${this.id} is already occupied`);
     }
     this.connections.set(portIndex, { neighborCell, neighborPortIndex });
   }
