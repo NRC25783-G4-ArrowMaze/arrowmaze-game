@@ -16,8 +16,9 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-12 | Planning del roadmap maestro: análisis de 13 features (A1–A5, B1–B3, C1–C4, D1–D2), 5 fases, 7 open questions | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
 | 2026-06-12 | README.md del proyecto: reemplaza template Vite por documentación real (arquitectura, features, comandos) | [`2026-06-12-master-roadmap-planning.md`](./2026-06-12-master-roadmap-planning.md) | Claude Sonnet 4.6 (Thinking) |
 | 2026-06-13 | Implementación de GameSession (aggregate root) y PlayMoveUseCase (A4 — detección de fin de partida) | [`2026-06-13-game-end-detection-a4.md`](./2026-06-13-game-end-detection-a4.md) | Claude Sonnet 4.6 |
+| 2026-06-14 | Planning A5 — Scoring: ScoringConstants VO, ScoringTracker, Score VO, integración en GameSession y PlayMoveUseCase | [`2026-06-14-game-session-scoring-a5-planning.md`](./2026-06-14-game-session-scoring-a5-planning.md) | Claude Sonnet 4.6 (Thinking) |
+| 2026-06-14 | Evaluación e implementación sistema scoring de GameSession (addendum + 71 tests, 0 regresiones) | [`2026-06-14-game-session-scoring-evaluation-implementation.md`](./2026-06-14-game-session-scoring-evaluation-implementation.md) | Claude Opus 4.8 + Sonnet 4.6 + Haiku 4.5 |
 | 2026-06-16 | Motor de Juego: Constructores de Tablero y Flechas (Frontend) | [`2026-06-15-level-load.md`](./2026-06-15-level-load.md) | Gemini |
-
 ---
 
 ## Formato de reportes
@@ -40,10 +41,12 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 11
+- **Total de reportes:** 13
 - **Última actualización:** 2026-06-16
-- **Modelos usados:** Claude Haiku 4.5 (1), Claude Sonnet 4.6 (5), Claude Sonnet 4.6 Thinking (2), Gemini 3.5 Flash (2), Copilot (1)
-- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Antigravity (Claude) (2), Claude Code (2)
+- **Modelos usados:** Claude Haiku 4.5 (2), Claude Opus 4.8 (1), Claude Sonnet 4.6 (6), Claude Sonnet 4.6 Thinking (3), Gemini 3.5 Flash (2), Copilot (1)
+- **Herramientas:** GitHub Copilot (1), Antigravity (Gemini / Claude) (5), Antigravity (Claude) (3), Claude Code (3)
+- **Tests nuevos:** 71 (game-session-scoring); histórico total 214 tests ✅
+- **Requisito crítico:** scoring 100% RAM-resident (no persistencia agregada) 
 
 ---
 

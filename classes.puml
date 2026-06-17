@@ -148,12 +148,36 @@ interface AdvanceResultDTO {
 }
 class NoMovesRemainingError extends Error
 class GameAlreadyFinishedError extends Error
+class ScoringTracker {
+    -_ticksUsed: number
+    -_totalFails: number
+    -_consecutiveFails: number
+    -_accumulatedPenalty: number
+    +ticksUsed: number
+    +totalFails: number
+    +consecutiveFails: number
+    +accumulatedPenalty: number
+    +recordTick(): void
+    +recordSuccess(): void
+    +recordFailure(): void
+}
+class Score {
+    +timeScore: number
+    +penaltyTotal: number
+    +flawlessVictory: boolean
+    +finalScore: number
+    +{static} compute(tracker: ScoringTracker): Score
+}
 class GameSession {
     -_movesRemaining: number
     -_status: GameStatus
+    -_scoringTracker: ScoringTracker
+    -_score: Score
     +movesRemaining: number
     +status: GameStatus
+    +score: Score
     +consumeMove(): void
+    +recordMoveOutcome(moveSucceeded: boolean): void
     +evaluateStatus(board: Board): GameStatus
 }
 interface PlayMoveInput {
@@ -166,6 +190,7 @@ interface PlayMoveResult {
     +outcome?: "advanced" | "blocked" | "destroyed"
     +movesRemaining: number
     +gameStatus: GameStatus
+    +score?: number
     +error?: string
 }
 interface IBoardBuilder {
