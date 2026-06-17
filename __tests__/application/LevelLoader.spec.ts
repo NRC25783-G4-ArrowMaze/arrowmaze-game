@@ -2,6 +2,7 @@ import { LevelLoader } from '../../src/application/use-cases/LevelLoader';
 import { type IBoardBuilder } from '../../src/application/ports/IBoardBuilder';
 import { type IArrowBuilder } from '../../src/application/ports/IArrowBuilder';
 import { Board } from '../../src/domain/entities/Board';
+import { Arrow } from '../../src/domain/entities/Arrow';
 import type { LevelDataDTO } from '../../src/infrastructure/shared/contracts/LevelDataDTOs';
 
 describe('LevelLoader', () => {
