@@ -98,12 +98,13 @@ describe('LevelDataBoardBuilder', () => {
 
   it('should_throw_LevelDataError_when_required_fields_are_missing', () => {
     // Arrange
-    const data = getValidBaseDTO() as any;
+    const data: Partial<LevelDataDTO> = getValidBaseDTO();
     delete data.allowedMoves;
 
     // Act & Assert
-    expect(() => builder.build(data)).toThrow(LevelDataError);
-    expect(() => builder.build(data)).toThrow("missing required field 'allowedMoves'");
+    expect(() => builder.build(data as LevelDataDTO)).toThrow(LevelDataError);
+    expect(() => builder.build(data as LevelDataDTO)).toThrow("missing required field 'allowedMoves'");
+  });
   });
 
   it('should_throw_BoardRegistryError_when_arrow_head_references_ghost_cell', () => {
