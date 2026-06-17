@@ -17,7 +17,10 @@ describe('InMemoryLevelRepository', () => {
   };
 
   beforeEach(() => {
-    mockLoader = new LevelLoader(null as any, null as any) as jest.Mocked<LevelLoader>;
+    mockLoader = new LevelLoader(
+      null as unknown as IBoardBuilder,
+      null as unknown as IArrowBuilder
+    ) as jest.Mocked<LevelLoader>;
     repository = new InMemoryLevelRepository(mockLoader);
     repository.addFixture(fakeDto);
   });
