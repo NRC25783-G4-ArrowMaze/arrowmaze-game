@@ -1,5 +1,5 @@
 import type { Board } from '../../domain/entities/Board';
-import type { LevelData } from '../dtos/LevelData';
+import type { LevelDataDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs'; 
 
 /**
  * IBoardBuilder — Puerto de aplicación para construir un Board desde LevelData.
@@ -10,5 +10,5 @@ import type { LevelData } from '../dtos/LevelData';
  * Regla de Dependencia: aplicación no conoce infraestructura.
  */
 export interface IBoardBuilder {
-  build(data: LevelData): Board;
+  build(data: LevelDataDTO): Board;
 }

@@ -800,6 +800,37 @@
         "notes": "Implementación literal del plan feature4_plan.md. TDD estricto: errores → entidad → tests dominio → DTOs → tests aplicación → use case. 154 tests en verde. Branch: feature4/game-end-detection."
       },
       {
+        "id": "2026-06-16-001",
+        "date": "2026-06-16",
+        "title": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)",
+        "file": "2026-06-15-level-load.md",
+        "tool": "Gemini",
+        "model": "Gemini",
+        "author": "@SantiagoChirinos",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 4,
+          "files_modified": 3
+        },
+        "areas": [
+          "game-engine",
+          "frontend",
+          "board-builder",
+          "arrow-builder",
+          "level-loader"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "passed",
+          "tests": "passed",
+          "structure": "passed"
+        },
+        "notes": "Separación de Agregados (SRP) en constructores. Contratos compartidos (LevelDataDTO) para monorepo. Validación geométrica defensiva."
+      }
+    ],
+    "statistics": {
+      "totalReports": 16,
+      "lastUpdated": "2026-06-16T00:00:00Z",
         "id": "2026-06-14-001",
         "date": "2026-06-14",
         "title": "A5 — Game Session Scoring: Planning",
@@ -959,8 +990,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-14-002",
-      "summary": "A5 Game Session Scoring: Evaluación con addendum + implementación completa (214/214 tests ✅, RAM-resident confirmado)."
+      "id": "2026-06-16-001",
+      "summary": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)"
     }
   }
 }

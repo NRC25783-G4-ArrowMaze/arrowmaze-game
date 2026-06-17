@@ -304,7 +304,7 @@ export class Arrow {
     const newSegments: ArrowSegment[] = [];
 
     for (let i = 0; i < targets.length; i++) {
-      const { segment, exitDir, targetCell } = targets[i];
+      const { exitDir, targetCell } = targets[i];
 
       if (targetCell === null) {
         // This segment flows into a sink — it is purged
@@ -343,7 +343,7 @@ export class Arrow {
     // toward the next surviving segment's new cell.
     // If the head is alone (single-head), exitPort = opposite of its entryPort in new cell.
     if (newSegments.length > 0 && newSegments[0] instanceof Head) {
-      const newHead = newSegments[0] as Head;
+      const newHead = newSegments[0];
       if (newSegments.length > 1) {
         const nextSeg = newSegments[1];
         const portToNext = this._findConnectingPort(newHead.cell, nextSeg.cell);
