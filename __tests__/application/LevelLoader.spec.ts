@@ -20,7 +20,7 @@ describe('LevelLoader', () => {
     // Arrange
     const fakeData: LevelDataDTO = { id: 'lvl_1', allowedMoves: 5, arrows: [], cells: [] };
     const fakeBoard = new Board('lvl_1');
-    const fakeArrows: any[] = [];
+    const fakeArrows: Arrow[] = [];
 
     mockBoardBuilder.build.mockReturnValue(fakeBoard);
     mockArrowBuilder.buildAll.mockReturnValue(fakeArrows);
