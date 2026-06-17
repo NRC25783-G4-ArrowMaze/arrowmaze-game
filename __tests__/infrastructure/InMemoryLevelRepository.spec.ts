@@ -40,7 +40,7 @@ describe('InMemoryLevelRepository', () => {
 
   it('should_delegate_to_loader_when_getLoadedLevel_is_called', async () => {
     // Arrange
-    const fakeLoadedLevel: any = { board: {}, arrows: [] };
+    const fakeLoadedLevel = { board: {}, arrows: [] } as unknown as LoadedLevel;
     mockLoader.load.mockReturnValue(fakeLoadedLevel);
 
     // Act
