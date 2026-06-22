@@ -1,7 +1,7 @@
-### 2026-06-16 — Motor de Juego: Constructores de Tablero y Flechas (Frontend)
+### 2026-06-15 — Motor de Juego: Constructores de Tablero y Flechas (Frontend)
 
 - **Herramienta:** Gemini
-- **Modelo / versión:** Gemini
+- **Modelo / versión:** Gemini (versión no especificada)
 - **Autor humano responsable:** @SantiagoChirinos
 - **Prompt(s) representativo(s):**
   - "Feature: Construcción y Deserialización del Tablero desde Archivo JSON... Quiero utilizar el puerto IBoardBuilder para parsear un objeto LevelData"
