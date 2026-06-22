@@ -72,7 +72,7 @@ describe('AdvanceArrowUseCase', () => {
   });
 
   test('Advance con cuerpo — DTO refleja toda la cadena actualizada', () => {
-    const { board, A, B, C } = buildLinearBoard();
+    const { board, A, B } = buildLinearBoard();
 
     // Flecha de 2 segmentos: A(head,exitPort:2), B(body)
     const arrow = new Arrow(A, 2);

@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-12T22:05:00Z",
+    "lastUpdated": "2026-06-22T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -603,15 +603,27 @@
         "layers": {
           "domain": {
             "status": "extended",
-            "entities": ["Arrow (modified)"],
-            "valueObjects": ["AdvanceResult", "AdvanceOutcome"],
-            "exceptions": ["ArrowCinematicError"],
+            "entities": [
+              "Arrow (modified)"
+            ],
+            "valueObjects": [
+              "AdvanceResult",
+              "AdvanceOutcome"
+            ],
+            "exceptions": [
+              "ArrowCinematicError"
+            ],
             "tests": 10
           },
           "application": {
             "status": "extended",
-            "useCases": ["AdvanceArrowUseCase"],
-            "dtos": ["AdvanceArrowInput", "AdvanceResultDTO"],
+            "useCases": [
+              "AdvanceArrowUseCase"
+            ],
+            "dtos": [
+              "AdvanceArrowInput",
+              "AdvanceResultDTO"
+            ],
             "tests": 5
           }
         },
@@ -691,16 +703,69 @@
           "dependency-graph"
         ],
         "featuresAnalyzed": {
-          "complete": ["A1", "A2", "A3"],
-          "partial": ["C2"],
-          "pending": ["A4", "A5", "B1", "B2", "B3", "C1", "C3", "C4", "D1", "D2"]
+          "complete": [
+            "A1",
+            "A2",
+            "A3"
+          ],
+          "partial": [
+            "C2"
+          ],
+          "pending": [
+            "A4",
+            "A5",
+            "B1",
+            "B2",
+            "B3",
+            "C1",
+            "C3",
+            "C4",
+            "D1",
+            "D2"
+          ]
         },
         "phases": [
-          { "phase": 1, "features": ["A4", "A5", "C2", "C1"], "layer": "domain+application" },
-          { "phase": 2, "features": ["D1"], "layer": "infrastructure" },
-          { "phase": 3, "features": ["B1", "B3", "B2"], "layer": "presentation" },
-          { "phase": 4, "features": ["C3", "C4"], "layer": "presentation" },
-          { "phase": 5, "features": ["D2"], "layer": "infrastructure" }
+          {
+            "phase": 1,
+            "features": [
+              "A4",
+              "A5",
+              "C2",
+              "C1"
+            ],
+            "layer": "domain+application"
+          },
+          {
+            "phase": 2,
+            "features": [
+              "D1"
+            ],
+            "layer": "infrastructure"
+          },
+          {
+            "phase": 3,
+            "features": [
+              "B1",
+              "B3",
+              "B2"
+            ],
+            "layer": "presentation"
+          },
+          {
+            "phase": 4,
+            "features": [
+              "C3",
+              "C4"
+            ],
+            "layer": "presentation"
+          },
+          {
+            "phase": 5,
+            "features": [
+              "D2"
+            ],
+            "layer": "infrastructure"
+          }
         ],
         "validation": {
           "build": "not_run",
@@ -773,15 +838,28 @@
         "layers": {
           "domain": {
             "status": "extended",
-            "entities": ["GameSession"],
-            "errors": ["NoMovesRemainingError", "GameAlreadyFinishedError"],
-            "types": ["GameStatus"],
+            "entities": [
+              "GameSession"
+            ],
+            "errors": [
+              "NoMovesRemainingError",
+              "GameAlreadyFinishedError"
+            ],
+            "types": [
+              "GameStatus"
+            ],
             "tests": 12
           },
           "application": {
             "status": "extended",
-            "useCases": ["PlayMoveUseCase"],
-            "dtos": ["PlayMoveInput", "PlayMoveResult", "LevelData (allowedMoves added)"],
+            "useCases": [
+              "PlayMoveUseCase"
+            ],
+            "dtos": [
+              "PlayMoveInput",
+              "PlayMoveResult",
+              "LevelData (allowedMoves added)"
+            ],
             "tests": 11
           }
         },
@@ -800,37 +878,6 @@
         "notes": "Implementación literal del plan feature4_plan.md. TDD estricto: errores → entidad → tests dominio → DTOs → tests aplicación → use case. 154 tests en verde. Branch: feature4/game-end-detection."
       },
       {
-        "id": "2026-06-16-001",
-        "date": "2026-06-16",
-        "title": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)",
-        "file": "2026-06-15-level-load.md",
-        "tool": "Gemini",
-        "model": "Gemini",
-        "author": "@SantiagoChirinos",
-        "status": "completed",
-        "deliverables": {
-          "files_created": 4,
-          "files_modified": 3
-        },
-        "areas": [
-          "game-engine",
-          "frontend",
-          "board-builder",
-          "arrow-builder",
-          "level-loader"
-        ],
-        "validation": {
-          "build": "not_run",
-          "lint": "passed",
-          "tests": "passed",
-          "structure": "passed"
-        },
-        "notes": "Separación de Agregados (SRP) en constructores. Contratos compartidos (LevelDataDTO) para monorepo. Validación geométrica defensiva."
-      }
-    ],
-    "statistics": {
-      "totalReports": 16,
-      "lastUpdated": "2026-06-16T00:00:00Z",
         "id": "2026-06-14-001",
         "date": "2026-06-14",
         "title": "A5 — Game Session Scoring: Planning",
@@ -930,14 +977,24 @@
         "layers": {
           "domain": {
             "status": "extended",
-            "valueObjects": ["ScoringConstants", "ScoringTracker", "Score"],
-            "entities": ["GameSession (modified)"],
+            "valueObjects": [
+              "ScoringConstants",
+              "ScoringTracker",
+              "Score"
+            ],
+            "entities": [
+              "GameSession (modified)"
+            ],
             "tests": 48
           },
           "application": {
             "status": "extended",
-            "useCases": ["PlayMoveUseCase (modified)"],
-            "dtos": ["SessionDTOs (modified)"],
+            "useCases": [
+              "PlayMoveUseCase (modified)"
+            ],
+            "dtos": [
+              "SessionDTOs (modified)"
+            ],
             "tests": 23
           }
         },
@@ -955,15 +1012,86 @@
           "Tests de 'registro de outcomes' asertan sobre finalScore observable (no contadores internos)"
         ],
         "addendumFindings": {
-          "bloqueantes": ["B-1 aritmética en test use-case (1300→1498)", "B-2 testabilidad de contadores internos ocultos"],
-          "menores": ["M-1 Object.freeze + @ts-expect-error", "M-2 flawlessVictory=false cobertura", "M-3 Grupo 4 tautológico", "M-4 Score.compute acople opcional"]
+          "bloqueantes": [
+            "B-1 aritmética en test use-case (1300→1498)",
+            "B-2 testabilidad de contadores internos ocultos"
+          ],
+          "menores": [
+            "M-1 Object.freeze + @ts-expect-error",
+            "M-2 flawlessVictory=false cobertura",
+            "M-3 Grupo 4 tautológico",
+            "M-4 Score.compute acople opcional"
+          ]
         },
         "notes": "Implementación literalTDD: evaluación del plan (hallazgos B-1, B-2) → addendum con correcciones → implementación según plan + correcciones → validación exhaustiva. 214 tests en verde, requisito crítico (RAM-resident) confirmado. Branch: feature5/game-session-scoring."
+      },
+      {
+        "id": "2026-06-15-001",
+        "date": "2026-06-15",
+        "title": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)",
+        "file": "2026-06-15-level-load.md",
+        "tool": "Gemini",
+        "model": "Gemini (versión no especificada)",
+        "author": "@SantiagoChirinos",
+        "phase": "implementation",
+        "feature": "level-load",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 4,
+          "files_modified": 3
+        },
+        "areas": [
+          "game-engine",
+          "frontend",
+          "board-builder",
+          "arrow-builder",
+          "level-loader"
+        ],
+        "validation": {
+          "build": "not_run",
+          "lint": "passed",
+          "tests": "passed",
+          "structure": "passed"
+        },
+        "notes": "Separación de Agregados (SRP) en constructores. Contratos compartidos (LevelDataDTO) para monorepo. Validación geométrica defensiva. NOTA: el spec __tests__/application/LevelDataBoardBuilder.spec.ts introducido con esta feature no compilaba en dev (un \"});\" sobrante); corregido en la sesión 2026-06-22-001."
+      },
+      {
+        "id": "2026-06-22-001",
+        "date": "2026-06-22",
+        "title": "Validación PR #10 + saneo registro AI usage + spec movimiento continuo",
+        "file": "2026-06-22-pr10-validation-ai-usage-cleanup.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "validation",
+        "feature": "pr10-review / ai-usage-cleanup",
+        "linked_session": "2026-06-15-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "files_created": 3,
+          "files_modified": 4
+        },
+        "areas": [
+          "pr-review",
+          "ai-usage-registry",
+          "test-fix",
+          "spec-driven",
+          "continuous-movement-spec"
+        ],
+        "validation": {
+          "build": "pending",
+          "lint": "pending",
+          "tests": "passed — 197/197 tras corregir LevelDataBoardBuilder.spec.ts",
+          "structure": "passed"
+        },
+        "notes": "Validación del PR #10 (presentación B1–B4). Fix de compilación en LevelDataBoardBuilder.spec.ts (\"});\" sobrante línea 108). Reparación del manifest.json (JSON inválido por doble bloque statistics + entradas A5 huérfanas) restaurando la base a1b7e6e y reinsertando limpio. Spec de movimiento continuo documentada sin implementar."
       }
     ],
     "statistics": {
-      "totalReports": 17,
-      "lastUpdated": "2026-06-14T00:00:00Z",
+      "totalReports": 19,
+      "lastUpdated": "2026-06-22T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -978,7 +1106,8 @@
         "Claude Sonnet 4.6 (Thinking)",
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
-        "Gemini 3.5 Flash (Low)"
+        "Gemini 3.5 Flash (Low)",
+        "Gemini (versión no especificada)"
       ],
       "totalLinesGenerated": 5994,
       "totalFilesCreated": 88,
@@ -990,8 +1119,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-16-001",
-      "summary": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)"
+      "id": "2026-06-22-001",
+      "summary": "Validación PR #10 + saneo registro AI usage + spec movimiento continuo"
     }
   }
 }

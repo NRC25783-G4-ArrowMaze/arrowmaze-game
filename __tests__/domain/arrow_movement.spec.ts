@@ -398,7 +398,7 @@ describe('Bloque 3 — Cálculo cinemático durante el vuelo (in-flight)', () =>
 
     // Test B: simular llamada a extend durante in-flight via override temporal
     // Usamos un wrapper que intercepta el avance para capturar el estado in-flight
-    let cinemaErrorCaught = false;
+    const cinemaErrorCaught = false;
     const originalAdvance = arrow2.advance.bind(arrow2);
 
     // Monkey-patch: wrapeamos advance para llamar extend justo cuando esté in-flight

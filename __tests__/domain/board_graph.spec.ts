@@ -4,6 +4,14 @@ import { Port } from '../../src/domain/value-objects/Port';
 import { TopologyValidator } from '../../src/domain/services/TopologyValidator';
 import { TopologyQueryService } from '../../src/domain/services/TopologyQueryService';
 
+// Acceso tipado a miembros privados para aserciones de bajo nivel (sin `any`).
+type CellInternals = {
+  portCount: number;
+  ports: Port[];
+  connections: Map<number, { neighborCell: Cell; neighborPortIndex: number }>;
+};
+type PortInternals = { index: number };
+
 describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
   // ══════════════════════════════════════════════
   // BLOQUE 1 — CREACIÓN DE CELDA Y TOPOLOGÍA
@@ -75,12 +83,12 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
     describe('Scenario: La capacidad topológica es inmutable después de la creación', () => {
       it('should not allow modification of port count after creation', () => {
         const cell = new Cell('c1', 4);
-        expect(() => (cell as any).portCount = 6).toThrow();
+        expect(() => (cell as unknown as CellInternals).portCount = 6).toThrow();
       });
 
       it('should not allow ports array mutation', () => {
         const cell = new Cell('c1', 4);
-        const ports = (cell as any).ports;
+        const ports = (cell as unknown as CellInternals).ports;
         expect(() => {
           ports.push(new Port(4));
         }).toThrow();
@@ -90,7 +98,7 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
         const cell = new Cell('c1', 4);
         expect(() => {
           const p = cell.getPortAtIndex(0);
-          (p as any).index = 999;
+          (p as unknown as PortInternals).index = 999;
         }).toThrow();
       });
     });
@@ -170,11 +178,11 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
 
         // Check forward direction: A port 1 points to B
         expect(cellA.getNeighborAtPort(1)).toBe(cellB);
-        expect((cellA as any).connections.get(1)?.neighborPortIndex).toBe(3);
+        expect((cellA as unknown as CellInternals).connections.get(1)?.neighborPortIndex).toBe(3);
 
         // Check reverse direction: B port 3 points to A
         expect(cellB.getNeighborAtPort(3)).toBe(cellA);
-        expect((cellB as any).connections.get(3)?.neighborPortIndex).toBe(1);
+        expect((cellB as unknown as CellInternals).connections.get(3)?.neighborPortIndex).toBe(1);
       });
 
       it('should mark connected ports as NOT exits', () => {
@@ -292,8 +300,8 @@ describe('Board Graph - Port-Based Topology (BDD Scenarios)', () => {
 
         expect(cellB.getNeighborAtPort(3)).toBeNull();
         expect(cellA.getNeighborAtPort(1)).toBeNull();
-        expect((cellA as any).connections.get(1)).toBeUndefined();
-        expect((cellB as any).connections.get(3)).toBeUndefined();
+        expect((cellA as unknown as CellInternals).connections.get(1)).toBeUndefined();
+        expect((cellB as unknown as CellInternals).connections.get(3)).toBeUndefined();
       });
     });
   });

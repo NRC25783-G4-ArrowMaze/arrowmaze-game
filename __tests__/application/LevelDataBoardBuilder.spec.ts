@@ -105,7 +105,6 @@ describe('LevelDataBoardBuilder', () => {
     expect(() => builder.build(data as LevelDataDTO)).toThrow(LevelDataError);
     expect(() => builder.build(data as LevelDataDTO)).toThrow("missing required field 'allowedMoves'");
   });
-  });
 
   it('should_throw_BoardRegistryError_when_arrow_head_references_ghost_cell', () => {
     // Arrange
