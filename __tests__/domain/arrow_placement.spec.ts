@@ -315,7 +315,7 @@ describe('Bloque 3 — Restricciones de colocación', () => {
 
     // @ts-expect-error — intentionally passing null to simulate missing exitPort
     expect(() => new Arrow(C1, null)).toThrow(ArrowCreationError);
-    // @ts-expect-error
+    // @ts-expect-error intentionally passing null to simulate missing exitPort
     expect(() => new Arrow(C1, null)).toThrow(
       'ArrowCreationError: head segment requires an explicit exitPort intent'
     );
