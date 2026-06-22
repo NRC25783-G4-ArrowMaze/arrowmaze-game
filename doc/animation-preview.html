@@ -1,0 +1,28 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>Arrow Maze — preview de animaciones (B2)</title>
+<style>body{font-family:system-ui,sans-serif;background:#f1f3f7;margin:0;padding:24px;text-align:center}
+button{font-size:15px;padding:10px 16px;margin:6px;border:0;border-radius:8px;background:#1f2937;color:#fff;cursor:pointer}
+svg{background:#ffffff;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.12)}</style></head>
+<body>
+<h2>Arrow Maze — animaciones de un tick</h2>
+<p>Cada botón reproduce la coreografía real (glide / recoil / fade).</p>
+<div>
+<button onclick="glide('blue')">advanced → glide (azul, N)</button>
+<button onclick="recoil('green')">blocked → recoil (verde, E)</button>
+<button onclick="fade('orange')">destroyed → fade (naranja, S)</button>
+<button onclick="reset()">reset</button>
+</div>
+<svg width="420" height="420" viewBox="0 0 420 420"><circle cx="35" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="35" r="6.3" fill="#d3d7e0"/><circle cx="35" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="105" r="6.3" fill="#d3d7e0"/><circle cx="35" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="175" r="6.3" fill="#d3d7e0"/><circle cx="35" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="245" r="6.3" fill="#d3d7e0"/><circle cx="35" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="315" r="6.3" fill="#d3d7e0"/><circle cx="35" cy="385" r="6.3" fill="#d3d7e0"/><circle cx="105" cy="385" r="6.3" fill="#d3d7e0"/><circle cx="175" cy="385" r="6.3" fill="#d3d7e0"/><circle cx="245" cy="385" r="6.3" fill="#d3d7e0"/><circle cx="315" cy="385" r="6.3" fill="#d3d7e0"/><circle cx="385" cy="385" r="6.3" fill="#d3d7e0"/><g id="blue" data-exit="0"><path d="M 315,175 L 315,105" fill="none" stroke="#3b82f6" stroke-width="26.6" stroke-linecap="round" stroke-linejoin="round"/><polygon points="315,70 340.2,127.4 289.8,127.4" fill="#3b82f6"/></g><g id="green" data-exit="1"><path d="M 105,175 L 105,175" fill="none" stroke="#22c55e" stroke-width="26.6" stroke-linecap="round" stroke-linejoin="round"/><polygon points="140,175 82.6,200.2 82.6,149.8" fill="#22c55e"/></g><g id="orange" data-exit="2"><path d="M 175,175 L 175,245" fill="none" stroke="#f97316" stroke-width="26.6" stroke-linecap="round" stroke-linejoin="round"/><polygon points="175,280 149.8,222.6 200.2,222.6" fill="#f97316"/></g></svg>
+<script>
+const CELL=70, FRAC=0.28;
+const PD=p=>[[0,-1],[1,0],[0,1],[-1,0]][p];
+const dxy=el=>{const [dc,dr]=PD(+el.dataset.exit);return [dc*CELL,dr*CELL];};
+function glide(id){const el=document.getElementById(id);const [dx,dy]=dxy(el);
+  el.animate([{transform:`translate(${-dx}px,${-dy}px)`},{transform:'translate(0,0)'}],{duration:180,easing:'ease-out'});}
+function recoil(id){const el=document.getElementById(id);const [dx,dy]=dxy(el);
+  el.animate([{transform:'translate(0,0)'},{transform:`translate(${dx*FRAC}px,${dy*FRAC}px)`,offset:.4},{transform:'translate(0,0)'}],{duration:220,easing:'ease-in-out'});}
+function fade(id){const el=document.getElementById(id);const [dx,dy]=dxy(el);
+  el.animate([{transform:'translate(0,0)',opacity:1},{transform:`translate(${dx}px,${dy}px)`,opacity:0}],{duration:260,easing:'ease-in',fill:'forwards'});}
+function reset(){['blue','green','orange'].forEach(id=>{const el=document.getElementById(id);el.getAnimations().forEach(a=>a.cancel());el.style.opacity=1;});}
+</script>
+</body></html>
