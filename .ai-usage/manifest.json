@@ -1127,10 +1127,66 @@
           "Estructura de ramas: fix/movement/base (planes + AI-usage) -> sub-ramas fix/movement/slide y fix/movement/tail"
         ],
         "notes": "Sesión de planning de dos fixes. FIX-1 (aplicación): SlideArrowUseCase encadena advance() hasta terminal (1 click = ticks). FIX-2 (dominio): cierra el hueco de colisión en la cola (advance solo validaba la cabeza; Cell.placeArrowSegment sobre-escribía en silencio). Entregados 2 Gherkin + 2 planes. Implementación pendiente en las sub-ramas."
+      },
+      {
+        "id": "2026-06-26-002",
+        "date": "2026-06-26",
+        "title": "FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase",
+        "file": "2026-06-26-slide-arrow-movement-impl.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "slide-arrow-movement",
+        "linked_session": "2026-06-26-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 265,
+          "files_created": 3,
+          "files_modified": 1,
+          "tests_new": 9,
+          "tests_passing": 225,
+          "test_suites": 20
+        },
+        "areas": [
+          "application-layer",
+          "use-cases",
+          "dtos",
+          "arrow-movement",
+          "tdd",
+          "bdd"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "useCases": [
+              "SlideArrowUseCase"
+            ],
+            "dtos": [
+              "SlideInput",
+              "SlideResult"
+            ],
+            "tests": 9
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "passed — exit 0",
+          "tests": "225/225 passed — 9 nuevos, 0 regresiones",
+          "gen_uml": "passed — classes.puml actualizado",
+          "structure": "passed — sin tocar dominio ni PlayMoveUseCase"
+        },
+        "decisions": [
+          "1 click = 1 movimiento: el bucle hace N ticks pero consumeMove()/recordMoveOutcome() se llaman una vez",
+          "Slide se detiene en blocked/destroyed; fallo de infra no consume movimiento",
+          "Cota defensiva maxTicks = nº celdas + 1 (el dominio ya garantiza terminación)",
+          "Reutiliza AdvanceArrowUseCase; no reimplementa trayectoria ni colisión"
+        ],
+        "notes": "Implementación TDD del plan FIX-1 en rama fix/movement/slide. SlideArrowUseCase encadena advance() hasta terminal y consolida la jugada (1 movimiento, 1 registro de scoring). Colisión de serpientes pendiente de FIX-2. Pendiente cableado de animación en el preview (solo presentación)."
       }
     ],
     "statistics": {
-      "totalReports": 20,
+      "totalReports": 21,
       "lastUpdated": "2026-06-26T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1149,18 +1205,18 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 5994,
-      "totalFilesCreated": 93,
+      "totalLinesGenerated": 6259,
+      "totalFilesCreated": 97,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 214,
-      "totalTestSuites": 15,
+      "totalTestsPassing": 225,
+      "totalTestSuites": 20,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-26-001",
-      "summary": "Planning de fixes de movimiento — FIX-1 (slide) + FIX-2 (colisión de cola)"
+      "id": "2026-06-26-002",
+      "summary": "FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase"
     }
   }
 }

@@ -3,6 +3,11 @@ class Port {
     -index: number
     +getIndex(): number
 }
+class TopologyError extends Error
+class BoardRegistryError extends Error
+class ConnectionError extends Error
+class LevelDataError extends Error
+class BoardMutationError extends Error
 class Cell {
     -id: string
     -portCount: number
@@ -14,6 +19,7 @@ class Cell {
     +getPortCount(): number
     +getPortAtIndex(index: number): Port
     +getNeighborAtPort(portIndex: number): Cell
+    +getConnection(portIndex: number): { neighbor: Cell; neighborPortIndex: number; }
     +isExit(portIndex: number): boolean
     +canConnect(portIndex: number): boolean
     +_getNeighborPortIndex(portIndex: number): number
@@ -193,14 +199,60 @@ interface PlayMoveResult {
     +score?: number
     +error?: string
 }
+interface SlideInput {
+    +session: GameSession
+    +board: Board
+    +arrow: Arrow
+}
+interface SlideResult {
+    +success: boolean
+    +trajectory: AdvanceOutcome[]
+    +finalOutcome?: AdvanceOutcome
+    +movesRemaining: number
+    +gameStatus: GameStatus
+    +score?: number
+    +error?: string
+}
+interface LevelCellDTO {
+    +id: string
+    +portCount: number
+}
+interface LevelConnectionDTO {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelArrowDTO {
+    +id: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface LevelDataDTO {
+    +id: string
+    +name?: string
+    +difficulty?: string
+    +allowedMoves: number
+    +arrows: LevelArrowDTO[]
+    +cells: LevelCellDTO[]
+    +connections?: LevelConnectionDTO[]
+}
+interface IArrowBuilder {
+    +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
+}
 interface IBoardBuilder {
-    +build(data: LevelData): Board
+    +build(data: LevelDataDTO): Board
 }
-interface IBoardRepository {
-    +getBoardForLevel(levelId: string): Promise<Board>
+class LevelDataArrowBuilder implements IArrowBuilder {
+    +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
 }
-interface ILevelRepository {
-    +getLevel(levelId: string): Promise<LevelData>
+class LevelDataBoardBuilder implements IBoardBuilder {
+    +build(data: LevelDataDTO): Board
+    -validateBaseStructure(data: LevelDataDTO): void
+    -validateCellData(cellData: LevelCellDTO): void
+    -processConnection(board: Board, conn: LevelConnectionDTO): void
+    -validateOppositePorts(fromCell: Cell, fromPort: number, toCell: Cell, toPort: number): void
+    -validateArrowIntegrity(board: Board, arrow: LevelArrowDTO): void
 }
 class AdvanceArrowUseCase {
     +execute(input: AdvanceArrowInput): AdvanceResultDTO
@@ -208,13 +260,19 @@ class AdvanceArrowUseCase {
 }
 class BuildBoardUseCase {
     -builder: IBoardBuilder
-    +execute(levelData: LevelData): Board
+    +execute(levelData: LevelDataDTO): Board
 }
-class LoadLevelUseCase {
-    -boardRepository: IBoardRepository
-    +execute(levelId: string): Promise<LoadLevelResult>
-    -extractCells(board: Board): CellDTO[]
-    -extractConnections(board: Board): ConnectionDTO[]
+interface LoadedLevel {
+    +board: Board
+    +arrows: Arrow[]
+}
+interface ILoadedLevelRepository {
+    +getLoadedLevel(levelId: string): Promise<LoadedLevel>
+}
+class LevelLoader {
+    -boardBuilder: IBoardBuilder
+    -arrowBuilder: IArrowBuilder
+    +load(data: LevelDataDTO): LoadedLevel
 }
 class PlaceArrowUseCase {
     +execute(input: PlaceArrowInput): PlaceArrowResult
@@ -240,14 +298,131 @@ class QueryTopologyUseCase {
     +canReachExit(board: Board, cellId: string): boolean
     -resolveCell(board: Board, cellId: string): Cell
 }
-class BoardFactory implements IBoardBuilder {
-    +build(data: LevelData): Board
-    +{static} fromLevelData(data: LevelData): Board
+class SlideArrowUseCase {
+    -advanceUseCase: AdvanceArrowUseCase
+    +execute(input: SlideInput): SlideResult
 }
-class InMemoryBoardRepository implements IBoardRepository, ILevelRepository {
-    -fixtures: Map<string, LevelData>
-    +getLevel(levelId: string): Promise<LevelData>
-    +getBoardForLevel(levelId: string): Promise<Board>
-    +addFixture(levelData: LevelData): void
+interface ILevelRepository {
+    +getLevel(levelId: string): Promise<LevelDataDTO>
+}
+class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepository {
+    -fixtures: Map<string, LevelDataDTO>
+    -levelLoader: LevelLoader
+    +getLevel(levelId: string): Promise<LevelDataDTO>
+    +getLoadedLevel(levelId: string): Promise<LoadedLevel>
+    +addFixture(levelData: LevelDataDTO): void
+}
+interface Point {
+    +x: number
+    +y: number
+}
+interface GridDelta {
+    +dCol: number
+    +dRow: number
+}
+interface GridPosition {
+    +col: number
+    +row: number
+}
+interface BoardLayout {
+    +maxCol: number
+    +maxRow: number
+    +cellSize: number
+    +offset: Point
+}
+interface ArrowMotion {
+    +kind: ArrowMotionKind
+    +dx: number
+    +dy: number
+    +durationMs: number
+}
+interface CellView {
+    +id: string
+    +col: number
+    +row: number
+}
+interface ArrowView {
+    +id: string
+    +color: string
+    +cellIds: string[]
+    +exitDir: number
+}
+interface BoardViewModel {
+    +cells: CellView[]
+    +arrows: ArrowView[]
+}
+interface PlayMoveCommand {
+    +arrowId: string
+}
+interface SceneCell {
+    +id: string
+    +col: number
+    +row: number
+    +portCount: number
+}
+interface SceneArrow {
+    +id: string
+    +color: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface Scene {
+    +id: string
+    +allowedMoves: number
+    +cells: SceneCell[]
+    +connections: LevelConnectionDTO[]
+    +arrows: SceneArrow[]
+}
+class GameController {
+    -board: Board
+    -session: GameSession
+    -playMoveUseCase: PlayMoveUseCase
+    -arrowsById: Map<string, Arrow>
+    -colorById: Map<string, string>
+    -layoutByCellId: Map<string, { col: number; row: number; }>
+    -cellIdByPosition: Map<string, string>
+    +status: GameStatus
+    +movesRemaining: number
+    +score: number
+    +viewModel(): BoardViewModel
+    +resolveArrowIdAt(col: number, row: number): string
+    +playMove(command: PlayMoveCommand): PlayMoveResult
+    -chainCellIds(arrow: Arrow): string[]
+}
+interface GameControllerState {
+    +controller: GameController
+    +viewModel: BoardViewModel
+    +status: GameStatus
+    +movesRemaining: number
+    +score: number
+    +inFlight: boolean
+    +setInFlight: (value: boolean) => void
+    +playMove: (command: PlayMoveCommand) => PlayMoveResult | null
+}
+interface RunTickParams {
+    +arrowId: string
+    +preArrow: ArrowView
+    +outcome: AdvanceOutcome
+    +cellSize: number
+}
+interface TickAnimationState {
+    +inFlight: boolean
+    +motions: ReadonlyMap<string, ArrowMotion>
+    +ghostArrow: ArrowView
+    +enabled: boolean
+    +setEnabled: (value: boolean) => void
+    +run: (params: RunTickParams) => void
+}
+interface PointerGate {
+    +button: number
+    +isPrimary: boolean
+}
+interface UseBoardInputParams {
+    +width: number
+    +height: number
+    +layout: BoardLayout
+    +enabled: boolean
+    +resolveArrowIdAt: ArrowResolver
+    +onPlayMove: (command: PlayMoveCommand) => void
 }
 @enduml
