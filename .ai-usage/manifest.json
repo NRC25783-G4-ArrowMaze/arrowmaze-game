@@ -1087,11 +1087,51 @@
           "structure": "passed"
         },
         "notes": "Validación del PR #10 (presentación B1–B4). Fix de compilación en LevelDataBoardBuilder.spec.ts (\"});\" sobrante línea 108). Reparación del manifest.json (JSON inválido por doble bloque statistics + entradas A5 huérfanas) restaurando la base a1b7e6e y reinsertando limpio. Spec de movimiento continuo documentada sin implementar."
+      },
+      {
+        "id": "2026-06-26-001",
+        "date": "2026-06-26",
+        "title": "Planning de fixes de movimiento — FIX-1 (slide, aplicación) + FIX-2 (colisión de cola, dominio)",
+        "file": "2026-06-26-movement-fixes-planning.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "slide-arrow-movement + tail-collision-detection",
+        "linked_session": "2026-06-22-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 0,
+          "files_created": 5,
+          "files_modified": 0
+        },
+        "areas": [
+          "planning",
+          "spec-driven",
+          "bdd",
+          "application-layer",
+          "domain-layer",
+          "arrow-movement",
+          "collision-detection"
+        ],
+        "validation": {
+          "build": "not_run — planning only",
+          "lint": "not_run — planning only",
+          "tests": "not_run — planning only",
+          "structure": "passed — specs validados contra el código del dominio"
+        },
+        "decisions": [
+          "Slide (FIX-1): 1 click = 1 movimiento; 1 registro de scoring por slide; no toca dominio ni PlayMoveUseCase",
+          "Colisión de cola (FIX-2): único cambio de dominio — validar el destino de la cola en Arrow.advance() fase 3",
+          "Modelo head-push confirmado: cabeza atrás (empuja), cola adelante (frente que entra a celdas nuevas)",
+          "Estructura de ramas: fix/movement/base (planes + AI-usage) -> sub-ramas fix/movement/slide y fix/movement/tail"
+        ],
+        "notes": "Sesión de planning de dos fixes. FIX-1 (aplicación): SlideArrowUseCase encadena advance() hasta terminal (1 click = ticks). FIX-2 (dominio): cierra el hueco de colisión en la cola (advance solo validaba la cabeza; Cell.placeArrowSegment sobre-escribía en silencio). Entregados 2 Gherkin + 2 planes. Implementación pendiente en las sub-ramas."
       }
     ],
     "statistics": {
-      "totalReports": 19,
-      "lastUpdated": "2026-06-22T00:00:00Z",
+      "totalReports": 20,
+      "lastUpdated": "2026-06-26T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1110,7 +1150,7 @@
         "Gemini (versión no especificada)"
       ],
       "totalLinesGenerated": 5994,
-      "totalFilesCreated": 88,
+      "totalFilesCreated": 93,
       "totalFilesDeleted": 13,
       "totalTestsPassing": 214,
       "totalTestSuites": 15,
@@ -1119,8 +1159,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-22-001",
-      "summary": "Validación PR #10 + saneo registro AI usage + spec movimiento continuo"
+      "id": "2026-06-26-001",
+      "summary": "Planning de fixes de movimiento — FIX-1 (slide) + FIX-2 (colisión de cola)"
     }
   }
 }
