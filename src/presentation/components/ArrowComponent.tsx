@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import { portDelta, type Point } from '../rendering/boardLayout';
 import { BODY_STROKE_RATIO } from '../theme';
 
@@ -7,10 +7,16 @@ const HEAD_TIP_RATIO = 0.5; // distancia del centro al apex
 const HEAD_BACK_RATIO = 0.32; // distancia del centro al punto medio de la base
 const HEAD_HALF_BASE_RATIO = 0.36; // mitad del ancho de la base
 
-/** Coreografía del rebote de colisión (la flecha empuja y regresa). */
-const RECOIL_MS = 220;
-/** Fracción de celda que la punta se empuja contra el obstáculo antes de volver. */
-const RECOIL_FRACTION = 0.28;
+/** Coreografía del rebote de colisión (amago de avance siguiendo la forma). */
+const RECOIL_MS = 200;
+/**
+ * Fracción de celda que la flecha amaga avanzar antes de regresar. El amago NO es
+ * un translate de toda la figura: cada vértice se mueve hacia su PROPIA dirección
+ * de avance (hacia el siguiente tramo), de modo que una flecha en L amaga "en L"
+ * —el tramo horizontal avanza horizontal, el vertical avanza vertical— en vez de
+ * levantarse entero hacia la punta.
+ */
+const RECOIL_FRACTION = 0.16;
 
 /** Props de ArrowComponent: view-model de presentación de UNA flecha. */
 export interface ArrowComponentProps {
@@ -101,6 +107,24 @@ function buildHeadPoints(
 }
 
 /**
+ * Vector de avance (px) de cada vértice si la flecha avanzara UN paso:
+ * - Tramo interno (i < n-1): hacia el centro del siguiente segmento → el vértice
+ *   se desliza a lo largo de su propio tramo (horizontal o vertical).
+ * - Punta (i = n-1): en dirección del exitDir (una celda).
+ *
+ * Esto hace que el amago de colisión siga la FORMA de la flecha (una L amaga "en L").
+ */
+function advanceDeltas(centers: Point[], exitDir: number, cellSize: number): Point[] {
+  const n = centers.length;
+  const { dCol, dRow } = portDelta(exitDir);
+  return centers.map((c, i) =>
+    i < n - 1
+      ? { x: centers[i + 1].x - c.x, y: centers[i + 1].y - c.y }
+      : { x: dCol * cellSize, y: dRow * cellSize },
+  );
+}
+
+/**
  * ArrowComponent — Pasada 2 del renderizado: una flecha completa, dibujada sobre
  * la grilla de puntos.
  *
@@ -109,9 +133,10 @@ function buildHeadPoints(
  * cuerpo y de la cabeza vienen del dato (sin fallback).
  *
  * El AVANCE se anima reproyectando la forma REAL del dominio entre ticks
- * (useGameController), así que el cuerpo se dibuja siempre en su forma actual,
- * sin transform. La COLISIÓN sí es un transform efímero: cuando `collideNonce`
- * cambia, la flecha rebota contra el obstáculo (su forma no cambia al chocar).
+ * (useGameController). La COLISIÓN es un amago efímero que sigue la forma: cuando
+ * `collideNonce` cambia, cada vértice avanza una fracción hacia su propio tramo y
+ * regresa. Se anima vía estado (recoilF) para que React controle el trazo de forma
+ * coherente (no se manipula el DOM imperativamente, que competiría con el render).
  */
 export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   color,
@@ -120,45 +145,58 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   cellSize,
   collideNonce,
 }) => {
-  const groupRef = useRef<SVGGElement | null>(null);
+  // Fracción de amago actual (0 = reposo). Animada por rAF durante la colisión.
+  const [recoilF, setRecoilF] = useState(0);
 
-  // Rebote de colisión: empuja la flecha RECOIL_FRACTION de celda en dirección
-  // de su punta (exitDir) y la regresa. Solo se dispara cuando collideNonce
-  // cambia; es puramente visual (no toca el dominio).
   useLayoutEffect(() => {
-    if (collideNonce === undefined) {
+    if (collideNonce === undefined || centers.length === 0) {
       return;
     }
-    const group = groupRef.current;
-    if (group === null || typeof group.animate !== 'function') {
-      return;
+    if (typeof requestAnimationFrame !== 'function') {
+      return; // Entornos sin rAF (p.ej. jsdom viejo): el estado de reposo ya es correcto.
     }
-    const { dCol, dRow } = portDelta(exitDir);
-    const px = dCol * cellSize * RECOIL_FRACTION;
-    const py = dRow * cellSize * RECOIL_FRACTION;
-    const animation = group.animate(
-      [
-        { transform: 'translate(0px, 0px)' },
-        { transform: `translate(${px}px, ${py}px)`, offset: 0.4 },
-        { transform: 'translate(0px, 0px)' },
-      ],
-      { duration: RECOIL_MS, easing: 'ease-in-out' },
-    );
-    return () => animation.cancel();
-  }, [collideNonce, exitDir, cellSize]);
+    let raf = 0;
+    const start = performance.now();
+    const frame = (now: number): void => {
+      const p = Math.min((now - start) / RECOIL_MS, 1);
+      // Envolvente 0 → F → 0 (pico suave a mitad): amago de ida y vuelta.
+      setRecoilF(RECOIL_FRACTION * Math.sin(p * Math.PI));
+      if (p < 1) {
+        raf = requestAnimationFrame(frame);
+      } else {
+        setRecoilF(0);
+      }
+    };
+    raf = requestAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(raf);
+      setRecoilF(0);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collideNonce]);
 
   if (centers.length === 0) {
     return null;
   }
 
-  const bodyPath = buildBodyPath(centers);
+  // Durante el amago, cada vértice se desplaza recoilF hacia su dirección de avance
+  // (siguiendo la forma). En reposo (recoilF === 0) se usan los centros tal cual.
+  const drawCenters =
+    recoilF === 0
+      ? centers
+      : advanceDeltas(centers, exitDir, cellSize).map((d, i) => ({
+          x: centers[i].x + d.x * recoilF,
+          y: centers[i].y + d.y * recoilF,
+        }));
+
+  const bodyPath = buildBodyPath(drawCenters);
   // La punta visual va en la celda LÍDER (última en orden de ocupación), no en la
   // celda-cabeza del dominio, que en este motor ocupa el extremo trasero.
-  const tipCenter = centers[centers.length - 1];
-  const headPoints = buildHeadPoints(tipCenter, tipDirection(centers, exitDir), cellSize);
+  const tipCenter = drawCenters[drawCenters.length - 1];
+  const headPoints = buildHeadPoints(tipCenter, tipDirection(drawCenters, exitDir), cellSize);
 
   return (
-    <g data-testid="arrow" ref={groupRef}>
+    <g data-testid="arrow">
       {/* Cuerpo: trazo grueso redondeado, sin relleno. Se dibuja PRIMERO. */}
       <path
         data-testid="arrow-body"
