@@ -1,9 +1,12 @@
 import React from 'react'
 import { ArrowComponent } from '../components/ArrowComponent'
+import { ArrowBurst } from '../components/ArrowBurst'
+import { ArrowHeadDisintegrate } from '../components/ArrowHeadDisintegrate'
 import { GameOverlay } from '../components/GameOverlay'
 import {
   computeBoardLayout,
   cellCenter,
+  portDelta,
   type Point,
 } from '../rendering/boardLayout'
 import { useGameController } from '../game/useGameController'
@@ -41,6 +44,14 @@ const NeonInteractiveBoard: React.FC = () => {
   const centerById = new Map<string, Point>(
     game.viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
   )
+
+  // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
+  const burstOrigin =
+    game.vanishing !== null ? centerById.get(game.vanishing.cellIds[0]) : undefined
+
+  // Origen de la desintegración de la punta.
+  const headDisintegrateOrigin =
+    game.headDisintegrating !== null ? centerById.get(game.headDisintegrating.cellId) : undefined
 
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: SIZE }}>
@@ -96,6 +107,36 @@ const NeonInteractiveBoard: React.FC = () => {
             </g>
           )
         })}
+
+        {/* Desintegración de la punta: fractura con glow que precede al estallido. */}
+        {game.headDisintegrating !== null && headDisintegrateOrigin !== undefined && (
+          (() => {
+            const { dCol, dRow } = portDelta(game.headDisintegrating.exitDir)
+            return (
+              <g filter="url(#neon-glow)">
+                <ArrowHeadDisintegrate
+                  key={game.headDisintegrating.nonce}
+                  center={headDisintegrateOrigin}
+                  color={game.headDisintegrating.color}
+                  cellSize={cellSize}
+                  tipDir={{ x: dCol, y: dRow }}
+                />
+              </g>
+            )
+          })()
+        )}
+
+        {/* Estallido de desaparición: chispas con glow en la cabeza destruida. */}
+        {game.vanishing !== null && burstOrigin !== undefined && (
+          <g filter="url(#neon-glow)">
+            <ArrowBurst
+              key={game.vanishing.nonce}
+              origin={burstOrigin}
+              color={game.vanishing.color}
+              cellSize={cellSize}
+            />
+          </g>
+        )}
       </svg>
 
       <GameOverlay status={game.status} score={game.score} />

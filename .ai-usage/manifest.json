@@ -1306,6 +1306,78 @@
         "notes": "Seguimiento de FIX-1: cablea el slide en el preview con animación tick-a-tick reusando el motor (sin translate). Reintroduce el rebote de colisión que se había eliminado con la maquinaria. Verificación en runtime (navegador) además de tests/typecheck. Rama feature/animaciones."
       },
       {
+        "id": "2026-06-27-003",
+        "date": "2026-06-27",
+        "title": "Animaciones desaparición, deformación colisión, UI mejorado",
+        "file": "2026-06-27-animaciones-desaparicion-deformacion-ui.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Haiku 4.5 + Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "presentation-animations-ui",
+        "linked_session": "2026-06-27-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 520,
+          "files_created": 2,
+          "files_modified": 5,
+          "files_deleted": 0,
+          "tests_passing": 228,
+          "test_suites": 20
+        },
+        "areas": [
+          "presentation-layer",
+          "react-components",
+          "animation",
+          "svg",
+          "ui-design",
+          "css",
+          "visual-effects"
+        ],
+        "animations": [
+          "ArrowBurst: 9 partículas radiales 350ms",
+          "ArrowHeadDisintegrate: grietas radiales 150ms pre-burst",
+          "ArrowComponent deformación: cuerpo +50% stroke, punta -40% tamaño en colisión"
+        ],
+        "uiImprovements": [
+          "BOARD_SIZE: 420px → 560px",
+          "Número movimientos: 36px azul font-weight 800",
+          "Header con gradiente + sombra",
+          "Layout limpio stat-moves + stat-status"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "ArrowBurst.tsx",
+              "ArrowHeadDisintegrate.tsx"
+            ],
+            "modified": [
+              "ArrowComponent.tsx (deformación)",
+              "useGameController.ts (señal headDisintegrating)",
+              "BoardComponent.tsx (render burst + disintegrate)",
+              "NeonInteractiveBoard.tsx (render con glow)",
+              "App.tsx/App.css (UI mejorado)"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed — Vite 57 módulos",
+          "lint": "passed — ESLint exit 0",
+          "tests": "228/228 passed — 0 regresiones",
+          "visual": "screenshot verificado: tablero 560px, número 30 azul prominente",
+          "dom": "verificado: 9 chispas + 4 grietas en DOM durante desaparición",
+          "runtime": "ambos tableros (claro + neón) funcionales sin errores"
+        },
+        "decisions": [
+          "Estallido + desintegración en secuencia (150ms + 350ms) para transición visual clara",
+          "Deformación de colisión: factor² para pico en impacto, easing suave",
+          "Timing sincronizado: headDisintegrating inicia al mismo tiempo que vanishing",
+          "UI: BOARD_SIZE aumentado, número de movimientos en 36px azul con label arriba"
+        ],
+        "notes": "Sesión de 4 animaciones visuales + mejora de UI principal. Puro código de presentación. ArrowBurst y ArrowHeadDisintegrate nuevos componentes SVG. ArrowComponent mejorado con deformación. Timing de desintegración (150ms) antes de burst (350ms) crea efecto visual cohesivo. Ambos tableros (claro + neón con glow) funcionales. Verificación visual en screenshot + DOM."
+      },
+      {
         "id": "2026-06-27-002",
         "date": "2026-06-27",
         "title": "Mapa de preview 'corazón': tablero-grafo esquemático y resoluble",
@@ -1356,8 +1428,8 @@
       }
     ],
     "statistics": {
-      "totalReports": 24,
-      "lastUpdated": "2026-06-27T00:00:00Z",
+      "totalReports": 25,
+      "lastUpdated": "2026-06-27T23:59:59Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",

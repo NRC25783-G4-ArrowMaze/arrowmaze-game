@@ -7,7 +7,7 @@ import { useGameController } from './presentation/game/useGameController';
 import { useBoardInput } from './presentation/input/useBoardInput';
 import { SAMPLE_LEVEL } from './presentation/game/sampleLevel';
 
-const BOARD_SIZE = 420;
+const BOARD_SIZE = 560;
 
 /**
  * App — Demo interactiva del tablero (B1 + B3).
@@ -37,9 +37,15 @@ const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
-        <p>
-          Movimientos: {game.movesRemaining} · Estado: {game.status}
-        </p>
+        <div className="app-stats">
+          <div className="stat-moves">
+            <span className="stat-label">Movimientos</span>
+            <span className="stat-value">{game.movesRemaining}</span>
+          </div>
+          <div className="stat-status">
+            {game.status === 'IN_PROGRESS' ? '▶ En juego' : `✓ ${game.status}`}
+          </div>
+        </div>
       </header>
       <main className="app-main">
         <div
@@ -55,6 +61,8 @@ const App: React.FC = () => {
             height={BOARD_SIZE}
             onPointerDown={onPointerDown}
             collision={game.collision ?? undefined}
+            vanishing={game.vanishing ?? undefined}
+            headDisintegrating={game.headDisintegrating ?? undefined}
           />
           <GameOverlay status={game.status} score={game.score} />
         </div>

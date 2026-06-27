@@ -30,6 +30,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-26 | FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio) | [`2026-06-26-tail-collision-detection-impl.md`](./2026-06-26-tail-collision-detection-impl.md) | Claude Opus 4.8 |
 | 2026-06-27 | Animación de slide tick-a-tick + recoil de colisión (presentación) | [`2026-06-27-slide-animation-recoil-presentation.md`](./2026-06-27-slide-animation-recoil-presentation.md) | Claude Sonnet 4.6 + Claude Opus 4.8 |
 | 2026-06-27 | Mapa de preview "corazón": tablero-grafo esquemático y resoluble | [`2026-06-27-heart-preview-map.md`](./2026-06-27-heart-preview-map.md) | Claude Opus 4.8 |
+| 2026-06-27 | Animaciones desaparición, deformación colisión, UI mejorado | [`2026-06-27-animaciones-desaparicion-deformacion-ui.md`](./2026-06-27-animaciones-desaparicion-deformacion-ui.md) | Claude Haiku 4.5 + Opus 4.8 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 

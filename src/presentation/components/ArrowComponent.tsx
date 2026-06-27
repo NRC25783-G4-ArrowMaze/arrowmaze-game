@@ -7,7 +7,7 @@ const HEAD_TIP_RATIO = 0.5; // distancia del centro al apex
 const HEAD_BACK_RATIO = 0.32; // distancia del centro al punto medio de la base
 const HEAD_HALF_BASE_RATIO = 0.36; // mitad del ancho de la base
 
-/** Coreografía del rebote de colisión (amago de avance siguiendo la forma). */
+/** Coreografía del rebote de colisión (amago de avance + deformación siguiendo la forma). */
 const RECOIL_MS = 200;
 /**
  * Fracción de celda que la flecha amaga avanzar antes de regresar. El amago NO es
@@ -17,6 +17,10 @@ const RECOIL_MS = 200;
  * levantarse entero hacia la punta.
  */
 const RECOIL_FRACTION = 0.16;
+/** Máximo engrosamiento del cuerpo durante la deformación por impacto (como fracción del stroke). */
+const DEFORM_STROKE_RATIO = 0.5; // 50% más grueso en el pico
+/** Máxima compresión de la punta durante la deformación (la punta se vuelve más pequeña). */
+const DEFORM_HEAD_RATIO = 0.4; // 40% más pequeño en el pico
 
 /** Props de ArrowComponent: view-model de presentación de UNA flecha. */
 export interface ArrowComponentProps {
@@ -82,11 +86,13 @@ function tipDirection(centers: Point[], exitDir: number): { x: number; y: number
 /**
  * Construye los puntos del polígono triangular de la punta, centrado en `center`
  * (la celda líder) y orientado según el vector unitario `dir`.
+ * Opcionalmente aplica deformación por impacto (la punta se comprime).
  */
 function buildHeadPoints(
   center: Point,
   dir: { x: number; y: number },
   cellSize: number,
+  deformFactor: number = 0,
 ): string {
   const dirX = dir.x;
   const dirY = dir.y;
@@ -94,9 +100,11 @@ function buildHeadPoints(
   const perpX = -dirY;
   const perpY = dirX;
 
-  const tip = HEAD_TIP_RATIO * cellSize;
-  const back = HEAD_BACK_RATIO * cellSize;
-  const half = HEAD_HALF_BASE_RATIO * cellSize;
+  // Aplica compresión: cuanto mayor sea deformFactor, más pequeño es el triángulo.
+  const compressionRatio = 1 - DEFORM_HEAD_RATIO * deformFactor;
+  const tip = HEAD_TIP_RATIO * cellSize * compressionRatio;
+  const back = HEAD_BACK_RATIO * cellSize * compressionRatio;
+  const half = HEAD_HALF_BASE_RATIO * cellSize * compressionRatio;
 
   const apex: Point = { x: center.x + dirX * tip, y: center.y + dirY * tip };
   const baseMid: Point = { x: center.x - dirX * back, y: center.y - dirY * back };
@@ -104,6 +112,19 @@ function buildHeadPoints(
   const right: Point = { x: baseMid.x - perpX * half, y: baseMid.y - perpY * half };
 
   return `${apex.x},${apex.y} ${left.x},${left.y} ${right.x},${right.y}`;
+}
+
+/**
+ * Factor de deformación por impacto: cuánto se comprime/deforma la flecha en el rebote.
+ * Máximo cuando recoilF es máximo (mitad del bounce), cero en reposo.
+ * Usa una envolvente suave para que la deformación "pique" en el impacto.
+ */
+function deformationFactor(recoilF: number): number {
+  // recoilF va 0 → RECOIL_FRACTION → 0
+  // Normalizamos: recoilNormalized = recoilF / RECOIL_FRACTION (0 → 1 → 0)
+  const normalized = Math.min(recoilF / RECOIL_FRACTION, 1);
+  // Retornamos una parábola: normalized² para un pico suave en el impacto
+  return normalized * normalized;
 }
 
 /**
@@ -189,11 +210,22 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
           y: centers[i].y + d.y * recoilF,
         }));
 
+  // Factor de deformación por impacto (0 en reposo, máximo en pico del rebote).
+  const deform = deformationFactor(recoilF);
+
   const bodyPath = buildBodyPath(drawCenters);
   // La punta visual va en la celda LÍDER (última en orden de ocupación), no en la
   // celda-cabeza del dominio, que en este motor ocupa el extremo trasero.
   const tipCenter = drawCenters[drawCenters.length - 1];
-  const headPoints = buildHeadPoints(tipCenter, tipDirection(drawCenters, exitDir), cellSize);
+  const headPoints = buildHeadPoints(
+    tipCenter,
+    tipDirection(drawCenters, exitDir),
+    cellSize,
+    deform, // aplica compresión de la punta
+  );
+
+  // Engrosamiento del cuerpo durante el impacto (simula compresión).
+  const bodyStrokeWidth = BODY_STROKE_RATIO * cellSize * (1 + DEFORM_STROKE_RATIO * deform);
 
   return (
     <g data-testid="arrow">
@@ -203,7 +235,7 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
         d={bodyPath}
         fill="none"
         stroke={color}
-        strokeWidth={BODY_STROKE_RATIO * cellSize}
+        strokeWidth={bodyStrokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
