@@ -27,6 +27,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-22 | Validación PR #10 + saneo registro AI usage + spec movimiento continuo | [`2026-06-22-pr10-validation-ai-usage-cleanup.md`](./2026-06-22-pr10-validation-ai-usage-cleanup.md) | Claude Opus 4.8 |
 | 2026-06-26 | Planning de fixes de movimiento — FIX-1 (slide, aplicación) + FIX-2 (colisión de cola, dominio) | [`2026-06-26-movement-fixes-planning.md`](./2026-06-26-movement-fixes-planning.md) | Claude Opus 4.8 |
 | 2026-06-26 | FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase (aplicación) | [`2026-06-26-slide-arrow-movement-impl.md`](./2026-06-26-slide-arrow-movement-impl.md) | Claude Opus 4.8 |
+| 2026-06-26 | FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio) | [`2026-06-26-tail-collision-detection-impl.md`](./2026-06-26-tail-collision-detection-impl.md) | Claude Opus 4.8 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 

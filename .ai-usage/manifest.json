@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-22T00:00:00Z",
+    "lastUpdated": "2026-06-26T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1183,10 +1183,64 @@
           "Reutiliza AdvanceArrowUseCase; no reimplementa trayectoria ni colisión"
         ],
         "notes": "Implementación TDD del plan FIX-1 en rama fix/movement/slide. SlideArrowUseCase encadena advance() hasta terminal y consolida la jugada (1 movimiento, 1 registro de scoring). Colisión de serpientes pendiente de FIX-2. Pendiente cableado de animación en el preview (solo presentación)."
+      },
+      {
+        "id": "2026-06-26-003",
+        "date": "2026-06-26",
+        "title": "FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio)",
+        "file": "2026-06-26-tail-collision-detection-impl.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "tail-collision-detection",
+        "linked_session": "2026-06-26-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 11,
+          "files_created": 2,
+          "files_modified": 3,
+          "tests_new": 8,
+          "tests_passing": 233,
+          "test_suites": 21
+        },
+        "areas": [
+          "domain-layer",
+          "entities",
+          "arrow-movement",
+          "collision-detection",
+          "cinematic-engine",
+          "tdd",
+          "bdd"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "entities": [
+              "Arrow (modified)"
+            ],
+            "tests": 8
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "lint": "passed — exit 0",
+          "tests": "233/233 passed — 8 nuevos, 0 regresiones",
+          "gen_uml": "passed — classes.puml sin cambios de contenido (API pública intacta)",
+          "structure": "passed — único cambio de dominio, sin tocar use cases ni Cell"
+        },
+        "decisions": [
+          "Alcance cola-only: en head-push la cola es el único segmento que entra a celda nueva",
+          "Sumidero (targetCell null) no bloquea: la cola se purga en el commit",
+          "self nunca bloquea (reutiliza _cellBelongsToSelf)",
+          "Rollback = no hacer nada: el chequeo es pre-commit, ningún contenedor fue mutado",
+          "No se tocó _calculateTargets, _commitAdvance, Cell ni ningún use case"
+        ],
+        "notes": "Implementación TDD del plan FIX-2 en rama fix/movement/tail. Cierra el hueco de colisión en la cola: advance() solo validaba la cabeza (self en flechas multi-celda) y Cell.placeArrowSegment sobre-escribía en silencio. Fase 3.5 valida el destino de la cola contra ocupación ajena. Scenario 7 'Lazy checking' verificado intacto. Con FIX-2 el slide de FIX-1 ya se detiene ante serpientes sin tocar SlideArrowUseCase."
       }
     ],
     "statistics": {
-      "totalReports": 21,
+      "totalReports": 22,
       "lastUpdated": "2026-06-26T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1205,18 +1259,18 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 6259,
-      "totalFilesCreated": 97,
+      "totalLinesGenerated": 6270,
+      "totalFilesCreated": 99,
       "totalFilesDeleted": 13,
-      "totalTestsPassing": 225,
-      "totalTestSuites": 20,
+      "totalTestsPassing": 233,
+      "totalTestSuites": 21,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-26-002",
-      "summary": "FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase"
+      "id": "2026-06-26-003",
+      "summary": "FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance"
     }
   }
 }
