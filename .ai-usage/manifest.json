@@ -1301,7 +1301,7 @@
           "Dominio y SlideArrowUseCase intactos (revertido un intento de cambio de dominio a petición del autor)"
         ],
         "knownIssues": [
-          "Recoil aplica translate rígido a toda la figura en dirección de la punta; en figuras no lineales (curvas/L) el rebote del cuerpo no es físicamente fiel. Registrado como issue de GitHub."
+          "RESUELTO (commit ef3783a, issue #13 cerrado): el recoil ahora sigue la forma — cada vértice amaga su avance hacia su propio tramo (la L amaga 'en L'), animado vía estado recoilF. La versión inicial trasladaba toda la figura hacia la punta y levantaba el tramo horizontal."
         ],
         "notes": "Seguimiento de FIX-1: cablea el slide en el preview con animación tick-a-tick reusando el motor (sin translate). Reintroduce el rebote de colisión que se había eliminado con la maquinaria. Verificación en runtime (navegador) además de tests/typecheck. Rama feature/animaciones."
       }

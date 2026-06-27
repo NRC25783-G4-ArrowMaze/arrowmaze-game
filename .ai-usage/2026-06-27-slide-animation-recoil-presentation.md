@@ -19,7 +19,7 @@
 - **Salida tomada de la IA:**
   - `src/presentation/game/GameController.ts` — `advanceTick(arrowId)` (un tick vía `AdvanceArrowUseCase`, sin tocar sesión) y `commitSlide(outcome)` (consolida la jugada: 1 movimiento + 1 scoring + status).
   - `src/presentation/game/useGameController.ts` — `playMove` reescrito como bucle tick-a-tick espaciado (`TICK_MS=90`) que reproyecta la forma real del dominio en cada tick; señal `collision` (`{ arrowId, nonce }`) emitida al terminar en `blocked`.
-  - `src/presentation/components/ArrowComponent.tsx` — render estático (sin translate) + prop `collideNonce` que dispara el rebote WAAPI (empuje de `0.28·celda` en dirección de la punta y retorno, 220 ms).
+  - `src/presentation/components/ArrowComponent.tsx` — render estático (sin translate) + prop `collideNonce` que dispara el rebote. El amago **sigue la forma**: cada vértice avanza una fracción (`0.16·celda`) hacia su propio tramo (la punta hacia `exitDir`), animado vía estado `recoilF` con `requestAnimationFrame`.
   - `src/presentation/components/BoardComponent.tsx`, `src/App.tsx`, `src/presentation/preview/NeonInteractiveBoard.tsx` — propagan la señal de colisión; eliminan el paso de `motions`/ghost.
   - **Eliminados:** `src/presentation/animation/motion.ts`, `src/presentation/game/useTickAnimation.ts`, `__tests__/presentation/animation.spec.ts` (maquinaria de translate B2, obsoleta).
 
@@ -40,7 +40,7 @@
   - `tsc --noEmit -p tsconfig.app.json`: exit 0.
   - **Runtime (preview neón, en navegador):** la flecha cian curva produce **6 formas distintas** tick a tick (la L se transforma en recta al consumirse la curva) y sale del tablero, coincidiendo con el dominio (`advanced×4 → destroyed`); el recoil de la amarilla muestra `transform` `0 → 43.2px (Este) → none` sin desplazar la flecha; **cero errores de consola** en montaje fresco. Cada slide consume 1 jugada.
 
-> **Problema conocido (registrado como issue de GitHub):** el recoil aplica un `translate` rígido a TODA la figura en dirección de la punta. En **figuras no lineales** (curvas/L) el rebote del cuerpo no es físicamente fiel (el tramo trasero se desplaza igual que la punta). Pendiente: modelar el rebote respetando la forma, análogo a como el avance reproyecta la forma real.
+> **Problema conocido → RESUELTO** (commit `ef3783a`, issue #13 cerrado): la primera versión del recoil aplicaba un `translate` rígido a TODA la figura en dirección de la punta, por lo que en figuras no lineales (curvas/L) el tramo horizontal se "levantaba" en vez de seguir su forma. Se rehízo para que **cada vértice amague su avance hacia su propio tramo** (deformando el trazo, animado vía estado `recoilF`): la L amaga "en L". Verificado en runtime (el tramo de abajo mantiene su `y` y se desliza en `x`).
 
 ---
 #### 📋 Resumen de la sesión
