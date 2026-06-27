@@ -10,24 +10,14 @@ import { SAMPLE_LEVEL } from './presentation/game/sampleLevel';
 import type { BoardViewModel } from './presentation/viewModel';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from './domain/value-objects/Score';
+import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvides';
 
 const BOARD_SIZE = 420;
 
 /**
- * App — Demo interactiva del tablero con animaciones (B1 + B2 + B3) y Persistencia Local.
- *
- * Flujo de un toque:
- * 1. La capa de input resuelve la flecha tocada (B3).
- * 2. Se captura el estado PREVIO de esa flecha.
- * 3. El motor ejecuta UN tick (PlayMoveUseCase) → outcome advanced/blocked/destroyed.
- * 4. La capa de animación reproduce la coreografía y bloquea el input mientras dura.
- *
- * La animación es puramente visual: el estado del juego lo decide el motor.
+ * App — Demo interactiva del tablero con animaciones y Sincronización Bidireccional.
  */
 const App: React.FC = () => {
-  // ─────────────────────────────────────────────
-  // 1. ESTADOS DE INFRAESTRUCTURA (Base de Datos)
-  // ─────────────────────────────────────────────
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
@@ -36,11 +26,29 @@ const App: React.FC = () => {
 
     const bootstrapGame = async () => {
       try {
-        // La fábrica se encarga del trabajo asíncrono y pesado de SQLite
-        const module = await LocalProgressModuleFactory.create();
+        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+        
+        // 🚀 Inyectamos el proveedor nativo de Capacitor
+        const tokenProvider = new CapacitorTokenProvider();
+
+        const module = await LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider);
         
         if (isMounted) {
           setProgressModule(module);
+
+          // Sincronización background (Bloque 4)
+          module.syncProgress.execute()
+            .then(() => console.log('[App] Sincronización background completada.'))
+            .catch(async (error: unknown) => {
+              console.warn('[App] Sincronización background detenida:', error);
+              
+              // Si el error es de sesión (401 SessionExpiredError), 
+              // podemos borrar el token inválido automáticamente.
+              if (error instanceof Error && error.name === 'SessionExpiredError') {
+                 await tokenProvider.removeToken();
+                 // TODO: Despachar evento para redirigir al Login
+              }
+            });
         }
       } catch (error) {
         console.error("Error arrancando el motor de base de datos", error);
@@ -65,10 +73,9 @@ const App: React.FC = () => {
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
   // ─────────────────────────────────────────────
-  // 3. PERSISTENCIA AUTOMÁTICA AL GANAR
+  // 3. PERSISTENCIA AUTOMÁTICA AL GANAR (UPSTREAM ENCOLADO)
   // ─────────────────────────────────────────────
   useEffect(() => {
-    // Si el juego fue ganado, el módulo de DB está listo y hay un score válido
     if (game.status === 'WON' && progressModule && game.score) {
       
       const levelData = SAMPLE_LEVEL as unknown as { id?: string; movesAllowed?: number };
@@ -76,21 +83,25 @@ const App: React.FC = () => {
       const totalMoves = levelData.movesAllowed ?? 20; 
       
       const movesUsed = totalMoves - game.movesRemaining;
-      const timeElapsedSeconds = 45;
+      const timeElapsedSeconds = 45; 
 
       progressModule.saveLocalProgress
         .execute(levelId, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
-          console.log(`[App] Progreso guardado en SQLite para el nivel ${levelId}`);
+          console.log(`[App] Progreso local guardado para el nivel ${levelId}`);
+          // Opcional: Podrías llamar a syncProgress.execute() aquí mismo para 
+          // intentar subir el récord de inmediato tras ganar, si hay internet.
+          return progressModule.syncProgress.execute();
         })
         .catch((error: unknown) => {
-          console.error('[App] Error al guardar el progreso local:', error);
+          console.error('[App] Error guardando o sincronizando el récord:', error);
         });
     }
   }, [game.status, game.score, game.movesRemaining, progressModule]);
 
-  // Durante un fade de destroyed, re-inyectamos la flecha "fantasma" para verla
-  // desvanecer (el motor ya la eliminó del estado).
+  // ─────────────────────────────────────────────
+  // 4. ANIMACIONES Y RENDERIZADO CONDICIONAL
+  // ─────────────────────────────────────────────
   const viewModel: BoardViewModel = useMemo(() => {
     if (anim.ghostArrow === null) {
       return game.viewModel;
@@ -105,7 +116,6 @@ const App: React.FC = () => {
     width: BOARD_SIZE,
     height: BOARD_SIZE,
     layout,
-    // Bloqueo adicional: input deshabilitado si la DB sigue cargando
     enabled: game.status === 'IN_PROGRESS' && !anim.inFlight && !isInitializing,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
     onPlayMove: (command) => {
@@ -126,11 +136,6 @@ const App: React.FC = () => {
     },
   });
 
-  // ─────────────────────────────────────────────
-  // 4. RENDERIZADO CONDICIONAL
-  // ─────────────────────────────────────────────
-  
-  // Protegemos la UI principal hasta que SQLite esté listo
   if (isInitializing) {
     return (
       <div className="app">
@@ -138,7 +143,7 @@ const App: React.FC = () => {
           <h1>Arrow Maze</h1>
         </header>
         <main className="app-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p>Inicializando base de datos local...</p>
+          <p>Cargando motor del juego...</p>
         </main>
       </div>
     );
