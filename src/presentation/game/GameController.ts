@@ -2,12 +2,13 @@ import { Board } from '../../domain/entities/Board';
 import { Arrow } from '../../domain/entities/Arrow';
 import type { ArrowSegment } from '../../domain/entities/ArrowSegment';
 import { GameSession, type GameStatus } from '../../domain/entities/GameSession';
-import { PlayMoveUseCase } from '../../application/use-cases/PlayMoveUseCase';
+import { SlideArrowUseCase } from '../../application/use-cases/SlideArrowUseCase';
 import { AdvanceArrowUseCase } from '../../application/use-cases/AdvanceArrowUseCase';
 import { LevelLoader } from '../../application/use-cases/LevelLoader';
 import { LevelDataBoardBuilder } from '../../application/services/LevelDataBoardBuilder';
 import { LevelDataArrowBuilder } from '../../application/services/LevelDataArrowBuilder';
-import type { PlayMoveResult } from '../../application/dtos/SessionDTOs';
+import type { SlideResult } from '../../application/dtos/SlideDTOs';
+import type { AdvanceOutcome } from '../../domain/value-objects/AdvanceResult';
 import type { BoardViewModel } from '../viewModel';
 import type { PlayMoveCommand } from '../input/PlayMoveCommand';
 import { type Scene, toLevelDataDTO } from './scene';
@@ -28,7 +29,8 @@ import { type Scene, toLevelDataDTO } from './scene';
 export class GameController {
   private readonly board: Board;
   private readonly session: GameSession;
-  private readonly playMoveUseCase: PlayMoveUseCase;
+  private readonly slideUseCase: SlideArrowUseCase;
+  private readonly advanceUseCase: AdvanceArrowUseCase;
 
   /** Flechas vivas por id. Una flecha destruida se elimina de este mapa. */
   private readonly arrowsById: Map<string, Arrow>;
@@ -48,7 +50,9 @@ export class GameController {
 
     this.board = board;
     this.session = new GameSession(scene.allowedMoves);
-    this.playMoveUseCase = new PlayMoveUseCase(new AdvanceArrowUseCase());
+    // Misma instancia (stateless) para el slide headless y el avance tick-a-tick.
+    this.advanceUseCase = new AdvanceArrowUseCase();
+    this.slideUseCase = new SlideArrowUseCase(this.advanceUseCase);
 
     // El builder devuelve las flechas en el mismo orden que scene.arrows.
     this.arrowsById = new Map(
@@ -89,12 +93,15 @@ export class GameController {
       ([id, { col, row }]) => ({ id, col, row }),
     );
 
-    const arrows = Array.from(this.arrowsById.entries()).map(([id, arrow]) => ({
-      id,
-      color: this.colorById.get(id) ?? '#000000',
-      cellIds: this.chainCellIds(arrow),
-      exitDir: arrow.head.exitPort,
-    }));
+    const arrows = Array.from(this.arrowsById.entries()).map(([id, arrow]) => {
+      const cellIds = this.chainCellIds(arrow);
+      return {
+        id,
+        color: this.colorById.get(id) ?? '#000000',
+        cellIds,
+        exitDir: this.visualExitDir(arrow.head.exitPort, cellIds),
+      };
+    });
 
     return { cells, arrows };
   }
@@ -131,28 +138,89 @@ export class GameController {
    *
    * @returns El PlayMoveResult del motor, o null si la flecha no existe.
    */
-  playMove(command: PlayMoveCommand): PlayMoveResult | null {
+  playMove(command: PlayMoveCommand): SlideResult | null {
     const arrow = this.arrowsById.get(command.arrowId);
     if (arrow === undefined) {
       return null;
     }
 
-    const result = this.playMoveUseCase.execute({
+    const result = this.slideUseCase.execute({
       session: this.session,
       board: this.board,
       arrow,
     });
 
-    if (result.success && result.outcome === 'destroyed') {
+    if (result.success && result.finalOutcome === 'destroyed') {
       this.arrowsById.delete(command.arrowId);
     }
 
     return result;
   }
 
+  /**
+   * Ejecuta UN tick de avance de la flecha (vía AdvanceArrowUseCase) sin tocar la
+   * sesión. Es el paso atómico que la presentación encadena en el tiempo para
+   * animar el slide tick-a-tick (la forma real del dominio se reproyecta entre
+   * pasos). Si el tick destruye la flecha, se retira del mapa de vivas.
+   *
+   * NO consume movimiento ni registra scoring: eso lo hace commitSlide() una sola
+   * vez al final del slide, preservando la regla "1 click = 1 jugada".
+   *
+   * @returns El outcome del tick, o null si la flecha no existe o el motor falló.
+   */
+  advanceTick(arrowId: string): AdvanceOutcome | null {
+    const arrow = this.arrowsById.get(arrowId);
+    if (arrow === undefined) {
+      return null;
+    }
+
+    const result = this.advanceUseCase.execute({ board: this.board, arrow });
+    if (!result.success) {
+      return null;
+    }
+
+    if (result.outcome === 'destroyed') {
+      this.arrowsById.delete(arrowId);
+    }
+
+    return result.outcome;
+  }
+
+  /**
+   * Consolida un slide como UNA jugada: consume 1 movimiento, registra 1 outcome
+   * de scoring y re-evalúa el status una vez. Espeja la consolidación que
+   * SlideArrowUseCase hace de golpe, pero para el bucle desplegado en el tiempo.
+   */
+  commitSlide(finalOutcome: AdvanceOutcome): void {
+    this.session.consumeMove();
+    this.session.recordMoveOutcome(finalOutcome !== 'blocked');
+    this.session.evaluateStatus(this.board);
+  }
+
   // ─────────────────────────────────────────────
   // HELPERS
   // ─────────────────────────────────────────────
+
+  /**
+   * Dirección visual de la punta (leading end), derivada de las dos últimas celdas.
+   * Para flechas rectas coincide con head.exitPort; para flechas curvadas corrige
+   * la discrepancia entre el puerto del head (trailing) y la dirección real del tip.
+   */
+  private visualExitDir(headExitPort: number, cellIds: string[]): number {
+    const lastId = cellIds[cellIds.length - 1];
+    const prevId = cellIds[cellIds.length - 2];
+    if (prevId === undefined || lastId === undefined) return headExitPort;
+    const last = this.layoutByCellId.get(lastId);
+    const prev = this.layoutByCellId.get(prevId);
+    if (last === undefined || prev === undefined) return headExitPort;
+    const dCol = last.col - prev.col;
+    const dRow = last.row - prev.row;
+    if (dRow === -1) return 0; // North
+    if (dCol === 1) return 1;  // East
+    if (dRow === 1) return 2;  // South
+    if (dCol === -1) return 3; // West
+    return headExitPort;
+  }
 
   /** Ids de celda que ocupa una flecha, en orden de ocupación (cabeza→cola). */
   private chainCellIds(arrow: Arrow): string[] {

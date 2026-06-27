@@ -9,7 +9,6 @@ import { CellComponent } from './CellComponent';
 import { ArrowComponent } from './ArrowComponent';
 import { BOARD_BACKGROUND, DOT_RADIUS_RATIO } from '../theme';
 import type { BoardViewModel } from '../viewModel';
-import type { ArrowMotion } from '../animation/motion';
 
 // Re-export por compatibilidad: los tipos del view-model viven en ../viewModel.
 export type { CellView, ArrowView, BoardViewModel } from '../viewModel';
@@ -25,10 +24,10 @@ export interface BoardComponentProps {
    */
   onPointerDown?: React.PointerEventHandler<SVGSVGElement>;
   /**
-   * Planes de animación por id de flecha (B2). Solo la flecha del tick en curso
-   * aparece aquí; las demás se dibujan estáticas. Ausente → todo estático (B1).
+   * Última colisión: la flecha cuyo `arrowId` coincide rebota (recoil). El
+   * `nonce` cambia en cada choque para re-disparar la animación. Ausente → sin rebote.
    */
-  motions?: ReadonlyMap<string, ArrowMotion>;
+  collision?: { arrowId: string; nonce: number };
 }
 
 /**
@@ -46,7 +45,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   width,
   height,
   onPointerDown,
-  motions,
+  collision,
 }) => {
   const { cells, arrows } = board;
 
@@ -109,7 +108,9 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               centers={centers}
               exitDir={arrow.exitDir}
               cellSize={cellSize}
-              motion={motions?.get(arrow.id)}
+              collideNonce={
+                collision?.arrowId === arrow.id ? collision.nonce : undefined
+              }
             />
           );
         })}

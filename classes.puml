@@ -312,30 +312,6 @@ class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepositor
     +getLoadedLevel(levelId: string): Promise<LoadedLevel>
     +addFixture(levelData: LevelDataDTO): void
 }
-interface Point {
-    +x: number
-    +y: number
-}
-interface GridDelta {
-    +dCol: number
-    +dRow: number
-}
-interface GridPosition {
-    +col: number
-    +row: number
-}
-interface BoardLayout {
-    +maxCol: number
-    +maxRow: number
-    +cellSize: number
-    +offset: Point
-}
-interface ArrowMotion {
-    +kind: ArrowMotionKind
-    +dx: number
-    +dy: number
-    +durationMs: number
-}
 interface CellView {
     +id: string
     +col: number
@@ -376,7 +352,8 @@ interface Scene {
 class GameController {
     -board: Board
     -session: GameSession
-    -playMoveUseCase: PlayMoveUseCase
+    -slideUseCase: SlideArrowUseCase
+    -advanceUseCase: AdvanceArrowUseCase
     -arrowsById: Map<string, Arrow>
     -colorById: Map<string, string>
     -layoutByCellId: Map<string, { col: number; row: number; }>
@@ -386,8 +363,15 @@ class GameController {
     +score: number
     +viewModel(): BoardViewModel
     +resolveArrowIdAt(col: number, row: number): string
-    +playMove(command: PlayMoveCommand): PlayMoveResult
+    +playMove(command: PlayMoveCommand): SlideResult
+    +advanceTick(arrowId: string): AdvanceOutcome
+    +commitSlide(finalOutcome: AdvanceOutcome): void
+    -visualExitDir(headExitPort: number, cellIds: string[]): number
     -chainCellIds(arrow: Arrow): string[]
+}
+interface CollisionSignal {
+    +arrowId: string
+    +nonce: number
 }
 interface GameControllerState {
     +controller: GameController
@@ -396,22 +380,26 @@ interface GameControllerState {
     +movesRemaining: number
     +score: number
     +inFlight: boolean
-    +setInFlight: (value: boolean) => void
-    +playMove: (command: PlayMoveCommand) => PlayMoveResult | null
+    +collision: CollisionSignal
+    +playMove: (command: PlayMoveCommand) => void
 }
-interface RunTickParams {
-    +arrowId: string
-    +preArrow: ArrowView
-    +outcome: AdvanceOutcome
+interface Point {
+    +x: number
+    +y: number
+}
+interface GridDelta {
+    +dCol: number
+    +dRow: number
+}
+interface GridPosition {
+    +col: number
+    +row: number
+}
+interface BoardLayout {
+    +maxCol: number
+    +maxRow: number
     +cellSize: number
-}
-interface TickAnimationState {
-    +inFlight: boolean
-    +motions: ReadonlyMap<string, ArrowMotion>
-    +ghostArrow: ArrowView
-    +enabled: boolean
-    +setEnabled: (value: boolean) => void
-    +run: (params: RunTickParams) => void
+    +offset: Point
 }
 interface PointerGate {
     +button: number

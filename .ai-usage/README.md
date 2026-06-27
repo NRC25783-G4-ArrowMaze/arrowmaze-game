@@ -28,6 +28,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-26 | Planning de fixes de movimiento — FIX-1 (slide, aplicación) + FIX-2 (colisión de cola, dominio) | [`2026-06-26-movement-fixes-planning.md`](./2026-06-26-movement-fixes-planning.md) | Claude Opus 4.8 |
 | 2026-06-26 | FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase (aplicación) | [`2026-06-26-slide-arrow-movement-impl.md`](./2026-06-26-slide-arrow-movement-impl.md) | Claude Opus 4.8 |
 | 2026-06-26 | FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio) | [`2026-06-26-tail-collision-detection-impl.md`](./2026-06-26-tail-collision-detection-impl.md) | Claude Opus 4.8 |
+| 2026-06-27 | Animación de slide tick-a-tick + recoil de colisión (presentación) | [`2026-06-27-slide-animation-recoil-presentation.md`](./2026-06-27-slide-animation-recoil-presentation.md) | Claude Sonnet 4.6 + Claude Opus 4.8 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -53,9 +54,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 21
-- **Última actualización:** 2026-06-26
-- **Suite de tests (actual):** 225/225 ✅ en 20 suites (FIX-1 `SlideArrowUseCase`: +9 tests)
+- **Total de reportes:** 22
+- **Última actualización:** 2026-06-27
+- **Suite de tests (actual):** 228/228 ✅ en 20 suites (presentación: −7 del `animation.spec.ts` B2 obsoleto)
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 

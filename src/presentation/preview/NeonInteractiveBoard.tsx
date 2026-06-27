@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { ArrowComponent } from '../components/ArrowComponent'
 import { GameOverlay } from '../components/GameOverlay'
 import {
@@ -8,68 +8,39 @@ import {
   type Point,
 } from '../rendering/boardLayout'
 import { useGameController } from '../game/useGameController'
-import { useTickAnimation } from '../game/useTickAnimation'
 import { useBoardInput } from '../input/useBoardInput'
 import { MOCK_SCENE } from './mockScene'
-import type { BoardViewModel } from '../viewModel'
 
 /**
  * NeonInteractiveBoard — Tablero INTERACTIVO con estética neón para la página oculta.
  *
  * Reutiliza el stack existente sin modificarlo:
- *   - useGameController: estado del juego (motor real, PlayMoveUseCase).
- *   - useBoardInput / useTickAnimation: click → tick → animación.
+ *   - useGameController: estado del juego (motor real) + slide animado tick-a-tick.
+ *   - useBoardInput: click → slide.
  *   - ArrowComponent: el render de flecha tradicional (cuerpo + punta).
  *
  * Lo único propio es la "carcasa" SVG: fondo oscuro, grilla de puntos tenue y un
- * filtro de glow por color. Haz click en una flecha para avanzarla.
+ * filtro de glow por color. Haz click en una flecha para deslizarla.
  */
 
 const SIZE = 480
 
 const NeonInteractiveBoard: React.FC = () => {
   const game = useGameController(MOCK_SCENE)
-  const anim = useTickAnimation()
   const layout = computeBoardLayout(game.viewModel.cells, SIZE, SIZE)
-
-  // Durante el fade de "destroyed" re-inyectamos la flecha fantasma para verla salir.
-  const viewModel: BoardViewModel = useMemo(() => {
-    if (anim.ghostArrow === null) {
-      return game.viewModel
-    }
-    return {
-      cells: game.viewModel.cells,
-      arrows: [...game.viewModel.arrows, anim.ghostArrow],
-    }
-  }, [game.viewModel, anim.ghostArrow])
 
   const onPointerDown = useBoardInput({
     width: SIZE,
     height: SIZE,
     layout,
-    enabled: game.status === 'IN_PROGRESS' && !anim.inFlight,
+    enabled: game.status === 'IN_PROGRESS' && !game.inFlight,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => {
-      const preArrow = game.viewModel.arrows.find((a) => a.id === command.arrowId)
-      if (preArrow === undefined) {
-        return
-      }
-      const result = game.playMove(command)
-      if (result === null || !result.success || result.outcome === undefined) {
-        return
-      }
-      anim.run({
-        arrowId: command.arrowId,
-        preArrow,
-        outcome: result.outcome,
-        cellSize: layout.cellSize,
-      })
-    },
+    onPlayMove: (command) => game.playMove(command),
   })
 
   const { maxCol, maxRow, cellSize, offset } = layout
   const centerById = new Map<string, Point>(
-    viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
+    game.viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
   )
   const dots = boundingBoxPositions(maxCol, maxRow)
 
@@ -106,7 +77,7 @@ const NeonInteractiveBoard: React.FC = () => {
           })}
         </g>
 
-        {viewModel.arrows.map((arrow) => {
+        {game.viewModel.arrows.map((arrow) => {
           const centers = arrow.cellIds
             .map((id) => centerById.get(id))
             .filter((p): p is Point => p !== undefined)
@@ -117,7 +88,11 @@ const NeonInteractiveBoard: React.FC = () => {
                 centers={centers}
                 exitDir={arrow.exitDir}
                 cellSize={cellSize}
-                motion={anim.motions.get(arrow.id)}
+                collideNonce={
+                  game.collision?.arrowId === arrow.id
+                    ? game.collision.nonce
+                    : undefined
+                }
               />
             </g>
           )

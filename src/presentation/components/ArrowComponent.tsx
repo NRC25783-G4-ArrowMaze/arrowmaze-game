@@ -1,12 +1,16 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { portDelta, type Point } from '../rendering/boardLayout';
 import { BODY_STROKE_RATIO } from '../theme';
-import type { ArrowMotion } from '../animation/motion';
 
 /** Geometría del triángulo de la cabeza, en fracciones de cellSize. */
 const HEAD_TIP_RATIO = 0.5; // distancia del centro al apex
 const HEAD_BACK_RATIO = 0.32; // distancia del centro al punto medio de la base
 const HEAD_HALF_BASE_RATIO = 0.36; // mitad del ancho de la base
+
+/** Coreografía del rebote de colisión (la flecha empuja y regresa). */
+const RECOIL_MS = 220;
+/** Fracción de celda que la punta se empuja contra el obstáculo antes de volver. */
+const RECOIL_FRACTION = 0.28;
 
 /** Props de ArrowComponent: view-model de presentación de UNA flecha. */
 export interface ArrowComponentProps {
@@ -22,49 +26,10 @@ export interface ArrowComponentProps {
   /** Tamaño de celda en píxeles (escala grosor del cuerpo y tamaño de la cabeza). */
   cellSize: number;
   /**
-   * Plan de animación del tick (B2). Si está presente, el grupo de la flecha
-   * reproduce la coreografía (glide/recoil/fade). Ausente → render estático (B1).
+   * Nonce de colisión: cambia cada vez que esta flecha queda bloqueada en un
+   * slide. Al cambiar, dispara el rebote (recoil). `undefined` = sin colisión.
    */
-  motion?: ArrowMotion;
-}
-
-/**
- * Construye los keyframes de la coreografía según el tipo de movimiento.
- * - glide:  parte desplazada -delta (posición previa) y converge a identidad (post).
- * - recoil: empuja +delta y regresa a identidad (spring-back). Sin flash ni shake.
- * - fade:   deriva +delta mientras la opacidad cae a 0 (se queda invisible).
- */
-function motionKeyframes(motion: ArrowMotion): {
-  frames: Keyframe[];
-  options: KeyframeAnimationOptions;
-} {
-  const to = `translate(${motion.dx}px, ${motion.dy}px)`;
-  const from = `translate(${-motion.dx}px, ${-motion.dy}px)`;
-
-  switch (motion.kind) {
-    case 'glide':
-      return {
-        frames: [{ transform: from }, { transform: 'translate(0px, 0px)' }],
-        options: { duration: motion.durationMs, easing: 'ease-out', fill: 'none' },
-      };
-    case 'recoil':
-      return {
-        frames: [
-          { transform: 'translate(0px, 0px)' },
-          { transform: to, offset: 0.4 },
-          { transform: 'translate(0px, 0px)' },
-        ],
-        options: { duration: motion.durationMs, easing: 'ease-in-out', fill: 'none' },
-      };
-    case 'fade':
-      return {
-        frames: [
-          { transform: 'translate(0px, 0px)', opacity: 1 },
-          { transform: to, opacity: 0 },
-        ],
-        options: { duration: motion.durationMs, easing: 'ease-in', fill: 'forwards' },
-      };
-  }
+  collideNonce?: number;
 }
 
 /**
@@ -142,32 +107,45 @@ function buildHeadPoints(
  * Orden de dibujo (spec B1): primero el cuerpo, luego la cabeza, de modo que el
  * triángulo de la cabeza solape el cap del cuerpo en la celda-cabeza. El color del
  * cuerpo y de la cabeza vienen del dato (sin fallback).
+ *
+ * El AVANCE se anima reproyectando la forma REAL del dominio entre ticks
+ * (useGameController), así que el cuerpo se dibuja siempre en su forma actual,
+ * sin transform. La COLISIÓN sí es un transform efímero: cuando `collideNonce`
+ * cambia, la flecha rebota contra el obstáculo (su forma no cambia al chocar).
  */
 export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   color,
   centers,
   exitDir,
   cellSize,
-  motion,
+  collideNonce,
 }) => {
   const groupRef = useRef<SVGGElement | null>(null);
 
-  // Reproduce la coreografía del tick vía Web Animations API. Se usa layout
-  // effect para fijar el primer keyframe antes del primer paint (sin parpadeo
-  // en glide). La animación es puramente visual: no escribe al dominio.
+  // Rebote de colisión: empuja la flecha RECOIL_FRACTION de celda en dirección
+  // de su punta (exitDir) y la regresa. Solo se dispara cuando collideNonce
+  // cambia; es puramente visual (no toca el dominio).
   useLayoutEffect(() => {
+    if (collideNonce === undefined) {
+      return;
+    }
     const group = groupRef.current;
-    if (motion === undefined || group === null) {
+    if (group === null || typeof group.animate !== 'function') {
       return;
     }
-    // Entornos sin WAAPI (p.ej. jsdom): se omite, el estado final ya es correcto.
-    if (typeof group.animate !== 'function') {
-      return;
-    }
-    const { frames, options } = motionKeyframes(motion);
-    const animation = group.animate(frames, options);
+    const { dCol, dRow } = portDelta(exitDir);
+    const px = dCol * cellSize * RECOIL_FRACTION;
+    const py = dRow * cellSize * RECOIL_FRACTION;
+    const animation = group.animate(
+      [
+        { transform: 'translate(0px, 0px)' },
+        { transform: `translate(${px}px, ${py}px)`, offset: 0.4 },
+        { transform: 'translate(0px, 0px)' },
+      ],
+      { duration: RECOIL_MS, easing: 'ease-in-out' },
+    );
     return () => animation.cancel();
-  }, [motion]);
+  }, [collideNonce, exitDir, cellSize]);
 
   if (centers.length === 0) {
     return null;
