@@ -1304,10 +1304,59 @@
           "RESUELTO (commit ef3783a, issue #13 cerrado): el recoil ahora sigue la forma — cada vértice amaga su avance hacia su propio tramo (la L amaga 'en L'), animado vía estado recoilF. La versión inicial trasladaba toda la figura hacia la punta y levantaba el tramo horizontal."
         ],
         "notes": "Seguimiento de FIX-1: cablea el slide en el preview con animación tick-a-tick reusando el motor (sin translate). Reintroduce el rebote de colisión que se había eliminado con la maquinaria. Verificación en runtime (navegador) además de tests/typecheck. Rama feature/animaciones."
+      },
+      {
+        "id": "2026-06-27-002",
+        "date": "2026-06-27",
+        "title": "Mapa de preview 'corazón': tablero-grafo esquemático y resoluble",
+        "file": "2026-06-27-heart-preview-map.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "heart-preview-map",
+        "linked_session": "2026-06-27-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 140,
+          "files_created": 1,
+          "files_modified": 1,
+          "files_deleted": 0
+        },
+        "areas": [
+          "presentation-layer",
+          "preview",
+          "scene-design",
+          "graph-topology",
+          "puzzle-solvability",
+          "headless-verification"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "extended",
+            "created": ["preview/heartScene.ts"],
+            "modified": ["preview/NeonInteractiveBoard.tsx"]
+          }
+        },
+        "validation": {
+          "build": "not_run",
+          "typecheck": "passed — tsc --noEmit exit 0",
+          "lint": "not_run",
+          "tests": "no afecta la suite (código solo de preview)",
+          "solver": "SOLVABLE en 5 slides (yellow->green->white->magenta->orange); 26 nodos, 5 flechas",
+          "runtime": "verificado en preview: la secuencia vacía el tablero (5->0) y el estado llega a WON (99->94); sin errores de consola"
+        },
+        "decisions": [
+          "Tablero-GRAFO, no matriz: solo los nodos del corazón conectados a sus vecinos existentes",
+          "Flechas apuntando hacia afuera (lóbulos N, centro S) para garantizar resolubilidad",
+          "Solver DFS headless (memoizado por firma de estado) para confirmar resolubilidad antes del navegador",
+          "Corazón esquemático (5 flechas, colores del icono), no réplica fiel"
+        ],
+        "notes": "Mapa de preview con forma de corazón. El autor corrigió el enfoque (matriz -> grafo) y la coherencia de direcciones, y fijó el alcance (jugable/resoluble + esquemático) vía preguntas. Verificación headless (solver) + runtime (WON)."
       }
     ],
     "statistics": {
-      "totalReports": 23,
+      "totalReports": 24,
       "lastUpdated": "2026-06-27T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1326,8 +1375,8 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 6450,
-      "totalFilesCreated": 99,
+      "totalLinesGenerated": 6590,
+      "totalFilesCreated": 100,
       "totalFilesDeleted": 16,
       "totalTestsPassing": 228,
       "totalTestSuites": 20,
@@ -1336,8 +1385,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-27-001",
-      "summary": "Animación de slide tick-a-tick + recoil de colisión (presentación)"
+      "id": "2026-06-27-002",
+      "summary": "Mapa de preview 'corazón': tablero-grafo esquemático y resoluble"
     }
   }
 }

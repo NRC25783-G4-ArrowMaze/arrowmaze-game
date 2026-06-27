@@ -4,12 +4,11 @@ import { GameOverlay } from '../components/GameOverlay'
 import {
   computeBoardLayout,
   cellCenter,
-  boundingBoxPositions,
   type Point,
 } from '../rendering/boardLayout'
 import { useGameController } from '../game/useGameController'
 import { useBoardInput } from '../input/useBoardInput'
-import { MOCK_SCENE } from './mockScene'
+import { HEART_SCENE } from './heartScene'
 
 /**
  * NeonInteractiveBoard — Tablero INTERACTIVO con estética neón para la página oculta.
@@ -23,10 +22,10 @@ import { MOCK_SCENE } from './mockScene'
  * filtro de glow por color. Haz click en una flecha para deslizarla.
  */
 
-const SIZE = 480
+const SIZE = 600
 
 const NeonInteractiveBoard: React.FC = () => {
-  const game = useGameController(MOCK_SCENE)
+  const game = useGameController(HEART_SCENE)
   const layout = computeBoardLayout(game.viewModel.cells, SIZE, SIZE)
 
   const onPointerDown = useBoardInput({
@@ -38,11 +37,10 @@ const NeonInteractiveBoard: React.FC = () => {
     onPlayMove: (command) => game.playMove(command),
   })
 
-  const { maxCol, maxRow, cellSize, offset } = layout
+  const { cellSize, offset } = layout
   const centerById = new Map<string, Point>(
     game.viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
   )
-  const dots = boundingBoxPositions(maxCol, maxRow)
 
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: SIZE }}>
@@ -68,11 +66,12 @@ const NeonInteractiveBoard: React.FC = () => {
 
         <rect x={0} y={0} width={SIZE} height={SIZE} rx={20} fill="#0a0e1a" />
 
-        <g opacity={0.5}>
-          {dots.map(({ col, row }) => {
-            const c = cellCenter(col, row, cellSize, offset)
+        {/* Nodos del GRAFO (solo las celdas reales, no una matriz rectangular). */}
+        <g opacity={0.25}>
+          {game.viewModel.cells.map((cell) => {
+            const c = cellCenter(cell.col, cell.row, cellSize, offset)
             return (
-              <circle key={`${col},${row}`} cx={c.x} cy={c.y} r={cellSize * 0.05} fill="#22305a" />
+              <circle key={cell.id} cx={c.x} cy={c.y} r={cellSize * 0.05} fill="#33406a" />
             )
           })}
         </g>
