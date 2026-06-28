@@ -11,7 +11,15 @@ import type { SlideResult } from '../../application/dtos/SlideDTOs';
 import type { AdvanceOutcome } from '../../domain/value-objects/AdvanceResult';
 import type { BoardViewModel } from '../viewModel';
 import type { PlayMoveCommand } from '../input/PlayMoveCommand';
-import { type Scene, toLevelDataDTO } from './scene';
+import { type Scene, type CollisionBehavior, toLevelDataDTO } from './scene';
+
+/** Snapshot mínimo para reconstruir una flecha en su posición de inicio de slide. */
+export interface ArrowSnapshot {
+  /** Celdas que ocupa la flecha, en orden cabeza→cola. */
+  cellIds: string[];
+  /** Puerto de salida del head (intención direccional del dominio). */
+  exitPort: number;
+}
 
 /**
  * GameController — Orquestador de presentación que conecta el input/animaciones
@@ -32,6 +40,9 @@ export class GameController {
   private readonly slideUseCase: SlideArrowUseCase;
   private readonly advanceUseCase: AdvanceArrowUseCase;
 
+  /** Qué hace una flecha al chocar (decisión de presentación, fijada por la escena). */
+  private readonly _collisionBehavior: CollisionBehavior;
+
   /** Flechas vivas por id. Una flecha destruida se elimina de este mapa. */
   private readonly arrowsById: Map<string, Arrow>;
   /** Color de presentación por id de flecha (el dominio no modela color). */
@@ -50,6 +61,7 @@ export class GameController {
 
     this.board = board;
     this.session = new GameSession(scene.allowedMoves);
+    this._collisionBehavior = scene.collisionBehavior ?? 'return';
     // Misma instancia (stateless) para el slide headless y el avance tick-a-tick.
     this.advanceUseCase = new AdvanceArrowUseCase();
     this.slideUseCase = new SlideArrowUseCase(this.advanceUseCase);
@@ -81,6 +93,11 @@ export class GameController {
 
   get score(): number | null {
     return this.session.score === null ? null : this.session.score.finalScore;
+  }
+
+  /** Comportamiento de colisión configurado por la escena ('return' por defecto). */
+  get collisionBehavior(): CollisionBehavior {
+    return this._collisionBehavior;
   }
 
   // ─────────────────────────────────────────────
@@ -195,6 +212,56 @@ export class GameController {
     this.session.consumeMove();
     this.session.recordMoveOutcome(finalOutcome !== 'blocked');
     this.session.evaluateStatus(this.board);
+  }
+
+  // ─────────────────────────────────────────────
+  // SNAPSHOT / RESTORE (modo de colisión 'return')
+  // ─────────────────────────────────────────────
+
+  /**
+   * Captura la posición actual de una flecha (celdas cabeza→cola + exitPort del head)
+   * para poder reconstruirla luego. Lo usa el modo 'return' al iniciar un slide.
+   *
+   * @returns El snapshot, o null si la flecha no existe.
+   */
+  snapshotArrow(arrowId: string): ArrowSnapshot | null {
+    const arrow = this.arrowsById.get(arrowId);
+    if (arrow === undefined) {
+      return null;
+    }
+    return { cellIds: this.chainCellIds(arrow), exitPort: arrow.head.exitPort };
+  }
+
+  /**
+   * Reconstruye una flecha en la posición de un snapshot, reutilizando la API
+   * pública del motor (destroy → new Arrow → extend). Lo usa el modo 'return' al
+   * terminar el glide de regreso: deja el estado de dominio coherente con lo que se
+   * ve (la flecha vuelve a su origen del slide).
+   *
+   * Precondición: las celdas del snapshot están libres (la flecha las vació al
+   * avanzar y el input está bloqueado durante el slide, así que nadie más las ocupó).
+   */
+  restoreArrow(arrowId: string, snapshot: ArrowSnapshot): void {
+    const arrow = this.arrowsById.get(arrowId);
+    if (arrow !== undefined) {
+      arrow.destroy();
+    }
+
+    const headCell = this.board.getCell(snapshot.cellIds[0]);
+    if (headCell === undefined) {
+      return;
+    }
+
+    const restored = new Arrow(headCell, snapshot.exitPort);
+    for (let i = 1; i < snapshot.cellIds.length; i++) {
+      const cell = this.board.getCell(snapshot.cellIds[i]);
+      if (cell === undefined) {
+        return;
+      }
+      restored.extend(cell);
+    }
+
+    this.arrowsById.set(arrowId, restored);
   }
 
   // ─────────────────────────────────────────────

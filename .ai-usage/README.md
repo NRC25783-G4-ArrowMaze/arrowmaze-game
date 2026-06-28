@@ -31,6 +31,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-27 | Animación de slide tick-a-tick + recoil de colisión (presentación) | [`2026-06-27-slide-animation-recoil-presentation.md`](./2026-06-27-slide-animation-recoil-presentation.md) | Claude Sonnet 4.6 + Claude Opus 4.8 |
 | 2026-06-27 | Mapa de preview "corazón": tablero-grafo esquemático y resoluble | [`2026-06-27-heart-preview-map.md`](./2026-06-27-heart-preview-map.md) | Claude Opus 4.8 |
 | 2026-06-27 | Animaciones desaparición, deformación colisión, UI mejorado | [`2026-06-27-animaciones-desaparicion-deformacion-ui.md`](./2026-06-27-animaciones-desaparicion-deformacion-ui.md) | Claude Haiku 4.5 + Opus 4.8 |
+| 2026-06-28 | Colisión configurable (return por defecto) + mapa decorado 6×6 | [`2026-06-28-colision-return-y-mapa-decorado.md`](./2026-06-28-colision-return-y-mapa-decorado.md) | Claude Opus 4.8 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -56,8 +57,8 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 23
-- **Última actualización:** 2026-06-27
+- **Total de reportes:** 24
+- **Última actualización:** 2026-06-28
 - **Suite de tests (actual):** 228/228 ✅ en 20 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.

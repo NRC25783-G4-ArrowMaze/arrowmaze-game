@@ -5,7 +5,7 @@ import { GameOverlay } from './presentation/components/GameOverlay';
 import { computeBoardLayout } from './presentation/rendering/boardLayout';
 import { useGameController } from './presentation/game/useGameController';
 import { useBoardInput } from './presentation/input/useBoardInput';
-import { SAMPLE_LEVEL } from './presentation/game/sampleLevel';
+import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
 
 const BOARD_SIZE = 560;
 
@@ -19,7 +19,7 @@ const BOARD_SIZE = 560;
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
 const App: React.FC = () => {
-  const game = useGameController(SAMPLE_LEVEL);
+  const game = useGameController(SAMPLE_LEVEL_2);
 
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
