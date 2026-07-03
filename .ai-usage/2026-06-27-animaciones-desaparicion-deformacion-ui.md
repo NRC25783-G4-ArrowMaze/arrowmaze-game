@@ -10,9 +10,8 @@ metadata:
 
 - **Herramienta:** Claude Code
 - **Modelo / versión:** claude-haiku-4-5-20251001 (switcheado a mitad de sesión)
-- **Autor humano responsable:** Usuario (fariasjr223@gmail.com)
+- **Autor humano responsable:** Usuario
 - **Prompt(s) representativo(s):**
-  - "animacion de desaparecion y otras animaciones, esto es puramente estetico ni deberia tocar apliacione nisiquiera solo"
   - "en collsion una animacion como de deformacion de la flecha y rebote seria buena mas aue solo el rebote"
   - "haz mas visibles el numero de movimientos, la pantalla en general"
 - **Salida tomada de la IA:** 
