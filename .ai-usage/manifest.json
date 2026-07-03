@@ -1425,11 +1425,111 @@
           "Corazón esquemático (5 flechas, colores del icono), no réplica fiel"
         ],
         "notes": "Mapa de preview con forma de corazón. El autor corrigió el enfoque (matriz -> grafo) y la coherencia de direcciones, y fijó el alcance (jugable/resoluble + esquemático) vía preguntas. Verificación headless (solver) + runtime (WON)."
+      },
+      {
+        "id": "2026-06-28-001",
+        "date": "2026-06-28",
+        "title": "Colisión configurable (return por defecto) + mapa decorado 6×6",
+        "file": "2026-06-28-colision-return-y-mapa-decorado.md",
+        "tool": "Claude Code (Cursor)",
+        "model": "Claude Opus 4.8",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "collision-behavior-return + sample-level-2",
+        "linked_session": "2026-06-27-003",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 400,
+          "files_created": 1,
+          "files_modified": 4,
+          "tests_passing": 228,
+          "test_suites": 20
+        },
+        "areas": [
+          "presentation-layer",
+          "collision-behavior",
+          "render-override",
+          "glide-back-animation",
+          "level-design"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "extended",
+            "created": ["game/sampleLevel2.ts"],
+            "modified": [
+              "game/scene.ts (CollisionBehavior)",
+              "game/GameController.ts (snapshotArrow/restoreArrow)",
+              "game/useGameController.ts (recorded + renderOverride + glideBack)",
+              "App.tsx (SAMPLE_LEVEL_2)"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed",
+          "lint": "passed",
+          "tests": "228/228 passed — 0 regresiones",
+          "runtime": "verificado en preview: colisión return funciona, mapa 6×6 lleno (36 nodos, 8 flechas), amber apunta al Este"
+        },
+        "decisions": [
+          "return como DEFAULT (no opt-in) — solo escenas excepcionales usan stay",
+          "Lógica 100% en presentación — reconstrucción con API pública del motor",
+          "sampleLevel2.ts separado para no afectar los 228 tests existentes"
+        ],
+        "notes": "Entrada reconstruida el 2026-07-03: el reporte y el índice existían pero faltaba en el manifest. Colisión configurable return/stay con glide de regreso tick-a-tick + nivel 6×6 decorado."
+      },
+      {
+        "id": "2026-07-03-001",
+        "date": "2026-07-03",
+        "title": "Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta",
+        "file": "2026-07-03-pulido-visual-animaciones.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "presentation-animation-polish",
+        "linked_session": "2026-06-28-001",
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 250,
+          "files_created": 0,
+          "files_modified": 3,
+          "tests_passing": 228,
+          "test_suites": 20
+        },
+        "areas": [
+          "presentation-layer",
+          "animation",
+          "svg",
+          "react-hooks",
+          "visual-effects"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "extended",
+            "modified": [
+              "components/ArrowComponent.tsx (glide SLIDE_MS 85ms + recoil asimétrico sin(p^0.7·π))",
+              "components/ArrowBurst.tsx (12 chispas en 2 anillos + onda expansiva, fade (1-p)^1.5)",
+              "components/ArrowHeadDisintegrate.tsx (fractura en 3 fragmentos con deriva radial y giro ±24°)"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed — tsc strict + Vite",
+          "lint": "passed — ESLint exit 0 (fix react-hooks/refs durante la sesión)",
+          "tests": "228/228 passed — 0 regresiones",
+          "structure": "passed — domain y application intactos; testids, duraciones espejadas (150/350 ms) y fallback sin rAF preservados"
+        },
+        "decisions": [
+          "Detección previa de 4 puntos débiles (slide a saltos, recoil simétrico, burst mecánico, desintegración plana) antes de implementar — libertad creativa delegada por el humano",
+          "Interpolación desde la última posición DIBUJADA (drawnRef) con arranque síncrono pre-paint para evitar parpadeo",
+          "Determinismo preservado en todas las animaciones (sin aleatoriedad) para tests y replays"
+        ],
+        "notes": "Sesión corta de pulido puramente visual en src/presentation/components/. El slide ahora se lee continuo (glide 85ms < TICK_MS 90ms), el impacto de colisión pica rápido y se recupera lento, el burst es orgánico (2 anillos + onda) y la punta se fractura en fragmentos que derivan y rotan."
       }
     ],
     "statistics": {
-      "totalReports": 25,
-      "lastUpdated": "2026-06-27T23:59:59Z",
+      "totalReports": 27,
+      "lastUpdated": "2026-07-03T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1439,6 +1539,7 @@
         "Claude Code (claude.ai/code)"
       ],
       "modelsUsed": [
+        "Claude Fable 5",
         "Claude Haiku 4.5",
         "Claude Opus 4.8",
         "Claude Sonnet 4.6 (Thinking)",
@@ -1447,8 +1548,8 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 6590,
-      "totalFilesCreated": 100,
+      "totalLinesGenerated": 7240,
+      "totalFilesCreated": 101,
       "totalFilesDeleted": 16,
       "totalTestsPassing": 228,
       "totalTestSuites": 20,
@@ -1457,8 +1558,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-06-27-002",
-      "summary": "Mapa de preview 'corazón': tablero-grafo esquemático y resoluble"
+      "id": "2026-07-03-001",
+      "summary": "Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta"
     }
   }
 }

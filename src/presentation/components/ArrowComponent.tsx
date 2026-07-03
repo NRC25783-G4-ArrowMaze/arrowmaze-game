@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { portDelta, type Point } from '../rendering/boardLayout';
 import { BODY_STROKE_RATIO } from '../theme';
 
@@ -6,6 +6,13 @@ import { BODY_STROKE_RATIO } from '../theme';
 const HEAD_TIP_RATIO = 0.5; // distancia del centro al apex
 const HEAD_BACK_RATIO = 0.32; // distancia del centro al punto medio de la base
 const HEAD_HALF_BASE_RATIO = 0.36; // mitad del ancho de la base
+
+/**
+ * Duración del glide entre ticks del slide (ms). Debe ser ≤ TICK_MS de
+ * useGameController (90 ms) para que la interpolación de un tick termine antes
+ * de que llegue el siguiente y el movimiento se lea continuo, no a saltos.
+ */
+const SLIDE_MS = 85;
 
 /** Coreografía del rebote de colisión (amago de avance + deformación siguiendo la forma). */
 const RECOIL_MS = 200;
@@ -154,7 +161,8 @@ function advanceDeltas(centers: Point[], exitDir: number, cellSize: number): Poi
  * cuerpo y de la cabeza vienen del dato (sin fallback).
  *
  * El AVANCE se anima reproyectando la forma REAL del dominio entre ticks
- * (useGameController). La COLISIÓN es un amago efímero que sigue la forma: cuando
+ * (useGameController); entre una proyección y la siguiente, la forma se
+ * interpola (glide de SLIDE_MS) para que el movimiento se lea continuo. La COLISIÓN es un amago efímero que sigue la forma: cuando
  * `collideNonce` cambia, cada vértice avanza una fracción hacia su propio tramo y
  * regresa. Se anima vía estado (recoilF) para que React controle el trazo de forma
  * coherente (no se manipula el DOM imperativamente, que competiría con el render).
@@ -169,6 +177,48 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // Fracción de amago actual (0 = reposo). Animada por rAF durante la colisión.
   const [recoilF, setRecoilF] = useState(0);
 
+  // Glide entre ticks: al cambiar `centers` (mismo nº de celdas), la forma se
+  // interpola desde la última posición DIBUJADA hacia la nueva en SLIDE_MS, en
+  // vez de saltar. `from` es el snapshot de origen; `t` el progreso 0 → 1.
+  const [glide, setGlide] = useState<{ from: Point[]; t: number } | null>(null);
+  // Última forma efectivamente dibujada (incluye posiciones intermedias del glide).
+  const drawnRef = useRef<Point[] | null>(null);
+  const centersKey = centers.map((p) => `${p.x},${p.y}`).join(';');
+
+  useLayoutEffect(() => {
+    const prev = drawnRef.current;
+    if (
+      prev === null ||
+      prev.length !== centers.length ||
+      typeof requestAnimationFrame !== 'function'
+    ) {
+      // Primer render, cambio de nº de celdas o entorno sin rAF: snap directo.
+      setGlide(null);
+      return;
+    }
+    const moved = prev.some((p, i) => p.x !== centers[i].x || p.y !== centers[i].y);
+    if (!moved) {
+      return;
+    }
+    const from = prev.map((p) => ({ x: p.x, y: p.y }));
+    // Arranque síncrono (antes del paint): evita un frame pintado en el destino.
+    setGlide({ from, t: 0 });
+    let raf = 0;
+    const start = performance.now();
+    const frame = (now: number): void => {
+      const p = Math.min((now - start) / SLIDE_MS, 1);
+      if (p < 1) {
+        setGlide({ from, t: p });
+        raf = requestAnimationFrame(frame);
+      } else {
+        setGlide(null);
+      }
+    };
+    raf = requestAnimationFrame(frame);
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [centersKey]);
+
   useLayoutEffect(() => {
     if (collideNonce === undefined || centers.length === 0) {
       return;
@@ -180,8 +230,9 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
     const start = performance.now();
     const frame = (now: number): void => {
       const p = Math.min((now - start) / RECOIL_MS, 1);
-      // Envolvente 0 → F → 0 (pico suave a mitad): amago de ida y vuelta.
-      setRecoilF(RECOIL_FRACTION * Math.sin(p * Math.PI));
+      // Envolvente 0 → F → 0 asimétrica: p^0.7 adelanta el pico (~38% del
+      // tiempo), así el impacto "pica" rápido y la recuperación es más lenta.
+      setRecoilF(RECOIL_FRACTION * Math.sin(Math.pow(p, 0.7) * Math.PI));
       if (p < 1) {
         raf = requestAnimationFrame(frame);
       } else {
@@ -196,6 +247,25 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collideNonce]);
 
+  // Base del dibujo: durante el glide, cada vértice se interpola (con salida
+  // suave) desde su última posición dibujada hacia la nueva; en reposo son los
+  // centros tal cual. La interpolación es solo estética: el dominio ya está en
+  // la celda destino.
+  const glideEase = glide === null ? 1 : 1 - (1 - glide.t) * (1 - glide.t);
+  const baseCenters =
+    glide === null || glide.from.length !== centers.length
+      ? centers
+      : centers.map((c, i) => ({
+          x: glide.from[i].x + (c.x - glide.from[i].x) * glideEase,
+          y: glide.from[i].y + (c.y - glide.from[i].y) * glideEase,
+        }));
+  // Registra la forma que se va a pintar en ESTE commit; corre después del
+  // effect del glide (orden de declaración), así aquel siempre lee la posición
+  // dibujada del commit anterior al arrancar una nueva interpolación.
+  useLayoutEffect(() => {
+    drawnRef.current = centers.length > 0 ? baseCenters : null;
+  });
+
   if (centers.length === 0) {
     return null;
   }
@@ -204,10 +274,10 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // (siguiendo la forma). En reposo (recoilF === 0) se usan los centros tal cual.
   const drawCenters =
     recoilF === 0
-      ? centers
-      : advanceDeltas(centers, exitDir, cellSize).map((d, i) => ({
-          x: centers[i].x + d.x * recoilF,
-          y: centers[i].y + d.y * recoilF,
+      ? baseCenters
+      : advanceDeltas(baseCenters, exitDir, cellSize).map((d, i) => ({
+          x: baseCenters[i].x + d.x * recoilF,
+          y: baseCenters[i].y + d.y * recoilF,
         }));
 
   // Factor de deformación por impacto (0 en reposo, máximo en pico del rebote).

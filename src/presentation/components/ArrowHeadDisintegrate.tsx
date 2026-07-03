@@ -4,6 +4,11 @@ import type { Point } from '../rendering/boardLayout';
 /** Duración de la desintegración de la punta (ms). Aparece antes del burst. */
 const DISINTEGRATE_MS = 150;
 
+/** Deriva máxima de cada fragmento, como fracción de cellSize. */
+const DRIFT_RATIO = 0.28;
+/** Rotación máxima de cada fragmento (grados) al final de la deriva. */
+const MAX_SPIN_DEG = 24;
+
 /** Props: posición y escala de la punta que se desintegra. */
 export interface ArrowHeadDisintegrateProps {
   /** Centro del triángulo (última posición de la cabeza). */
@@ -16,13 +21,79 @@ export interface ArrowHeadDisintegrateProps {
   tipDir: { x: number; y: number };
 }
 
+/** Un fragmento de la fractura: sub-triángulo + su deriva y giro propios. */
+interface Fragment {
+  points: [Point, Point, Point];
+  /** Dirección unitaria de deriva (desde el baricentro del triángulo hacia afuera). */
+  driftDir: { x: number; y: number };
+  /** Baricentro del fragmento (centro de rotación). */
+  centroid: Point;
+  /** Sentido y magnitud relativa del giro (-1 a 1). */
+  spin: number;
+}
+
+function centroidOf(a: Point, b: Point, c: Point): Point {
+  return { x: (a.x + b.x + c.x) / 3, y: (a.y + b.y + c.y) / 3 };
+}
+
 /**
- * ArrowHeadDisintegrate — Animación de desgaste/fractura de la punta mientras sale.
+ * Parte el triángulo de la punta en 3 fragmentos (cada lado + el baricentro),
+ * cada uno con una deriva radial hacia afuera y un giro alternado. La partición
+ * es determinista: misma punta → misma fractura.
+ */
+function buildFragments(
+  center: Point,
+  tipDir: { x: number; y: number },
+  cellSize: number,
+): Fragment[] {
+  // Parámetros del triángulo (espejo de ArrowComponent.buildHeadPoints).
+  const HEAD_TIP_RATIO = 0.5;
+  const HEAD_BACK_RATIO = 0.32;
+  const HEAD_HALF_BASE_RATIO = 0.36;
+
+  const dirX = tipDir.x;
+  const dirY = tipDir.y;
+  const perpX = -dirY;
+  const perpY = dirX;
+
+  const tip = HEAD_TIP_RATIO * cellSize;
+  const back = HEAD_BACK_RATIO * cellSize;
+  const half = HEAD_HALF_BASE_RATIO * cellSize;
+
+  const apex: Point = { x: center.x + dirX * tip, y: center.y + dirY * tip };
+  const baseMid: Point = { x: center.x - dirX * back, y: center.y - dirY * back };
+  const left: Point = { x: baseMid.x + perpX * half, y: baseMid.y + perpY * half };
+  const right: Point = { x: baseMid.x - perpX * half, y: baseMid.y - perpY * half };
+
+  const g = centroidOf(apex, left, right);
+
+  const sides: Array<[Point, Point, number]> = [
+    [apex, left, 1],
+    [left, right, -1],
+    [right, apex, 1],
+  ];
+
+  return sides.map(([a, b, spin]) => {
+    const c = centroidOf(a, b, g);
+    const dx = c.x - g.x;
+    const dy = c.y - g.y;
+    const len = Math.hypot(dx, dy) || 1;
+    return {
+      points: [a, b, g],
+      driftDir: { x: dx / len, y: dy / len },
+      centroid: c,
+      spin,
+    };
+  });
+}
+
+/**
+ * ArrowHeadDisintegrate — Fractura de la punta mientras sale del tablero.
  *
- * La punta (triángulo) se desvanece con un efecto visual de "grietas" que se expanden,
- * como si se erosionara al pasar por la salida del tablero. Dura ~150ms y aparece
- * justo ANTES del ArrowBurst (estallido de chispas), creando una transición de
- * desintegración: punta se quiebra → fractura → estalla en chispas.
+ * El triángulo se parte en 3 fragmentos que derivan hacia afuera, giran
+ * ligeramente y se desvanecen, como si la punta se quebrara al cruzar la
+ * salida. Dura ~150ms y aparece justo ANTES del ArrowBurst (estallido de
+ * chispas): punta se quiebra → fragmentos derivan → estalla en chispas.
  */
 export const ArrowHeadDisintegrate: React.FC<ArrowHeadDisintegrateProps> = ({
   center,
@@ -50,74 +121,30 @@ export const ArrowHeadDisintegrate: React.FC<ArrowHeadDisintegrateProps> = ({
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  const opacity = 1 - progress; // 1 → 0
+  const opacity = 1 - progress;
   if (opacity <= 0) {
     return null;
   }
 
-  // Parámetros del triángulo (espejo de ArrowComponent.buildHeadPoints).
-  const HEAD_TIP_RATIO = 0.5;
-  const HEAD_BACK_RATIO = 0.32;
-  const HEAD_HALF_BASE_RATIO = 0.36;
-
-  const dirX = tipDir.x;
-  const dirY = tipDir.y;
-  const perpX = -dirY;
-  const perpY = dirX;
-
-  const tip = HEAD_TIP_RATIO * cellSize;
-  const back = HEAD_BACK_RATIO * cellSize;
-  const half = HEAD_HALF_BASE_RATIO * cellSize;
-
-  const apex: Point = { x: center.x + dirX * tip, y: center.y + dirY * tip };
-  const baseMid: Point = { x: center.x - dirX * back, y: center.y - dirY * back };
-  const left: Point = { x: baseMid.x + perpX * half, y: baseMid.y + perpY * half };
-  const right: Point = { x: baseMid.x - perpX * half, y: baseMid.y - perpY * half };
-
-  // Ancho de línea de las grietas que crecen conforme avanza la desintegración.
-  const crackWidth = 1 + progress * 2.5; // 1 → 3.5 px
-  // Desplazamiento de las grietas (se expanden hacia afuera desde el centro).
-  const crackExpand = progress * (cellSize * 0.2);
-
-  // Grietas: líneas radiantes desde el centro del triángulo que lo fracturan.
-  const centerX = center.x;
-  const centerY = center.y;
-  const cracks = [
-    { x1: centerX, y1: centerY, x2: apex.x, y2: apex.y }, // grieta hacia punta
-    { x1: centerX, y1: centerY, x2: left.x, y2: left.y }, // hacia vértice izq
-    { x1: centerX, y1: centerY, x2: right.x, y2: right.y }, // hacia vértice der
-    // Grietas adicionales (expansivas) que se expanden desde el triángulo hacia afuera.
-    {
-      x1: apex.x,
-      y1: apex.y,
-      x2: apex.x + dirX * crackExpand,
-      y2: apex.y + dirY * crackExpand,
-    },
-  ];
+  const fragments = buildFragments(center, tipDir, cellSize);
+  // Deriva con salida suave: los fragmentos saltan al partirse y luego frenan.
+  const drift = (1 - (1 - progress) * (1 - progress)) * DRIFT_RATIO * cellSize;
 
   return (
     <g data-testid="arrow-head-disintegrate" opacity={opacity}>
-      {/* Triángulo base (se va volviendo translúcido). */}
-      <polygon
-        points={`${apex.x},${apex.y} ${left.x},${left.y} ${right.x},${right.y}`}
-        fill={color}
-        opacity={opacity * 0.6} // más translúcido aún
-      />
-
-      {/* Grietas que fractúan el triángulo. */}
-      {cracks.map((crack, i) => (
-        <line
-          key={i}
-          x1={crack.x1}
-          y1={crack.y1}
-          x2={crack.x2}
-          y2={crack.y2}
-          stroke={color}
-          strokeWidth={crackWidth}
-          opacity={opacity * 0.8}
-          strokeLinecap="round"
-        />
-      ))}
+      {fragments.map((frag, i) => {
+        const dx = frag.driftDir.x * drift;
+        const dy = frag.driftDir.y * drift;
+        const deg = frag.spin * MAX_SPIN_DEG * progress;
+        return (
+          <polygon
+            key={i}
+            points={frag.points.map((p) => `${p.x},${p.y}`).join(' ')}
+            fill={color}
+            transform={`translate(${dx} ${dy}) rotate(${deg} ${frag.centroid.x} ${frag.centroid.y})`}
+          />
+        );
+      })}
     </g>
   );
 };
