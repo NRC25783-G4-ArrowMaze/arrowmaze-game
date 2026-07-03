@@ -2,7 +2,7 @@
 
 - **Herramienta:** Claude Code (Cursor)
 - **Modelo / versión:** claude-opus-4-8
-- **Autor humano responsable:** jrgil20 (fariasjr223@gmail.com)
+- **Autor humano responsable:** @jrgil20
 - **Prompt(s) representativo(s):**
   - "Quiero que sea posible las dos cosas: que quede en el lugar o que se devuelva a la posición"
   - "Ummm puedes ponerlo a probar y en el preview lo verifico"
