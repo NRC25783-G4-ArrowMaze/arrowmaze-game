@@ -1,4 +1,4 @@
-import { InMemoryLevelRepository } from '../../src/infrastructure/repositories/InMemoryBoardRepository';
+import { InMemoryLevelRepository } from '../../src/infrastructure/repositories/InMemoryLevelRepository';
 import { LevelLoader } from '../../src/application/use-cases/LevelLoader';
 import type { IBoardBuilder } from '../../src/application/ports/IBoardBuilder';
 import type { IArrowBuilder } from '../../src/application/ports/IArrowBuilder';

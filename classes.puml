@@ -348,12 +348,18 @@ interface Scene {
     +cells: SceneCell[]
     +connections: LevelConnectionDTO[]
     +arrows: SceneArrow[]
+    +collisionBehavior?: CollisionBehavior
+}
+interface ArrowSnapshot {
+    +cellIds: string[]
+    +exitPort: number
 }
 class GameController {
     -board: Board
     -session: GameSession
     -slideUseCase: SlideArrowUseCase
     -advanceUseCase: AdvanceArrowUseCase
+    -_collisionBehavior: CollisionBehavior
     -arrowsById: Map<string, Arrow>
     -colorById: Map<string, string>
     -layoutByCellId: Map<string, { col: number; row: number; }>
@@ -361,16 +367,42 @@ class GameController {
     +status: GameStatus
     +movesRemaining: number
     +score: number
+    +collisionBehavior: CollisionBehavior
     +viewModel(): BoardViewModel
     +resolveArrowIdAt(col: number, row: number): string
     +playMove(command: PlayMoveCommand): SlideResult
     +advanceTick(arrowId: string): AdvanceOutcome
     +commitSlide(finalOutcome: AdvanceOutcome): void
+    +snapshotArrow(arrowId: string): ArrowSnapshot
+    +restoreArrow(arrowId: string, snapshot: ArrowSnapshot): void
     -visualExitDir(headExitPort: number, cellIds: string[]): number
     -chainCellIds(arrow: Arrow): string[]
 }
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: Cell[]
+}
+interface ArrowShape {
+    +cellIds: string[]
+    +exitDir: number
+}
+interface ArrowRenderOverride extends ArrowShape {
+    +arrowId: string
+}
 interface CollisionSignal {
     +arrowId: string
+    +nonce: number
+}
+interface VanishSignal {
+    +color: string
+    +cellIds: string[]
+    +nonce: number
+}
+interface HeadDisintegratingSignal {
+    +color: string
+    +cellId: string
+    +exitDir: number
     +nonce: number
 }
 interface GameControllerState {
@@ -381,6 +413,8 @@ interface GameControllerState {
     +score: number
     +inFlight: boolean
     +collision: CollisionSignal
+    +vanishing: VanishSignal
+    +headDisintegrating: HeadDisintegratingSignal
     +playMove: (command: PlayMoveCommand) => void
 }
 interface Point {
@@ -412,5 +446,10 @@ interface UseBoardInputParams {
     +enabled: boolean
     +resolveArrowIdAt: ArrowResolver
     +onPlayMove: (command: PlayMoveCommand) => void
+}
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: [number, number][]
 }
 @enduml

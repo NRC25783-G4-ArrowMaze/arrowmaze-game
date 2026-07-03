@@ -21,7 +21,7 @@ export class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRe
   constructor(levelLoader: LevelLoader,
     fixtures: LevelDataDTO[] = []
   ) {
-    this.levelLoader = this.levelLoader = levelLoader;
+    this.levelLoader = levelLoader;
     this.fixtures = new Map(fixtures.map(f => [f.id, f]));
   }
 
