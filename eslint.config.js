@@ -19,4 +19,39 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  // Clean Architecture layer boundaries (see CLAUDE.md → Layer Dependency Rules)
+  {
+    files: ['src/domain/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['**/application/**', '**/infrastructure/**', '**/presentation/**'],
+          message: 'Domain must not import from outer layers.',
+        }],
+      }],
+    },
+  },
+  {
+    files: ['src/application/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          // The contracts carve-out is a known deviation pending refactor (CLAUDE.md).
+          regex: 'infrastructure/(?!shared/contracts/)|presentation/',
+          message: 'Application must not import from infrastructure or presentation.',
+        }],
+      }],
+    },
+  },
+  {
+    files: ['src/infrastructure/**/*.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          group: ['**/presentation/**'],
+          message: 'Infrastructure must not import from presentation.',
+        }],
+      }],
+    },
+  },
 ])
