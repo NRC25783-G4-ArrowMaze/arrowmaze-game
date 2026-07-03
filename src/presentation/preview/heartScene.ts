@@ -1,5 +1,5 @@
 import type { Scene, SceneArrow, SceneCell } from '../game/scene'
-import type { LevelConnectionDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs'
+import type { LevelConnectionDTO } from '../../application/dtos/LevelDataDTOs'
 
 /**
  * heartScene — Mapa para la página de preview con forma de corazón.

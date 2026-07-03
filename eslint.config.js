@@ -36,8 +36,7 @@ export default defineConfig([
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [{
-          // The contracts carve-out is a known deviation pending refactor (CLAUDE.md).
-          regex: 'infrastructure/(?!shared/contracts/)|presentation/',
+          group: ['**/infrastructure/**', '**/presentation/**'],
           message: 'Application must not import from infrastructure or presentation.',
         }],
       }],

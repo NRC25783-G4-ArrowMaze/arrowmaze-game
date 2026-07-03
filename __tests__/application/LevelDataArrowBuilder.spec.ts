@@ -2,7 +2,7 @@ import { LevelDataArrowBuilder } from '../../src/application/services/LevelDataA
 import { Board } from '../../src/domain/entities/Board';
 import { Cell } from '../../src/domain/entities/Cell';
 import { BoardRegistryError } from '../../src/domain/errors/BoardErrors';
-import type { LevelArrowDTO } from '../../src/infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelArrowDTO } from '../../src/application/dtos/LevelDataDTOs';
 
 describe('LevelDataArrowBuilder', () => {
   let builder: LevelDataArrowBuilder;

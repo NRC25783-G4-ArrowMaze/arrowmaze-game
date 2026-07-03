@@ -22,13 +22,11 @@ src/
 ├── application/       # Layer 2 — Use cases + DTOs + ports + app services
 │   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
 │   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
-│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelData
+│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
 │   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
 │   └── ports/         # IArrowBuilder, IBoardBuilder
 ├── infrastructure/    # Layer 3 — Frameworks, adapters
 │   ├── repositories/  # InMemoryLevelRepository
-│   ├── shared/
-│   │   └── contracts/ # LevelDataDTOs (see Known deviations below)
 │   └── config/        # api-config
 └── presentation/      # Layer 4 — React UI, game controller, input, rendering
     ├── components/    # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...
@@ -50,9 +48,6 @@ domain ← application ← infrastructure ← presentation
 - **Presentation** may import from application and domain, never the other way around.
 
 Layer boundaries are enforced by ESLint (`no-restricted-imports` blocks in `eslint.config.js`) — `pnpm lint` fails on cross-layer imports.
-
-**Known deviation (pending refactor — do not extend it):**
-- `src/application/**` imports `LevelDataDTO` from `src/infrastructure/shared/contracts/LevelDataDTOs.ts` (6 files, type-only). The contract should live in application; `src/application/dtos/LevelData.ts` is the orphaned original (currently unused). The ESLint boundary rule carves out this path until the contract is moved.
 
 ---
 

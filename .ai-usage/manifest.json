@@ -1563,7 +1563,7 @@
         },
         "decisions": [
           "Fronteras de capas verificadas en pnpm lint via no-restricted-imports (antes solo documentación)",
-          "Desviación application → infrastructure/shared/contracts documentada como Known deviation con carve-out en el lint (pendiente de mover el contrato, decisión del autor)",
+          "Desviación application → infrastructure/shared/contracts resuelta: LevelDataDTOs movido a application/dtos (15 imports), huérfano LevelData.ts eliminado, carve-out del lint retirado",
           "Rename InMemoryBoardRepository.ts → InMemoryLevelRepository.ts (archivo = clase exportada)",
           "Flag de Jest 30 corregido en docs: --testPathPatterns (plural)",
           "CLAUDE.md, README.md y .agents/rules/arrow-game.md sincronizados con la estructura real de src/"

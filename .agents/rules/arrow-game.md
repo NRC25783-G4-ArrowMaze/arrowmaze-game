@@ -208,7 +208,6 @@ src/
 │   └── ports/         # IArrowBuilder, IBoardBuilder
 ├── infrastructure/    # Capa 3 — Adapters, repositorios, config
 │   ├── repositories/  # InMemoryLevelRepository
-│   ├── shared/contracts/ # LevelDataDTOs (desviación conocida — ver CLAUDE.md)
 │   └── config/
 └── presentation/      # Capa 4 — UI React, controlador de juego, input, render
     ├── components/

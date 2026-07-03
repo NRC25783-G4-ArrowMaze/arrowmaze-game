@@ -44,12 +44,11 @@ src/
 ├── application/          # Casos de uso + DTOs + puertos + servicios de aplicación
 │   ├── use-cases/        # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
 │   │                     # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
-│   ├── dtos/             # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelData
+│   ├── dtos/             # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
 │   ├── services/         # LevelDataArrowBuilder, LevelDataBoardBuilder
 │   └── ports/            # IArrowBuilder, IBoardBuilder
 ├── infrastructure/       # Adaptadores y repositorios
 │   ├── repositories/     # InMemoryLevelRepository
-│   ├── shared/contracts/ # LevelDataDTOs
 │   └── config/
 └── presentation/         # UI React, controlador de juego, input y render
     ├── components/       # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...

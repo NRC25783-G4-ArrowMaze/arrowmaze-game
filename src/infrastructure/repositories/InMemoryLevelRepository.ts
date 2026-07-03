@@ -1,5 +1,5 @@
 import type { ILoadedLevelRepository, LoadedLevel } from '../../domain/repositories/ILevelRepository';
-import type { LevelDataDTO } from '../shared/contracts/LevelDataDTOs';
+import type { LevelDataDTO } from '../../application/dtos/LevelDataDTOs';
 import { type LevelLoader } from '../../application/use-cases/LevelLoader';
 
 // ─────────────────────────────────────────────

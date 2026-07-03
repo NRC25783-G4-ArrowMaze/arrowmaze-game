@@ -1,7 +1,7 @@
 import type {
   LevelDataDTO,
   LevelConnectionDTO,
-} from '../../infrastructure/shared/contracts/LevelDataDTOs';
+} from '../../application/dtos/LevelDataDTOs';
 
 /**
  * scene — Modelo de ESCENA de presentación.

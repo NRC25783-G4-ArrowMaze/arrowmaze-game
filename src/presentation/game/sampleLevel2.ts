@@ -1,5 +1,5 @@
 import type { Scene, SceneArrow, SceneCell } from './scene';
-import type { LevelConnectionDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelConnectionDTO } from '../../application/dtos/LevelDataDTOs';
 
 /**
  * sampleLevel2 — Segundo nivel de ejemplo para la app principal.

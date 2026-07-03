@@ -1,5 +1,5 @@
 import { LevelDataBoardBuilder } from '../../src/application/services/LevelDataBoardBuilder'
-import { LevelDataDTO } from '../../src/infrastructure/shared/contracts/LevelDataDTOs';
+import { LevelDataDTO } from '../../src/application/dtos/LevelDataDTOs';
 import { LevelDataError, ConnectionError, BoardRegistryError, TopologyError } from '../../src/domain/errors/BoardErrors';
 
 describe('LevelDataBoardBuilder', () => {

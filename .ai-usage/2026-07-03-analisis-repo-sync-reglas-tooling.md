@@ -22,7 +22,8 @@
   - `jest.config.cjs`: config de ts-jest migrada de `globals` (deprecado) a `transform` — elimina los warnings en cada corrida
   - `eslint.config.js`: bloques `no-restricted-imports` que verifican las fronteras de capas de Clean Architecture en `pnpm lint` (domain, application con carve-out documentado para `infrastructure/shared/contracts`, infrastructure); la excepción usa `regex` con lookahead negativo porque la negación `!` estilo gitignore no re-incluye bajo un directorio excluido
   - `classes.puml` regenerado con `pnpm gen-uml`
-- **Modificaciones manuales del equipo:** El autor decidió dejar pendiente (sin resolver) la desviación de capas de `LevelDataDTOs` tras cuestionar si era una violación real — quedó documentada como "Known deviation" con carve-out en el lint en vez de mover el contrato a application.
+  - Resolución de la desviación de capas (autorizada después con "hazlo"): `LevelDataDTOs.ts` movido de `infrastructure/shared/contracts/` a `application/dtos/`, 15 imports actualizados (6 application, 1 infrastructure, 4 presentation, 4 tests), huérfano `application/dtos/LevelData.ts` eliminado y carve-out del lint retirado — la regla de capas queda estricta
+- **Modificaciones manuales del equipo:** El autor cuestionó si el import de `LevelDataDTOs` era una violación real y primero la pospuso (documentada como "Known deviation" con carve-out en el lint); en un segundo momento autorizó resolverla moviendo el contrato a application.
 - **Validación realizada:**
   - `pnpm test`: ✅ 228/228 en 20 suites, sin warnings de ts-jest
   - `pnpm lint`: ✅ limpio; regla de capas probada con archivo sonda (import prohibido detectado como error y sonda eliminada)

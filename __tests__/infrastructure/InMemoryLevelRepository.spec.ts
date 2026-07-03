@@ -2,7 +2,7 @@ import { InMemoryLevelRepository } from '../../src/infrastructure/repositories/I
 import { LevelLoader } from '../../src/application/use-cases/LevelLoader';
 import type { IBoardBuilder } from '../../src/application/ports/IBoardBuilder';
 import type { IArrowBuilder } from '../../src/application/ports/IArrowBuilder';
-import type { LevelDataDTO } from '../../src/infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelDataDTO } from '../../src/application/dtos/LevelDataDTOs';
 import type { LoadedLevel } from '../../src/domain/repositories/ILevelRepository';
 
 // Mockeamos la clase entera para interceptar el método load
