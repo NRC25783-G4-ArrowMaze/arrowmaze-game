@@ -36,19 +36,27 @@ presentation ──► infrastructure ──► application ──► domain
 ```
 src/
 ├── domain/               # Lógica pura. Sin dependencias externas.
-│   ├── entities/         # Arrow, Head, Segment, ArrowSegment, Board, Cell
-│   ├── value-objects/    # Port, AdvanceResult
+│   ├── entities/         # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── value-objects/    # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/         # TopologyValidator, TopologyQueryService, PathChecker
-│   └── errors/           # ArrowErrors (ArrowPlacementError, ArrowCreationError, ArrowCinematicError)
-├── application/          # Casos de uso + DTOs + puertos
-│   ├── use-cases/        # BuildBoardUseCase, LoadLevelUseCase, PlaceArrowUseCase,
-│   │                     # QueryTopologyUseCase, AdvanceArrowUseCase
-│   ├── dtos/             # ArrowDTOs, MovementDTOs, GameDTOs, LevelData
-│   └── ports/            # IBoardRepository, ILevelRepository, IBoardBuilder
-└── infrastructure/       # Adaptadores, fábricas, repositorios
-    ├── factories/        # BoardFactory
-    ├── repositories/     # InMemoryBoardRepository
-    └── config/
+│   ├── repositories/     # ILevelRepository (puerto definido en dominio)
+│   └── errors/           # ArrowErrors, BoardErrors, GameErrors
+├── application/          # Casos de uso + DTOs + puertos + servicios de aplicación
+│   ├── use-cases/        # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
+│   │                     # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
+│   ├── dtos/             # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelData
+│   ├── services/         # LevelDataArrowBuilder, LevelDataBoardBuilder
+│   └── ports/            # IArrowBuilder, IBoardBuilder
+├── infrastructure/       # Adaptadores y repositorios
+│   ├── repositories/     # InMemoryLevelRepository
+│   ├── shared/contracts/ # LevelDataDTOs
+│   └── config/
+└── presentation/         # UI React, controlador de juego, input y render
+    ├── components/       # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...
+    ├── game/             # GameController, useGameController, scene, sampleLevel(2)
+    ├── input/            # useBoardInput, tapResolver, PlayMoveCommand
+    ├── rendering/        # boardLayout
+    └── preview/          # mockScene, heartScene, NeonInteractiveBoard
 ```
 
 ---
@@ -62,23 +70,23 @@ src/
 | **A1** | Tablero como grafo de nodos en memoria — `Board` / `Cell` con topología port-based | ✅ Completo |
 | **A2** | Flechas como listas enlazadas — `Arrow → Head → Segment` sobre el grafo | ✅ Completo |
 | **A3** | Resolución y desplazamiento — motor cinemático Head-push con rollback atómico | ✅ Completo |
-| **A4** | Detección de victoria y derrota por vaciado del tablero / agotamiento de movimientos | ❌ Pendiente |
-| **A5** | Cálculo y composición de la puntuación por sesión de juego | ❌ Pendiente |
+| **A4** | Detección de victoria y derrota por vaciado del tablero / agotamiento de movimientos | ✅ Completo |
+| **A5** | Cálculo y composición de la puntuación por sesión de juego | ✅ Completo |
 
 ### Grupo B — Renderizado y presentación
 
 | # | Feature | Estado |
 |---|---|---|
-| **B1** | Renderizado visual del tablero sobre el grafo de nodos | ❌ Pendiente |
-| **B2** | Animaciones y retroalimentación visual de acciones del motor | ❌ Pendiente |
-| **B3** | Captura y enrutamiento de entrada del jugador hacia el motor | ❌ Pendiente |
+| **B1** | Renderizado visual del tablero sobre el grafo de nodos | ✅ Completo |
+| **B2** | Animaciones y retroalimentación visual de acciones del motor | ⚠️ En progreso (`feature/animaciones`) |
+| **B3** | Captura y enrutamiento de entrada del jugador hacia el motor | ✅ Completo |
 
 ### Grupo C — Flujo y estados
 
 | # | Feature | Estado |
 |---|---|---|
-| **C1** | Máquina de estados del ciclo de vida de una partida (`GameSession`) | ❌ Pendiente |
-| **C2** | Carga y deserialización de niveles — schema `LevelData` + `InMemoryBoardRepository` listos | ⚠️ Parcial |
+| **C1** | Máquina de estados del ciclo de vida de una partida (`GameSession`) | ✅ Completo |
+| **C2** | Carga y deserialización de niveles — `LevelLoader` + `InMemoryLevelRepository` listos; falta repositorio JSON/remoto | ⚠️ Parcial |
 | **C3** | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | ❌ Pendiente |
 | **C4** | Pantallas de soporte: inicio, victoria, derrota, pausa, ajustes | ❌ Pendiente |
 
@@ -141,23 +149,18 @@ Resultados posibles (`AdvanceOutcome`): `'advanced'` · `'blocked'` · `'destroy
 
 ```
 __tests__/
-├── domain/
-│   ├── board_graph.spec.ts       # A1 — topología, conexiones, ocupación (48 tests)
-│   ├── arrow_placement.spec.ts   # A2 — colocación, invariantes, restricciones (17 tests)
-│   └── arrow_movement.spec.ts    # A3 — avance, colisiones, rollback, curvas (9 escenarios)
-└── application/
-    ├── BuildBoardUseCase.spec.ts
-    ├── LoadLevelUseCase.spec.ts
-    ├── PlaceArrowUseCase.spec.ts
-    ├── QueryTopologyUseCase.spec.ts
-    └── AdvanceArrowUseCase.spec.ts
+├── domain/          # Unit tests puros — grafo, movimiento, colisiones, sesión, scoring
+├── application/     # Integration tests por use case (place, advance, play, slide, load)
+├── infrastructure/  # Repositorios (InMemoryLevelRepository)
+└── presentation/    # Enrutamiento de input y sesión de juego
 ```
 
-**131 tests pasando · 9 suites · 0 fallos**
+**228 tests pasando · 20 suites · 0 fallos**
 
 ```bash
-pnpm test              # Suite completa
-pnpm test -- --watch   # Modo watch
+pnpm test                                 # Suite completa
+pnpm test -- --watch                      # Modo watch
+pnpm test -- --testPathPatterns="<name>"  # Un spec concreto (Jest 30: flag en plural)
 ```
 
 ---
