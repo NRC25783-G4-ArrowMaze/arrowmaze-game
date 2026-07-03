@@ -1525,10 +1525,54 @@
           "Determinismo preservado en todas las animaciones (sin aleatoriedad) para tests y replays"
         ],
         "notes": "Sesión corta de pulido puramente visual en src/presentation/components/. El slide ahora se lee continuo (glide 85ms < TICK_MS 90ms), el impacto de colisión pica rápido y se recupera lento, el burst es orgánico (2 anillos + onda) y la punta se fractura en fragmentos que derivan y rotan."
+      },
+      {
+        "id": "2026-07-03-002",
+        "date": "2026-07-03",
+        "title": "Auditoría del repo: reglas sincronizadas y tooling corregido",
+        "file": "2026-07-03-analisis-repo-sync-reglas-tooling.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-fable-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "repo-audit-rules-sync",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 8,
+          "files_renamed": 1,
+          "tests_passing": 228,
+          "test_suites": 20
+        },
+        "areas": [
+          "repo-audit",
+          "documentation-sync",
+          "work-rules",
+          "lint-enforcement",
+          "clean-architecture",
+          "tooling",
+          "jest-config",
+          "eslint-config"
+        ],
+        "validation": {
+          "build": "passed — tsc + Vite sin errores",
+          "lint": "passed — regla de fronteras de capas probada con archivo sonda",
+          "tests": "228/228 passed — sin warnings de ts-jest tras migración a transform",
+          "gen_uml": "passed — classes.puml regenerado"
+        },
+        "decisions": [
+          "Fronteras de capas verificadas en pnpm lint via no-restricted-imports (antes solo documentación)",
+          "Desviación application → infrastructure/shared/contracts documentada como Known deviation con carve-out en el lint (pendiente de mover el contrato, decisión del autor)",
+          "Rename InMemoryBoardRepository.ts → InMemoryLevelRepository.ts (archivo = clase exportada)",
+          "Flag de Jest 30 corregido en docs: --testPathPatterns (plural)",
+          "CLAUDE.md, README.md y .agents/rules/arrow-game.md sincronizados con la estructura real de src/"
+        ],
+        "notes": "Auditoría general: 228/228 tests y lint limpios de partida, pero deriva severa docs↔código. Se detectó y documentó código muerto (application/dtos/LevelData.ts) y la violación de capas type-only de LevelDataDTOs (6 imports). main sigue en el commit inicial (higiene de repo, sin acción). También se reinsertó en este manifest la entrada faltante 2026-06-28-001."
       }
     ],
     "statistics": {
-      "totalReports": 27,
+      "totalReports": 28,
       "lastUpdated": "2026-07-03T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1549,7 +1593,7 @@
         "Gemini (versión no especificada)"
       ],
       "totalLinesGenerated": 7240,
-      "totalFilesCreated": 101,
+      "totalFilesCreated": 102,
       "totalFilesDeleted": 16,
       "totalTestsPassing": 228,
       "totalTestSuites": 20,
@@ -1558,8 +1602,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-03-001",
-      "summary": "Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta"
+      "id": "2026-07-03-002",
+      "summary": "Auditoría del repo: reglas sincronizadas y tooling corregido"
     }
   }
 }
