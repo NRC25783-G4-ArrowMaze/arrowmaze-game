@@ -179,6 +179,7 @@ class Score {
     +flawlessVictory: boolean
     +finalScore: number
     +{static} compute(tracker: ScoringTracker): Score
+    +{static} createSimpleScore(value: number): Score
 }
 class GameSession {
     -_movesRemaining: number
@@ -222,8 +223,38 @@ interface SlideResult {
 interface IArrowBuilder {
     +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
 }
+interface IAuthTokenProvider {
+    +getToken(): Promise<string>
+}
 interface IBoardBuilder {
     +build(data: LevelDataDTO): Board
+}
+class InvalidLevelProgressError extends Error
+class LevelProgress {
+    -_levelId: string
+    -_score: Score
+    -_movesUsed: number
+    -_timeElapsedSeconds: number
+    -_achievedAt: Date
+    +levelId: string
+    +score: Score
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: Date
+    +isBeatenBy(newScore: Score, newMovesUsed: number, newTimeElapsedSeconds: number): boolean
+    +{static} create(levelId: string, score: Score, movesUsed: number, timeElapsedSeconds: number, achievedAt?: Date): LevelProgress
+}
+interface ILocalProgressRepository {
+    +initialize(): Promise<void>
+    +findByLevelId(levelId: string): Promise<LevelProgress>
+    +findAll(): Promise<LevelProgress[]>
+    +save(progress: LevelProgress): Promise<void>
+    +findPendingSync(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+interface IProgressApiClient {
+    +pushProgress(progress: LevelProgress): Promise<void>
+    +fetchUserProgress(): Promise<LevelProgress[]>
 }
 class LevelDataArrowBuilder implements IArrowBuilder {
     +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
@@ -243,6 +274,11 @@ class AdvanceArrowUseCase {
 class BuildBoardUseCase {
     -builder: IBoardBuilder
     +execute(levelData: LevelDataDTO): Board
+}
+class GetLocalProgress {
+    -_repository: ILocalProgressRepository
+    +getAll(): Promise<LevelProgress[]>
+    +getByLevel(levelId: string): Promise<LevelProgress>
 }
 interface LoadedLevel {
     +board: Board
@@ -280,9 +316,87 @@ class QueryTopologyUseCase {
     +canReachExit(board: Board, cellId: string): boolean
     -resolveCell(board: Board, cellId: string): Cell
 }
+class SaveLocalProgress {
+    -_repository: ILocalProgressRepository
+    +execute(levelId: string, finalScore: Score, movesUsed: number, timeElapsedSeconds: number): Promise<void>
+}
 class SlideArrowUseCase {
     -advanceUseCase: AdvanceArrowUseCase
     +execute(input: SlideInput): SlideResult
+}
+class SyncOfflineProgress {
+    -_repository: ILocalProgressRepository
+    +getPendingSyncRecords(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+class SessionExpiredError extends Error
+class NetworkError extends Error
+class SyncProgress {
+    -_localRepository: ILocalProgressRepository
+    -_apiClient: IProgressApiClient
+    +execute(): Promise<void>
+    -processUpstream(): Promise<void>
+    -processDownstream(): Promise<void>
+    -saveAsSynced(progress: LevelProgress): Promise<void>
+}
+interface ApiProgressDTO {
+    +levelId: string
+    +score: number
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: string
+}
+class FetchProgressApiClient implements IProgressApiClient {
+    -_baseUrl: string
+    -_tokenProvider: IAuthTokenProvider
+    -getHeaders(): Promise<HeadersInit>
+    +pushProgress(progress: LevelProgress): Promise<void>
+    +fetchUserProgress(): Promise<LevelProgress[]>
+}
+class CapacitorTokenProvider implements IAuthTokenProvider {
+    -TOKEN_KEY: "auth_session_token"
+    +getToken(): Promise<string>
+    +setToken(token: string): Promise<void>
+    +removeToken(): Promise<void>
+}
+interface LocalRecord {
+    +levelId: string
+    +score: number
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: string
+    +pendingSync: number
+}
+class LocalProgressMapper {
+    +{static} toDomain(record: LocalRecord): LevelProgress
+    +{static} toPersistence(domain: LevelProgress, isPendingSync: boolean): LocalRecord
+}
+interface IDatabaseDriver {
+    +executeSql(query: string, params?: (string | number)[]): Promise<T[]>
+}
+class SqliteProgressRepository implements ILocalProgressRepository {
+    -_db: IDatabaseDriver
+    +initialize(): Promise<void>
+    +findByLevelId(levelId: string): Promise<LevelProgress>
+    +findAll(): Promise<LevelProgress[]>
+    +save(progress: LevelProgress): Promise<void>
+    +findPendingSync(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+class CapacitorSqliteDriver implements IDatabaseDriver {
+    -_sqlite: SQLiteConnection
+    -_db: SQLiteDBConnection
+    +openDatabase(dbName?: string): Promise<void>
+    +executeSql(query: string, params?: (string | number)[]): Promise<T[]>
+}
+interface LocalProgressModule {
+    +saveLocalProgress: SaveLocalProgress
+    +getLocalProgress: GetLocalProgress
+    +syncOfflineProgress: SyncOfflineProgress
+    +syncProgress: SyncProgress
+}
+class LocalProgressModuleFactory {
+    +{static} create(apiBaseUrl: string, tokenProvider: IAuthTokenProvider): Promise<LocalProgressModule>
 }
 interface ILevelRepository {
     +getLevel(levelId: string): Promise<LevelDataDTO>
@@ -293,6 +407,30 @@ class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepositor
     +getLevel(levelId: string): Promise<LevelDataDTO>
     +getLoadedLevel(levelId: string): Promise<LoadedLevel>
     +addFixture(levelData: LevelDataDTO): void
+}
+interface Point {
+    +x: number
+    +y: number
+}
+interface GridDelta {
+    +dCol: number
+    +dRow: number
+}
+interface GridPosition {
+    +col: number
+    +row: number
+}
+interface BoardLayout {
+    +maxCol: number
+    +maxRow: number
+    +cellSize: number
+    +offset: Point
+}
+interface ArrowMotion {
+    +kind: ArrowMotionKind
+    +dx: number
+    +dy: number
+    +durationMs: number
 }
 interface CellView {
     +id: string
@@ -399,23 +537,19 @@ interface GameControllerState {
     +headDisintegrating: HeadDisintegratingSignal
     +playMove: (command: PlayMoveCommand) => void
 }
-interface Point {
-    +x: number
-    +y: number
-}
-interface GridDelta {
-    +dCol: number
-    +dRow: number
-}
-interface GridPosition {
-    +col: number
-    +row: number
-}
-interface BoardLayout {
-    +maxCol: number
-    +maxRow: number
+interface RunTickParams {
+    +arrowId: string
+    +preArrow: ArrowView
+    +outcome: AdvanceOutcome
     +cellSize: number
-    +offset: Point
+}
+interface TickAnimationState {
+    +inFlight: boolean
+    +motions: ReadonlyMap<string, ArrowMotion>
+    +ghostArrow: ArrowView
+    +enabled: boolean
+    +setEnabled: (value: boolean) => void
+    +run: (params: RunTickParams) => void
 }
 interface PointerGate {
     +button: number

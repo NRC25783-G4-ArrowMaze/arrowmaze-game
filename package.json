@@ -13,6 +13,8 @@
     "gen-uml": "tplant --input \"src/**/*.ts\" --output classes.puml && node postprocess-uml.js"
   },
   "dependencies": {
+    "@capacitor-community/sqlite": "^8.1.0",
+    "@capacitor/preferences": "^8.0.1",
     "axios": "^1.16.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

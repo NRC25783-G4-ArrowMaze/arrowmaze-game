@@ -1427,6 +1427,71 @@
         "notes": "Mapa de preview con forma de corazón. El autor corrigió el enfoque (matriz -> grafo) y la coherencia de direcciones, y fijó el alcance (jugable/resoluble + esquemático) vía preguntas. Verificación headless (solver) + runtime (WON)."
       },
       {
+        "id": "2026-06-27-004",
+        "date": "2026-06-27",
+        "title": "Persistencia local del progreso (Offline-First) + sincronización bidireccional",
+        "file": "2026-06-27-progreso-local.md",
+        "tool": "Gemini",
+        "model": "Gemini (versión no especificada)",
+        "author": "@SantiagoChirinos",
+        "phase": "implementation",
+        "feature": "feature13-persistencia-local",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "lines_of_code": 1200,
+          "files_created": 21,
+          "files_modified": 2
+        },
+        "areas": [
+          "domain-layer",
+          "application-layer",
+          "infrastructure-layer",
+          "sqlite",
+          "capacitor",
+          "offline-first",
+          "sync"
+        ],
+        "layers": {
+          "domain": {
+            "status": "extended",
+            "created": [
+              "entities/LevelProgress.ts",
+              "errors/SyncErrors.ts",
+              "repositories/ILocalProgressRepository.ts",
+              "repositories/IProgressApiClient.ts",
+              "repositories/IAuthTokenProvider.ts"
+            ],
+            "modified": ["value-objects/Score.ts (createSimpleScore)"]
+          },
+          "application": {
+            "status": "extended",
+            "created": [
+              "use-cases/SaveLocalProgress.ts",
+              "use-cases/GetLocalProgress.ts",
+              "use-cases/SaveOfflineProgress.ts",
+              "use-cases/SyncProgress.ts"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "created": [
+              "persistence/sqlite/ (driver, repositorio, mapper, modelo)",
+              "api/FetchProgressApiClient.ts",
+              "auth/CapacitorTokenProvides.ts",
+              "factories/LocalProgressModuleFactory.ts"
+            ]
+          }
+        },
+        "validation": {
+          "build": "passed — tsc -b exit 0",
+          "lint": "pending — 1 error preserve-caught-error en LocalProgressModuleFactory.ts",
+          "tests": "passed — 3 suites nuevas (LevelProgress, SaveLocalProgress, SyncProgress)",
+          "structure": "pending — puertos en domain/repositories/ en lugar de application/ports/ (convención del repo)"
+        },
+        "notes": "Entrada registrada retroactivamente durante la resolución de conflictos del PR #16: el reporte .md existía en la rama pero nunca se indexó en README/manifest. Deuda pendiente declarada: falta features/*.feature y doc/<feature>_plan.md; timeElapsedSeconds provisional (45s) en App.tsx; puertos por mover a application/ports."
+      },
+      {
         "id": "2026-06-28-001",
         "date": "2026-06-28",
         "title": "Colisión configurable (return por defecto) + mapa decorado 6×6",
@@ -1569,18 +1634,76 @@
           "CLAUDE.md, README.md y .agents/rules/arrow-game.md sincronizados con la estructura real de src/"
         ],
         "notes": "Auditoría general: 228/228 tests y lint limpios de partida, pero deriva severa docs↔código. Se detectó y documentó código muerto (application/dtos/LevelData.ts) y la violación de capas type-only de LevelDataDTOs (6 imports). main sigue en el commit inicial (higiene de repo, sin acción). También se reinsertó en este manifest la entrada faltante 2026-06-28-001."
+      },
+      {
+        "id": "2026-07-04-001",
+        "date": "2026-07-04",
+        "title": "Resolución de conflictos PR #16 + matriz de decisiones",
+        "file": "2026-07-04-resolucion-conflictos-pr16.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5 + Haiku 4.5",
+        "author": "@Jrgil20",
+        "phase": "integration",
+        "feature": "feature13-merge-resolution",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 17,
+          "files_deleted": 3,
+          "files_renamed": 6,
+          "tests_passing": 249,
+          "test_suites": 24
+        },
+        "areas": [
+          "git-merge",
+          "conflict-resolution",
+          "clean-architecture",
+          "ai-usage-registry",
+          "documentation",
+          "integration-testing"
+        ],
+        "layers": {
+          "application": {
+            "status": "resolved",
+            "notes": "SaveLocalProgress, GetLocalProgress, SyncProgress u otros use-cases de feature13 integrados sin fricción en el árbol de dev"
+          },
+          "infrastructure": {
+            "status": "resolved",
+            "notes": "SQLite driver, repository, factory y API client de feature13 conviven con las capas de dev sin violaciones de fronteras"
+          },
+          "presentation": {
+            "status": "resolved",
+            "notes": "App.tsx fusiona wiring de persistencia del PR con la base evolucionada de dev (B1-B3 + FIX-1/FIX-2 + #14 animaciones)"
+          }
+        },
+        "validation": {
+          "build": "passed — tsc -b exit 0",
+          "lint": "passed — ESLint exit 0 (including preserve-caught-error fix)",
+          "tests": "passed — 247/247 (dev base 228 + feature13 nouvelles 19)",
+          "merge": "tested with local worktree — cero regresiones",
+          "runtime": "verified — navegador: 13 movimientos, input habilitado, tablero renderiza"
+        },
+        "decisions": [
+          "Presentación: CONSERVAR dev (7 archivos add/add eran idénticos byte-a-byte con PR#10 squasheado; dev evolucionó con #12/#14)",
+          "App.tsx: COMBINAR (base dev de B1-B3 + reinserción de persistencia sin casts; score !== null para evitar pérdida de 0)",
+          "AI usage: COMBINAR (base dev + retroactiva 2026-06-27-004 con metadatos completados)",
+          "DTOs / dirs: ELIMINAR (LeaderboardDTO, ProgressDTO muertos; src/infrastructure/shared/contracts/ violaba fronteras de #14)"
+        ],
+        "notes": "Sesión de resolución exhaustiva con matriz de decisiones explícita. Todos los conflictos eran resolubles sin pérdida de lógica. Segunda fase de la misma sesión: deuda de revisión saldada — puertos movidos a application/ports/ (12 imports), InvalidLevelProgressError tipado (+2 tests), renombres archivo=clase con git mv, timer de presentación real en App.tsx (reemplaza 45s hardcodeado), classes.puml regenerado. Pendiente de Santiago: Gherkin y plan en doc/."
       }
     ],
     "statistics": {
-      "totalReports": 28,
-      "lastUpdated": "2026-07-03T00:00:00Z",
+      "totalReports": 30,
+      "lastUpdated": "2026-07-04T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
         "Antigravity (Claude)",
         "Antigravity (Gemini)",
         "Claude (web.claude.ai)",
-        "Claude Code (claude.ai/code)"
+        "Claude Code (claude.ai/code)",
+        "Gemini"
       ],
       "modelsUsed": [
         "Claude Fable 5",
@@ -1592,11 +1715,11 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 7240,
-      "totalFilesCreated": 102,
+      "totalLinesGenerated": 8440,
+      "totalFilesCreated": 123,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 228,
-      "totalTestSuites": 20,
+      "totalTestsPassing": 249,
+      "totalTestSuites": 24,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"

@@ -39,4 +39,8 @@ export class Score {
     );
     return new Score(timeScore, tracker.accumulatedPenalty, flawlessVictory, finalScore);
   }
+
+  static createSimpleScore(value: number):Score{
+    return new Score(0,0,false,value);
+  }
 }

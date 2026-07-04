@@ -36,19 +36,25 @@ presentation ──► infrastructure ──► application ──► domain
 ```
 src/
 ├── domain/               # Lógica pura. Sin dependencias externas.
-│   ├── entities/         # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── entities/         # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession, LevelProgress
 │   ├── value-objects/    # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/         # TopologyValidator, TopologyQueryService, PathChecker
 │   ├── repositories/     # ILevelRepository (puerto definido en dominio)
-│   └── errors/           # ArrowErrors, BoardErrors, GameErrors
+│   └── errors/           # ArrowErrors, BoardErrors, GameErrors, SyncErrors, ProgressErrors
 ├── application/          # Casos de uso + DTOs + puertos + servicios de aplicación
 │   ├── use-cases/        # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
-│   │                     # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
+│   │                     # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase,
+│   │                     # SaveLocalProgress, GetLocalProgress, SyncOfflineProgress, SyncProgress
 │   ├── dtos/             # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
 │   ├── services/         # LevelDataArrowBuilder, LevelDataBoardBuilder
-│   └── ports/            # IArrowBuilder, IBoardBuilder
+│   └── ports/            # IArrowBuilder, IBoardBuilder, ILocalProgressRepository,
+│                         # IProgressApiClient, IAuthTokenProvider
 ├── infrastructure/       # Adaptadores y repositorios
 │   ├── repositories/     # InMemoryLevelRepository
+│   ├── persistence/      # sqlite/ (CapacitorSqliteDriver, SqliteProgressRepository, mapper, model)
+│   ├── api/              # FetchProgressApiClient
+│   ├── auth/             # CapacitorTokenProvider
+│   ├── factories/        # LocalProgressModuleFactory (composition root de persistencia/sync)
 │   └── config/
 └── presentation/         # UI React, controlador de juego, input y render
     ├── components/       # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...
