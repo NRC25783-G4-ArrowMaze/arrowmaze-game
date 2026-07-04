@@ -1,77 +1,57 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import { ArrowComponent } from '../components/ArrowComponent'
+import { ArrowBurst } from '../components/ArrowBurst'
+import { ArrowHeadDisintegrate } from '../components/ArrowHeadDisintegrate'
 import { GameOverlay } from '../components/GameOverlay'
 import {
   computeBoardLayout,
   cellCenter,
-  boundingBoxPositions,
+  portDelta,
   type Point,
 } from '../rendering/boardLayout'
 import { useGameController } from '../game/useGameController'
-import { useTickAnimation } from '../game/useTickAnimation'
 import { useBoardInput } from '../input/useBoardInput'
-import { MOCK_SCENE } from './mockScene'
-import type { BoardViewModel } from '../viewModel'
+import { HEART_SCENE } from './heartScene'
 
 /**
  * NeonInteractiveBoard — Tablero INTERACTIVO con estética neón para la página oculta.
  *
  * Reutiliza el stack existente sin modificarlo:
- *   - useGameController: estado del juego (motor real, PlayMoveUseCase).
- *   - useBoardInput / useTickAnimation: click → tick → animación.
+ *   - useGameController: estado del juego (motor real) + slide animado tick-a-tick.
+ *   - useBoardInput: click → slide.
  *   - ArrowComponent: el render de flecha tradicional (cuerpo + punta).
  *
  * Lo único propio es la "carcasa" SVG: fondo oscuro, grilla de puntos tenue y un
- * filtro de glow por color. Haz click en una flecha para avanzarla.
+ * filtro de glow por color. Haz click en una flecha para deslizarla.
  */
 
-const SIZE = 480
+const SIZE = 600
 
 const NeonInteractiveBoard: React.FC = () => {
-  const game = useGameController(MOCK_SCENE)
-  const anim = useTickAnimation()
+  const game = useGameController(HEART_SCENE)
   const layout = computeBoardLayout(game.viewModel.cells, SIZE, SIZE)
-
-  // Durante el fade de "destroyed" re-inyectamos la flecha fantasma para verla salir.
-  const viewModel: BoardViewModel = useMemo(() => {
-    if (anim.ghostArrow === null) {
-      return game.viewModel
-    }
-    return {
-      cells: game.viewModel.cells,
-      arrows: [...game.viewModel.arrows, anim.ghostArrow],
-    }
-  }, [game.viewModel, anim.ghostArrow])
 
   const onPointerDown = useBoardInput({
     width: SIZE,
     height: SIZE,
     layout,
-    enabled: game.status === 'IN_PROGRESS' && !anim.inFlight,
+    enabled: game.status === 'IN_PROGRESS' && !game.inFlight,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => {
-      const preArrow = game.viewModel.arrows.find((a) => a.id === command.arrowId)
-      if (preArrow === undefined) {
-        return
-      }
-      const result = game.playMove(command)
-      if (result === null || !result.success || result.outcome === undefined) {
-        return
-      }
-      anim.run({
-        arrowId: command.arrowId,
-        preArrow,
-        outcome: result.outcome,
-        cellSize: layout.cellSize,
-      })
-    },
+    onPlayMove: (command) => game.playMove(command),
   })
 
-  const { maxCol, maxRow, cellSize, offset } = layout
+  const { cellSize, offset } = layout
   const centerById = new Map<string, Point>(
-    viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
+    game.viewModel.cells.map((c) => [c.id, cellCenter(c.col, c.row, cellSize, offset)]),
   )
-  const dots = boundingBoxPositions(maxCol, maxRow)
+
+  // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
+  const burstOrigin =
+    game.vanishing !== null ? centerById.get(game.vanishing.cellIds[0]) : undefined
+
+  // Origen de la desintegración de la punta.
+  const headDisintegrateOrigin =
+    game.headDisintegrating !== null ? centerById.get(game.headDisintegrating.cellId) : undefined
 
   return (
     <div style={{ position: 'relative', width: '100%', maxWidth: SIZE }}>
@@ -97,16 +77,17 @@ const NeonInteractiveBoard: React.FC = () => {
 
         <rect x={0} y={0} width={SIZE} height={SIZE} rx={20} fill="#0a0e1a" />
 
-        <g opacity={0.5}>
-          {dots.map(({ col, row }) => {
-            const c = cellCenter(col, row, cellSize, offset)
+        {/* Nodos del GRAFO (solo las celdas reales, no una matriz rectangular). */}
+        <g opacity={0.25}>
+          {game.viewModel.cells.map((cell) => {
+            const c = cellCenter(cell.col, cell.row, cellSize, offset)
             return (
-              <circle key={`${col},${row}`} cx={c.x} cy={c.y} r={cellSize * 0.05} fill="#22305a" />
+              <circle key={cell.id} cx={c.x} cy={c.y} r={cellSize * 0.05} fill="#33406a" />
             )
           })}
         </g>
 
-        {viewModel.arrows.map((arrow) => {
+        {game.viewModel.arrows.map((arrow) => {
           const centers = arrow.cellIds
             .map((id) => centerById.get(id))
             .filter((p): p is Point => p !== undefined)
@@ -117,11 +98,45 @@ const NeonInteractiveBoard: React.FC = () => {
                 centers={centers}
                 exitDir={arrow.exitDir}
                 cellSize={cellSize}
-                motion={anim.motions.get(arrow.id)}
+                collideNonce={
+                  game.collision?.arrowId === arrow.id
+                    ? game.collision.nonce
+                    : undefined
+                }
               />
             </g>
           )
         })}
+
+        {/* Desintegración de la punta: fractura con glow que precede al estallido. */}
+        {game.headDisintegrating !== null && headDisintegrateOrigin !== undefined && (
+          (() => {
+            const { dCol, dRow } = portDelta(game.headDisintegrating.exitDir)
+            return (
+              <g filter="url(#neon-glow)">
+                <ArrowHeadDisintegrate
+                  key={game.headDisintegrating.nonce}
+                  center={headDisintegrateOrigin}
+                  color={game.headDisintegrating.color}
+                  cellSize={cellSize}
+                  tipDir={{ x: dCol, y: dRow }}
+                />
+              </g>
+            )
+          })()
+        )}
+
+        {/* Estallido de desaparición: chispas con glow en la cabeza destruida. */}
+        {game.vanishing !== null && burstOrigin !== undefined && (
+          <g filter="url(#neon-glow)">
+            <ArrowBurst
+              key={game.vanishing.nonce}
+              origin={burstOrigin}
+              color={game.vanishing.color}
+              cellSize={cellSize}
+            />
+          </g>
+        )}
       </svg>
 
       <GameOverlay status={game.status} score={game.score} />

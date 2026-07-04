@@ -14,19 +14,26 @@ Package manager: **pnpm**
 ```
 src/
 ├── domain/            # Layer 1 — Pure business logic, zero external dependencies
-│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell
-│   ├── value-objects/ # Port, AdvanceResult
+│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── value-objects/ # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/      # TopologyValidator, TopologyQueryService, PathChecker
-│   └── errors/        # Typed domain errors (ArrowErrors)
-├── application/       # Layer 2 — Use cases + DTOs + ports
-│   ├── use-cases/     # BuildBoardUseCase, LoadLevelUseCase, PlaceArrowUseCase,
-│   │                  # AdvanceArrowUseCase, QueryTopologyUseCase
-│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, LevelData
-│   └── ports/         # IBoardRepository, ILevelRepository
-└── infrastructure/    # Layer 3 — Frameworks, adapters, factories
-    ├── factories/     # BoardFactory
-    ├── repositories/  # InMemoryBoardRepository
-    └── config/        # api-config
+│   ├── repositories/  # ILevelRepository (port defined in domain)
+│   └── errors/        # Typed domain errors (ArrowErrors, BoardErrors, GameErrors)
+├── application/       # Layer 2 — Use cases + DTOs + ports + app services
+│   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
+│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
+│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
+│   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
+│   └── ports/         # IArrowBuilder, IBoardBuilder
+├── infrastructure/    # Layer 3 — Frameworks, adapters
+│   ├── repositories/  # InMemoryLevelRepository
+│   └── config/        # api-config
+└── presentation/      # Layer 4 — React UI, game controller, input, rendering
+    ├── components/    # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...
+    ├── game/          # GameController, useGameController, scene, sampleLevel, sampleLevel2
+    ├── input/         # useBoardInput, tapResolver, PlayMoveCommand
+    ├── rendering/     # boardLayout
+    └── preview/       # mockScene, heartScene, NeonInteractiveBoard
 ```
 
 ### Layer Dependency Rules
@@ -37,7 +44,10 @@ domain ← application ← infrastructure ← presentation
 
 - **Domain** never imports from application, infrastructure, or any framework.
 - **Application** never imports from infrastructure — depends on port interfaces only.
-- **Infrastructure** implements ports defined in application.
+- **Infrastructure** implements ports defined in application (or in domain, e.g. `ILevelRepository`).
+- **Presentation** may import from application and domain, never the other way around.
+
+Layer boundaries are enforced by ESLint (`no-restricted-imports` blocks in `eslint.config.js`) — `pnpm lint` fails on cross-layer imports.
 
 ---
 
@@ -45,8 +55,10 @@ domain ← application ← infrastructure ← presentation
 
 ```
 __tests__/
-├── domain/       # Pure unit tests — real domain objects, no mocks
-└── application/  # Integration tests per use case
+├── domain/          # Pure unit tests — real domain objects, no mocks
+├── application/     # Integration tests per use case
+├── infrastructure/  # Repository/adapter tests
+└── presentation/    # UI logic tests (input routing, game session)
 ```
 
 BDD acceptance criteria live in `features/*.feature` (Gherkin). Each feature file corresponds to one `__tests__/**/*.spec.ts`.
@@ -60,7 +72,7 @@ Feature plans and technical specs are documented in `doc/` before implementation
 | Command | Description |
 |---|---|
 | `pnpm test` | Run the full Jest suite |
-| `pnpm test -- --testPathPattern="<name>"` | Run a specific spec file |
+| `pnpm test -- --testPathPatterns="<name>"` | Run a specific spec file (Jest 30: the flag is plural; `--testPathPattern` fails) |
 | `pnpm build` | TypeScript compile + Vite production build |
 | `pnpm lint` | Run ESLint |
 | `pnpm gen-uml` | Regenerate `classes.puml` from TypeScript sources |
@@ -103,6 +115,7 @@ The format template is defined in `.claude/skills/ai-usage-reporter/SKILL.md`.
 4. Verify all scenarios pass: `pnpm test`
 5. Update `classes.puml`: `pnpm gen-uml`
 6. Document AI usage in `.ai-usage/`
+7. If the `src/` structure changed (new folders, ports, or use cases), update the Architecture tree in this file — and keep `README.md` and `.agents/rules/arrow-game.md` consistent (they duplicate it and drift)
 
 ## Execution Contract (Antigravity → Claude Code)
 

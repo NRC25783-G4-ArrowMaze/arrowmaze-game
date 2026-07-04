@@ -3,7 +3,7 @@ import { type IBoardBuilder } from '../../src/application/ports/IBoardBuilder';
 import { type IArrowBuilder } from '../../src/application/ports/IArrowBuilder';
 import { Board } from '../../src/domain/entities/Board';
 import { Arrow } from '../../src/domain/entities/Arrow';
-import type { LevelDataDTO } from '../../src/infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelDataDTO } from '../../src/application/dtos/LevelDataDTOs';
 
 describe('LevelLoader', () => {
   let mockBoardBuilder: jest.Mocked<IBoardBuilder>;

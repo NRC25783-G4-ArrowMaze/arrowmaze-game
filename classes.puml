@@ -83,23 +83,29 @@ interface LoadLevelResult {
     +connections: ConnectionDTO[]
     +error?: string
 }
-interface CellData {
+interface LevelCellDTO {
     +id: string
     +portCount: number
 }
-interface ConnectionData {
+interface LevelConnectionDTO {
     +fromCell: string
     +fromPort: number
     +toCell: string
     +toPort: number
 }
-interface LevelData {
+interface LevelArrowDTO {
     +id: string
-    +name: string
-    +difficulty: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface LevelDataDTO {
+    +id: string
+    +name?: string
+    +difficulty?: string
     +allowedMoves: number
-    +cells: CellData[]
-    +connections: ConnectionData[]
+    +arrows: LevelArrowDTO[]
+    +cells: LevelCellDTO[]
+    +connections?: LevelConnectionDTO[]
 }
 abstract class ArrowSegment {
     +cell: Cell
@@ -213,30 +219,6 @@ interface SlideResult {
     +score?: number
     +error?: string
 }
-interface LevelCellDTO {
-    +id: string
-    +portCount: number
-}
-interface LevelConnectionDTO {
-    +fromCell: string
-    +fromPort: number
-    +toCell: string
-    +toPort: number
-}
-interface LevelArrowDTO {
-    +id: string
-    +head: { cellId: string; exitPort: number; }
-    +body: string[]
-}
-interface LevelDataDTO {
-    +id: string
-    +name?: string
-    +difficulty?: string
-    +allowedMoves: number
-    +arrows: LevelArrowDTO[]
-    +cells: LevelCellDTO[]
-    +connections?: LevelConnectionDTO[]
-}
 interface IArrowBuilder {
     +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
 }
@@ -312,30 +294,6 @@ class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepositor
     +getLoadedLevel(levelId: string): Promise<LoadedLevel>
     +addFixture(levelData: LevelDataDTO): void
 }
-interface Point {
-    +x: number
-    +y: number
-}
-interface GridDelta {
-    +dCol: number
-    +dRow: number
-}
-interface GridPosition {
-    +col: number
-    +row: number
-}
-interface BoardLayout {
-    +maxCol: number
-    +maxRow: number
-    +cellSize: number
-    +offset: Point
-}
-interface ArrowMotion {
-    +kind: ArrowMotionKind
-    +dx: number
-    +dy: number
-    +durationMs: number
-}
 interface CellView {
     +id: string
     +col: number
@@ -372,11 +330,18 @@ interface Scene {
     +cells: SceneCell[]
     +connections: LevelConnectionDTO[]
     +arrows: SceneArrow[]
+    +collisionBehavior?: CollisionBehavior
+}
+interface ArrowSnapshot {
+    +cellIds: string[]
+    +exitPort: number
 }
 class GameController {
     -board: Board
     -session: GameSession
-    -playMoveUseCase: PlayMoveUseCase
+    -slideUseCase: SlideArrowUseCase
+    -advanceUseCase: AdvanceArrowUseCase
+    -_collisionBehavior: CollisionBehavior
     -arrowsById: Map<string, Arrow>
     -colorById: Map<string, string>
     -layoutByCellId: Map<string, { col: number; row: number; }>
@@ -384,10 +349,43 @@ class GameController {
     +status: GameStatus
     +movesRemaining: number
     +score: number
+    +collisionBehavior: CollisionBehavior
     +viewModel(): BoardViewModel
     +resolveArrowIdAt(col: number, row: number): string
-    +playMove(command: PlayMoveCommand): PlayMoveResult
+    +playMove(command: PlayMoveCommand): SlideResult
+    +advanceTick(arrowId: string): AdvanceOutcome
+    +commitSlide(finalOutcome: AdvanceOutcome): void
+    +snapshotArrow(arrowId: string): ArrowSnapshot
+    +restoreArrow(arrowId: string, snapshot: ArrowSnapshot): void
+    -visualExitDir(headExitPort: number, cellIds: string[]): number
     -chainCellIds(arrow: Arrow): string[]
+}
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: Cell[]
+}
+interface ArrowShape {
+    +cellIds: string[]
+    +exitDir: number
+}
+interface ArrowRenderOverride extends ArrowShape {
+    +arrowId: string
+}
+interface CollisionSignal {
+    +arrowId: string
+    +nonce: number
+}
+interface VanishSignal {
+    +color: string
+    +cellIds: string[]
+    +nonce: number
+}
+interface HeadDisintegratingSignal {
+    +color: string
+    +cellId: string
+    +exitDir: number
+    +nonce: number
 }
 interface GameControllerState {
     +controller: GameController
@@ -396,22 +394,28 @@ interface GameControllerState {
     +movesRemaining: number
     +score: number
     +inFlight: boolean
-    +setInFlight: (value: boolean) => void
-    +playMove: (command: PlayMoveCommand) => PlayMoveResult | null
+    +collision: CollisionSignal
+    +vanishing: VanishSignal
+    +headDisintegrating: HeadDisintegratingSignal
+    +playMove: (command: PlayMoveCommand) => void
 }
-interface RunTickParams {
-    +arrowId: string
-    +preArrow: ArrowView
-    +outcome: AdvanceOutcome
+interface Point {
+    +x: number
+    +y: number
+}
+interface GridDelta {
+    +dCol: number
+    +dRow: number
+}
+interface GridPosition {
+    +col: number
+    +row: number
+}
+interface BoardLayout {
+    +maxCol: number
+    +maxRow: number
     +cellSize: number
-}
-interface TickAnimationState {
-    +inFlight: boolean
-    +motions: ReadonlyMap<string, ArrowMotion>
-    +ghostArrow: ArrowView
-    +enabled: boolean
-    +setEnabled: (value: boolean) => void
-    +run: (params: RunTickParams) => void
+    +offset: Point
 }
 interface PointerGate {
     +button: number
@@ -424,5 +428,10 @@ interface UseBoardInputParams {
     +enabled: boolean
     +resolveArrowIdAt: ArrowResolver
     +onPlayMove: (command: PlayMoveCommand) => void
+}
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: [number, number][]
 }
 @enduml

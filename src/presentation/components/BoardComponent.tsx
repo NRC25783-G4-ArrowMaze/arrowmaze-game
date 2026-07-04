@@ -3,13 +3,15 @@ import {
   computeBoardLayout,
   cellCenter,
   boundingBoxPositions,
+  portDelta,
   type Point,
 } from '../rendering/boardLayout';
 import { CellComponent } from './CellComponent';
 import { ArrowComponent } from './ArrowComponent';
+import { ArrowBurst } from './ArrowBurst';
+import { ArrowHeadDisintegrate } from './ArrowHeadDisintegrate';
 import { BOARD_BACKGROUND, DOT_RADIUS_RATIO } from '../theme';
 import type { BoardViewModel } from '../viewModel';
-import type { ArrowMotion } from '../animation/motion';
 
 // Re-export por compatibilidad: los tipos del view-model viven en ../viewModel.
 export type { CellView, ArrowView, BoardViewModel } from '../viewModel';
@@ -25,10 +27,20 @@ export interface BoardComponentProps {
    */
   onPointerDown?: React.PointerEventHandler<SVGSVGElement>;
   /**
-   * Planes de animación por id de flecha (B2). Solo la flecha del tick en curso
-   * aparece aquí; las demás se dibujan estáticas. Ausente → todo estático (B1).
+   * Última colisión: la flecha cuyo `arrowId` coincide rebota (recoil). El
+   * `nonce` cambia en cada choque para re-disparar la animación. Ausente → sin rebote.
    */
-  motions?: ReadonlyMap<string, ArrowMotion>;
+  collision?: { arrowId: string; nonce: number };
+  /**
+   * Última desaparición: estalla chispas en la celda-cabeza (cellIds[0]) de la
+   * flecha que se destruyó. El `nonce` re-dispara el estallido. Ausente → sin estallido.
+   */
+  vanishing?: { color: string; cellIds: string[]; nonce: number };
+  /**
+   * Cabeza desintegrándose justo antes del burst: el triángulo se quiebra/erosiona.
+   * Renderiza la punta en su última posición con efecto de fracturas. Ausente → sin efecto.
+   */
+  headDisintegrating?: { color: string; cellId: string; exitDir: number; nonce: number };
 }
 
 /**
@@ -46,7 +58,9 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   width,
   height,
   onPointerDown,
-  motions,
+  collision,
+  vanishing,
+  headDisintegrating,
 }) => {
   const { cells, arrows } = board;
 
@@ -65,6 +79,16 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
 
   // Grilla completa de puntos: una posición por celda del bounding box.
   const dotPositions = boundingBoxPositions(maxCol, maxRow);
+
+  // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
+  const burstOrigin =
+    vanishing !== undefined ? centerById.get(vanishing.cellIds[0]) : undefined;
+
+  // Origen de la desintegración de la punta.
+  const headDisintegrateOrigin =
+    headDisintegrating !== undefined
+      ? centerById.get(headDisintegrating.cellId)
+      : undefined;
 
   return (
     <svg
@@ -109,11 +133,39 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               centers={centers}
               exitDir={arrow.exitDir}
               cellSize={cellSize}
-              motion={motions?.get(arrow.id)}
+              collideNonce={
+                collision?.arrowId === arrow.id ? collision.nonce : undefined
+              }
             />
           );
         })}
       </g>
+
+      {/* Desintegración de la punta: fractura que precede al estallido. */}
+      {headDisintegrating !== undefined && headDisintegrateOrigin !== undefined && (
+        (() => {
+          const { dCol, dRow } = portDelta(headDisintegrating.exitDir);
+          return (
+            <ArrowHeadDisintegrate
+              key={headDisintegrating.nonce}
+              center={headDisintegrateOrigin}
+              color={headDisintegrating.color}
+              cellSize={cellSize}
+              tipDir={{ x: dCol, y: dRow }}
+            />
+          );
+        })()
+      )}
+
+      {/* Estallido de desaparición: chispas en la cabeza de la flecha destruida. */}
+      {vanishing !== undefined && burstOrigin !== undefined && (
+        <ArrowBurst
+          key={vanishing.nonce}
+          origin={burstOrigin}
+          color={vanishing.color}
+          cellSize={cellSize}
+        />
+      )}
     </svg>
   );
 };

@@ -1,7 +1,7 @@
 import type {
   LevelDataDTO,
   LevelConnectionDTO,
-} from '../../infrastructure/shared/contracts/LevelDataDTOs';
+} from '../../application/dtos/LevelDataDTOs';
 
 /**
  * scene — Modelo de ESCENA de presentación.
@@ -30,6 +30,13 @@ export interface SceneArrow {
   body: string[];
 }
 
+/**
+ * Comportamiento de una flecha al chocar (dato de presentación; el motor lo ignora):
+ *   - 'return': la flecha se devuelve deslizándose a su posición de inicio de slide (DEFAULT).
+ *   - 'stay':   la flecha queda donde chocó (opt-in para mapas puntuales).
+ */
+export type CollisionBehavior = 'stay' | 'return';
+
 /** Escena completa: tablero + flechas + presupuesto de movimientos. */
 export interface Scene {
   id: string;
@@ -37,6 +44,8 @@ export interface Scene {
   cells: SceneCell[];
   connections: LevelConnectionDTO[];
   arrows: SceneArrow[];
+  /** Qué hace una flecha al chocar. Default 'return'. */
+  collisionBehavior?: CollisionBehavior;
 }
 
 /**

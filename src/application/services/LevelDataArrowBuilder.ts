@@ -1,7 +1,7 @@
 import { type IArrowBuilder } from '../ports/IArrowBuilder';
 import { Board } from '../../domain/entities/Board';
 import { Arrow } from '../../domain/entities/Arrow';
-import type { LevelArrowDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelArrowDTO } from '../dtos/LevelDataDTOs';
 import { BoardRegistryError } from '../../domain/errors/BoardErrors';
 
 export class LevelDataArrowBuilder implements IArrowBuilder {

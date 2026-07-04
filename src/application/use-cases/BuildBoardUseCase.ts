@@ -1,5 +1,5 @@
 import { Board } from '../../domain/entities/Board';
-import type { LevelDataDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelDataDTO } from '../dtos/LevelDataDTOs';
 import type { IBoardBuilder } from '../ports/IBoardBuilder';
 
 /**
