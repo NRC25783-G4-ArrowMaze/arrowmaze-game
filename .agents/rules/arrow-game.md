@@ -195,19 +195,25 @@ __tests__/
 ```
 src/
 ├── domain/            # Capa 1 — Lógica pura, cero dependencias externas
-│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession, LevelProgress
 │   ├── value-objects/ # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/      # TopologyValidator, TopologyQueryService, PathChecker
 │   ├── repositories/  # ILevelRepository (puerto definido en dominio)
-│   └── errors/        # Errores tipados (ArrowErrors, BoardErrors, GameErrors)
+│   └── errors/        # Errores tipados (ArrowErrors, BoardErrors, GameErrors, SyncErrors, ProgressErrors)
 ├── application/       # Capa 2 — Use cases + DTOs + ports + servicios de aplicación
 │   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
-│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
+│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase,
+│   │                  # SaveLocalProgress, GetLocalProgress, SyncOfflineProgress, SyncProgress
 │   ├── dtos/
 │   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
-│   └── ports/         # IArrowBuilder, IBoardBuilder
+│   └── ports/         # IArrowBuilder, IBoardBuilder, ILocalProgressRepository,
+│                      # IProgressApiClient, IAuthTokenProvider
 ├── infrastructure/    # Capa 3 — Adapters, repositorios, config
 │   ├── repositories/  # InMemoryLevelRepository
+│   ├── persistence/   # sqlite/ (CapacitorSqliteDriver, SqliteProgressRepository, mapper, model)
+│   ├── api/           # FetchProgressApiClient
+│   ├── auth/          # CapacitorTokenProvider
+│   ├── factories/     # LocalProgressModuleFactory (composition root de persistencia/sync)
 │   └── config/
 └── presentation/      # Capa 4 — UI React, controlador de juego, input, render
     ├── components/

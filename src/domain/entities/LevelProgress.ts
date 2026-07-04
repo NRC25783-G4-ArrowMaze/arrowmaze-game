@@ -1,4 +1,5 @@
 import { Score } from '../value-objects/Score';
+import { InvalidLevelProgressError } from '../errors/ProgressErrors';
 
 export class LevelProgress {
   private readonly _levelId: string;
@@ -34,9 +35,10 @@ export class LevelProgress {
     timeElapsedSeconds: number,
     achievedAt: Date = new Date()
   ): LevelProgress {
-    if (movesUsed < 0) throw new Error('LevelProgress: movesUsed must be >= 0');
-    if (timeElapsedSeconds < 0) throw new Error('LevelProgress: timeElapsedSeconds must be >= 0');
-    
+    if (movesUsed < 0) throw new InvalidLevelProgressError('movesUsed must be >= 0');
+    if (timeElapsedSeconds < 0) throw new InvalidLevelProgressError('timeElapsedSeconds must be >= 0');
+
+
     return new LevelProgress(levelId, score, movesUsed, timeElapsedSeconds, achievedAt);
   }
 

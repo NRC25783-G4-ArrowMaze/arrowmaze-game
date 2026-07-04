@@ -1,4 +1,4 @@
-import { type ILocalProgressRepository } from '../../../domain/repositories/ILocalProgressRepository';
+import { type ILocalProgressRepository } from '../../../application/ports/ILocalProgressRepository';
 import { type LevelProgress } from '../../../domain/entities/LevelProgress';
 import { type LocalRecord } from './models/LocalRecord';
 import { LocalProgressMapper } from './mappers/LocalProgressMapper';

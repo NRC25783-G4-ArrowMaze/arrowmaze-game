@@ -1,5 +1,5 @@
 import { Preferences } from '@capacitor/preferences';
-import { type IAuthTokenProvider } from '../../domain/repositories/IAuthTokenProvider';
+import { type IAuthTokenProvider } from '../../application/ports/IAuthTokenProvider';
 
 export class CapacitorTokenProvider implements IAuthTokenProvider {
   // Definimos la clave como una constante privada

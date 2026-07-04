@@ -66,9 +66,11 @@
 
 ---
 
-**Deuda técnica declarada post-merge (fuera de este commit, agenda para después):**
-- Falta Gherkin y plan en `doc/` para que feature13 cumpla el flujo de spec-driven del proyecto
-- Puertos aún en `domain/repositories/` en lugar de `application/ports/` (movimiento pendiente)
-- `new Error()` plano en `LevelProgress` (debería ser typed error)
-- Typos de nombres: `CapacitorTokenProvides.ts`, `SaveLocalProgres.spec.ts`, `SaveOfflineProgress.ts`→`SyncOfflineProgress`
-- `timeElapsedSeconds = 45` hardcodeado (timer no implementado, TODO hasta que GameSession expose el tiempo)
+**Deuda técnica post-merge — estado tras la segunda fase de la sesión (2026-07-04):**
+- ✅ **RESUELTO** — Puertos movidos de `domain/repositories/` a `application/ports/` (`ILocalProgressRepository`, `IProgressApiClient`, `IAuthTokenProvider`); `ILevelRepository` permanece en dominio (excepción documentada en CLAUDE.md). Imports actualizados en 12 archivos.
+- ✅ **RESUELTO** — `LevelProgress.create` ahora lanza `InvalidLevelProgressError` (nuevo `src/domain/errors/ProgressErrors.ts`, patrón de `GameErrors.ts`) + 2 tests nuevos en el spec de dominio.
+- ✅ **RESUELTO** — Renombres con `git mv`: `CapacitorTokenProvides.ts` → `CapacitorTokenProvider.ts`, `SaveOfflineProgress.ts` → `SyncOfflineProgress.ts`, `SaveLocalProgres.spec.ts` → `SaveLocalProgress.spec.ts`.
+- ✅ **RESUELTO** — `timeElapsedSeconds` real: timer de presentación (`useRef` + efecto de montaje, cumple regla de pureza de React) que mide desde el inicio del nivel hasta el WON. Ya no se persiste el valor falso de 45s.
+- ⏳ **PENDIENTE (Santiago)** — Gherkin en `features/` y plan en `doc/` (aviso publicado en el PR #16).
+
+Verificación tras la segunda fase: 249/249 tests ✅ (+2 del error tipado) · tsc exit 0 ✅ · eslint exit 0 ✅ · preview navegador OK ✅ · `classes.puml` regenerado con las rutas nuevas.

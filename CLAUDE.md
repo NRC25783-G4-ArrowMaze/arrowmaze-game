@@ -14,19 +14,25 @@ Package manager: **pnpm**
 ```
 src/
 ├── domain/            # Layer 1 — Pure business logic, zero external dependencies
-│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession, LevelProgress
 │   ├── value-objects/ # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/      # TopologyValidator, TopologyQueryService, PathChecker
 │   ├── repositories/  # ILevelRepository (port defined in domain)
-│   └── errors/        # Typed domain errors (ArrowErrors, BoardErrors, GameErrors)
+│   └── errors/        # Typed domain errors (ArrowErrors, BoardErrors, GameErrors, SyncErrors, ProgressErrors)
 ├── application/       # Layer 2 — Use cases + DTOs + ports + app services
 │   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
-│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
+│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase,
+│   │                  # SaveLocalProgress, GetLocalProgress, SyncOfflineProgress, SyncProgress
 │   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
 │   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
-│   └── ports/         # IArrowBuilder, IBoardBuilder
+│   └── ports/         # IArrowBuilder, IBoardBuilder, ILocalProgressRepository,
+│                      # IProgressApiClient, IAuthTokenProvider
 ├── infrastructure/    # Layer 3 — Frameworks, adapters
 │   ├── repositories/  # InMemoryLevelRepository
+│   ├── persistence/   # sqlite/ (CapacitorSqliteDriver, SqliteProgressRepository, mapper, model)
+│   ├── api/           # FetchProgressApiClient
+│   ├── auth/          # CapacitorTokenProvider
+│   ├── factories/     # LocalProgressModuleFactory (composition root de persistencia/sync)
 │   └── config/        # api-config
 └── presentation/      # Layer 4 — React UI, game controller, input, rendering
     ├── components/    # BoardComponent, ArrowComponent, CellComponent, GameOverlay, ...

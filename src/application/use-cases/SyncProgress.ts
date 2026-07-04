@@ -1,5 +1,5 @@
-import { type ILocalProgressRepository } from '../../domain/repositories/ILocalProgressRepository';
-import { type IProgressApiClient } from '../../domain/repositories/IProgressApiClient';
+import { type ILocalProgressRepository } from '../ports/ILocalProgressRepository';
+import { type IProgressApiClient } from '../ports/IProgressApiClient';
 import { type LevelProgress } from '../../domain/entities/LevelProgress';
 import { SessionExpiredError } from '../../domain/errors/SyncErrors';
 

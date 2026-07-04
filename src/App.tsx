@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import { BoardComponent } from './presentation/components/BoardComponent';
 import { GameOverlay } from './presentation/components/GameOverlay';
@@ -8,7 +8,7 @@ import { useBoardInput } from './presentation/input/useBoardInput';
 import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from './domain/value-objects/Score';
-import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvides';
+import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 
 const BOARD_SIZE = 560;
 
@@ -71,14 +71,22 @@ const App: React.FC = () => {
 
   const game = useGameController(SAMPLE_LEVEL_2);
 
+  // Marca de inicio del nivel: el tiempo se mide en presentación
+  // (el motor no modela tiempo de partida).
+  const levelStartRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    levelStartRef.current = Date.now();
+  }, []);
+
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
   // Persistencia automática al ganar (upstream encolado)
   useEffect(() => {
     if (game.status === 'WON' && progressModule && game.score !== null) {
       const movesUsed = SAMPLE_LEVEL_2.allowedMoves - game.movesRemaining;
-      // TODO(feature13): el motor aún no expone tiempo de partida; valor provisional.
-      const timeElapsedSeconds = 45;
+      const startedAt = levelStartRef.current ?? Date.now();
+      const timeElapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
 
       progressModule.saveLocalProgress
         .execute(SAMPLE_LEVEL_2.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)

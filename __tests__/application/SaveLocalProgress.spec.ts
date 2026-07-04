@@ -1,5 +1,5 @@
 import { SaveLocalProgress } from '../../src/application/use-cases/SaveLocalProgress';
-import { type ILocalProgressRepository } from '../../src/domain/repositories/ILocalProgressRepository';
+import { type ILocalProgressRepository } from '../../src/application/ports/ILocalProgressRepository';
 import { LevelProgress } from '../../src/domain/entities/LevelProgress';
 import { Score } from '../../src/domain/value-objects/Score';
 

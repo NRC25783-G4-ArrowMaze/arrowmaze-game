@@ -1648,10 +1648,11 @@
         "linked_session": null,
         "status": "completed",
         "deliverables": {
-          "files_created": 1,
-          "files_modified": 3,
+          "files_created": 2,
+          "files_modified": 17,
           "files_deleted": 3,
-          "tests_passing": 247,
+          "files_renamed": 6,
+          "tests_passing": 249,
           "test_suites": 24
         },
         "areas": [
@@ -1689,7 +1690,7 @@
           "AI usage: COMBINAR (base dev + retroactiva 2026-06-27-004 con metadatos completados)",
           "DTOs / dirs: ELIMINAR (LeaderboardDTO, ProgressDTO muertos; src/infrastructure/shared/contracts/ violaba fronteras de #14)"
         ],
-        "notes": "Sesión de resolución exhaustiva con matriz de decisiones explícita. Todos los conflictos eran resolubles sin pérdida de lógica. Falta post-merge: Gherkin, plan en doc/, puertos en application/ports/, error chain en LevelProgress, typos de nombres."
+        "notes": "Sesión de resolución exhaustiva con matriz de decisiones explícita. Todos los conflictos eran resolubles sin pérdida de lógica. Segunda fase de la misma sesión: deuda de revisión saldada — puertos movidos a application/ports/ (12 imports), InvalidLevelProgressError tipado (+2 tests), renombres archivo=clase con git mv, timer de presentación real en App.tsx (reemplaza 45s hardcodeado), classes.puml regenerado. Pendiente de Santiago: Gherkin y plan en doc/."
       }
     ],
     "statistics": {
@@ -1717,7 +1718,7 @@
       "totalLinesGenerated": 8440,
       "totalFilesCreated": 123,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 247,
+      "totalTestsPassing": 249,
       "totalTestSuites": 24,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",

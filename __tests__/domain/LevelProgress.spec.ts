@@ -1,5 +1,6 @@
 import { LevelProgress } from '../../src/domain/entities/LevelProgress';
 import { Score } from "../../src/domain/value-objects/Score";
+import { InvalidLevelProgressError } from '../../src/domain/errors/ProgressErrors';
 
 describe('LevelProgress Entity - Cascade Sorting', () => {
   // Helpers para crear instancias válidas del Value Object sin usar 'any'
@@ -52,5 +53,15 @@ describe('LevelProgress Entity - Cascade Sorting', () => {
     const isBeaten = record.isBeatenBy(sameScore, 10, 30);
 
     expect(isBeaten).toBe(false);
+  });
+
+  it('debe lanzar InvalidLevelProgressError si movesUsed es negativo', () => {
+    expect(() => LevelProgress.create('lvl_1', createScore(1000), -1, 60))
+      .toThrow(InvalidLevelProgressError);
+  });
+
+  it('debe lanzar InvalidLevelProgressError si timeElapsedSeconds es negativo', () => {
+    expect(() => LevelProgress.create('lvl_1', createScore(1000), 10, -5))
+      .toThrow(InvalidLevelProgressError);
   });
 });

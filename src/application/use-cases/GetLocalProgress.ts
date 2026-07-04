@@ -1,4 +1,4 @@
-import { type ILocalProgressRepository } from '../../domain/repositories/ILocalProgressRepository';
+import { type ILocalProgressRepository } from '../ports/ILocalProgressRepository';
 import { type LevelProgress } from '../../domain/entities/LevelProgress';
 
 export class GetLocalProgress {

@@ -1,6 +1,6 @@
 import { SyncProgress } from '../../src/application/use-cases/SyncProgress';
-import { type ILocalProgressRepository } from '../../src/domain/repositories/ILocalProgressRepository';
-import { type IProgressApiClient } from '../../src/domain/repositories/IProgressApiClient';
+import { type ILocalProgressRepository } from '../../src/application/ports/ILocalProgressRepository';
+import { type IProgressApiClient } from '../../src/application/ports/IProgressApiClient';
 import { LevelProgress } from '../../src/domain/entities/LevelProgress';
 import { Score } from '../../src/domain/value-objects/Score';
 import { SessionExpiredError } from '../../src/domain/errors/SyncErrors';

@@ -1,5 +1,5 @@
-import { type IProgressApiClient } from '../../domain/repositories/IProgressApiClient';
-import { type IAuthTokenProvider } from '../../domain/repositories/IAuthTokenProvider';
+import { type IProgressApiClient } from '../../application/ports/IProgressApiClient';
+import { type IAuthTokenProvider } from '../../application/ports/IAuthTokenProvider';
 import { LevelProgress } from '../../domain/entities/LevelProgress';
 import { Score } from '../../domain/value-objects/Score';
 import { SessionExpiredError, NetworkError } from '../../domain/errors/SyncErrors';

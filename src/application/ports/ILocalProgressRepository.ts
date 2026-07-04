@@ -1,4 +1,4 @@
-import { type LevelProgress } from '../entities/LevelProgress';
+import { type LevelProgress } from '../../domain/entities/LevelProgress';
 
 export interface ILocalProgressRepository {
   /**

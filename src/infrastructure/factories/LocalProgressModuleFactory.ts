@@ -3,9 +3,9 @@ import { SqliteProgressRepository } from '../persistence/sqlite/sqliteProgressRe
 import { FetchProgressApiClient } from '../api/FetchProgressApiClient';
 import { SaveLocalProgress } from '../../application/use-cases/SaveLocalProgress';
 import { GetLocalProgress } from '../../application/use-cases/GetLocalProgress';
-import { SyncOfflineProgress } from '../../application/use-cases/SaveOfflineProgress';
+import { SyncOfflineProgress } from '../../application/use-cases/SyncOfflineProgress';
 import { SyncProgress } from '../../application/use-cases/SyncProgress';
-import { type IAuthTokenProvider } from '../../domain/repositories/IAuthTokenProvider';
+import { type IAuthTokenProvider } from '../../application/ports/IAuthTokenProvider';
 
 export interface LocalProgressModule {
   saveLocalProgress: SaveLocalProgress;

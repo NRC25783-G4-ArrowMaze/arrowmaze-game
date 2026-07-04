@@ -63,7 +63,7 @@ Cada entrada en este registro sigue el formato estándar:
 
 - **Total de reportes:** 30
 - **Última actualización:** 2026-07-04
-- **Suite de tests (actual):** 247/247 ✅ en 24 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
+- **Suite de tests (actual):** 249/249 ✅ en 24 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
