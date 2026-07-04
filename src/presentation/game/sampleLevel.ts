@@ -1,5 +1,5 @@
 import type { Scene, SceneCell } from './scene';
-import type { LevelConnectionDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelConnectionDTO } from '../../application/dtos/LevelDataDTOs';
 
 /**
  * sampleLevel — Nivel de ejemplo (escena de presentación) para demostrar B3/B2/B4.

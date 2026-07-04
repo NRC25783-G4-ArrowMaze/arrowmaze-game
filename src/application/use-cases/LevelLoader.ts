@@ -1,6 +1,6 @@
 import { type IBoardBuilder } from '../ports/IBoardBuilder';
 import { type IArrowBuilder } from '../ports/IArrowBuilder';
-import type { LevelDataDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelDataDTO } from '../dtos/LevelDataDTOs';
 import type { LoadedLevel } from '../../domain/repositories/ILevelRepository';
 
 

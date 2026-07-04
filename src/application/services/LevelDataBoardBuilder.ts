@@ -1,5 +1,5 @@
 import { type IBoardBuilder } from '../ports/IBoardBuilder';
-import type { LevelArrowDTO, LevelDataDTO, LevelConnectionDTO, LevelCellDTO } from '../../infrastructure/shared/contracts/LevelDataDTOs';
+import type { LevelArrowDTO, LevelDataDTO, LevelConnectionDTO, LevelCellDTO } from '../dtos/LevelDataDTOs';
 import { Board } from '../../domain/entities/Board';
 import { Cell } from '../../domain/entities/Cell';
 import { LevelDataError, ConnectionError, BoardRegistryError } from '../../domain/errors/BoardErrors';

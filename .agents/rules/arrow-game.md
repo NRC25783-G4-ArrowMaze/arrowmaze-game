@@ -180,8 +180,10 @@ Reglas de ejecución:
 
 ```
 __tests__/
-├── domain/       # Unit tests puros — objetos reales, cero mocks
-└── application/  # Integration tests por use case
+├── domain/          # Unit tests puros — objetos reales, cero mocks
+├── application/     # Integration tests por use case
+├── infrastructure/  # Tests de repositorios/adapters
+└── presentation/    # Tests de lógica de UI (input, sesión)
 ```
 
 ---
@@ -193,18 +195,26 @@ __tests__/
 ```
 src/
 ├── domain/            # Capa 1 — Lógica pura, cero dependencias externas
-│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell
-│   ├── value-objects/ # Port, AdvanceResult
+│   ├── entities/      # Arrow, Head, Segment, ArrowSegment, Board, Cell, GameSession
+│   ├── value-objects/ # Port, AdvanceResult, Score, ScoringConstants, ScoringTracker
 │   ├── services/      # TopologyValidator, TopologyQueryService, PathChecker
-│   └── errors/        # Errores tipados (ArrowErrors)
-├── application/       # Capa 2 — Use cases + DTOs + ports
-│   ├── use-cases/
+│   ├── repositories/  # ILevelRepository (puerto definido en dominio)
+│   └── errors/        # Errores tipados (ArrowErrors, BoardErrors, GameErrors)
+├── application/       # Capa 2 — Use cases + DTOs + ports + servicios de aplicación
+│   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
+│   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase
 │   ├── dtos/
-│   └── ports/         # IBoardRepository, ILevelRepository
-└── infrastructure/    # Capa 3 — Adapters, factories, config
-    ├── factories/
-    ├── repositories/
-    └── config/
+│   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
+│   └── ports/         # IArrowBuilder, IBoardBuilder
+├── infrastructure/    # Capa 3 — Adapters, repositorios, config
+│   ├── repositories/  # InMemoryLevelRepository
+│   └── config/
+└── presentation/      # Capa 4 — UI React, controlador de juego, input, render
+    ├── components/
+    ├── game/
+    ├── input/
+    ├── rendering/
+    └── preview/
 ```
 
 ### 6.2 Reglas de dependencia
@@ -223,8 +233,9 @@ domain ← application ← infrastructure ← presentation
 ```typescript
 class Arrow { }                                  // Entidad — PascalCase
 class AdvanceArrowUseCase { }                    // Verbo + sustantivo + UseCase
-interface IBoardRepository { }                   // I + sustantivo + Repository
-class InMemoryBoardRepository implements IBoardRepository { }  // Impl + tecnología
+interface ILevelRepository { }                   // I + sustantivo + Repository
+class InMemoryLevelRepository implements ILevelRepository { }  // Impl + tecnología
+// El nombre del archivo SIEMPRE coincide con la clase exportada.
 ```
 
 ### 6.4 Errores de dominio

@@ -209,6 +209,20 @@ export class Arrow {
         return { outcome: 'blocked', freedCellIds: [], occupiedCellIds: [] };
       }
 
+      // ── Phase 3.5: Validate tail's (leading edge) target ──
+      // En head-push, la COLA es el único segmento que entra a una celda nueva.
+      // Si ese destino está ocupado por una entidad ajena → blocked (rollback).
+      // Sumidero (null) no bloquea: la cola se purga en el commit.
+      const tailTarget = targets[targets.length - 1];
+      const tailTargetCell = tailTarget.targetCell;
+      if (
+        tailTargetCell !== null &&
+        tailTargetCell.isOccupied() &&
+        !this._cellBelongsToSelf(tailTargetCell)
+      ) {
+        return { outcome: 'blocked', freedCellIds: [], occupiedCellIds: [] };
+      }
+
       // ── Phase 4: Commit advance ────────────────
       return this._commitAdvance(chain, targets);
 

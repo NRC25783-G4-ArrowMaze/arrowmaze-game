@@ -46,8 +46,8 @@ describe('B3 — inversión coordenada → celda → flecha', () => {
   });
 });
 
-describe('B3 — un toque ejecuta UN tick y mueve la flecha una celda', () => {
-  it('tocar "blue" la avanza de (4,2) a (4,1)', () => {
+describe('B3 — un toque ejecuta un slide hasta terminal', () => {
+  it('tocar "blue" la desliza hasta el borde y la destruye en 1 movimiento', () => {
     const controller = new GameController(SAMPLE_LEVEL);
 
     const before = controller.viewModel().arrows.find(byId('blue'));
@@ -56,12 +56,12 @@ describe('B3 — un toque ejecuta UN tick y mueve la flecha una celda', () => {
     const result = controller.playMove({ arrowId: 'blue' });
 
     expect(result?.success).toBe(true);
-    expect(result?.outcome).toBe('advanced');
-    expect(result?.movesRemaining).toBe(SAMPLE_LEVEL.allowedMoves - 1);
+    expect(result?.finalOutcome).toBe('destroyed');
+    expect(result?.movesRemaining).toBe(SAMPLE_LEVEL.allowedMoves - 1); // 1 sola jugada
 
+    // Después del slide, blue se destruyó y ya no aparece en el view-model.
     const after = controller.viewModel().arrows.find(byId('blue'));
-    expect(after?.cellIds[0]).toBe('4,1'); // cabeza avanzó una celda al Norte
-    expect(after?.cellIds.length).toBe(2); // sigue midiendo 2 (avanzó cabeza, liberó cola)
+    expect(after).toBeUndefined();
   });
 
   it('tocar "green" queda bloqueada por "orange" (estado sin cambios)', () => {
@@ -70,7 +70,7 @@ describe('B3 — un toque ejecuta UN tick y mueve la flecha una celda', () => {
 
     const result = controller.playMove({ arrowId: 'green' });
 
-    expect(result?.outcome).toBe('blocked');
+    expect(result?.finalOutcome).toBe('blocked');
     const after = controller.viewModel().arrows.find(byId('green'));
     expect(after?.cellIds).toEqual(before?.cellIds); // nada se movió
   });

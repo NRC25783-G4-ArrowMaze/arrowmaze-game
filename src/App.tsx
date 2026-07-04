@@ -1,21 +1,26 @@
-import React, { useMemo, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { BoardComponent } from './presentation/components/BoardComponent';
 import { GameOverlay } from './presentation/components/GameOverlay';
 import { computeBoardLayout } from './presentation/rendering/boardLayout';
 import { useGameController } from './presentation/game/useGameController';
-import { useTickAnimation } from './presentation/game/useTickAnimation';
 import { useBoardInput } from './presentation/input/useBoardInput';
-import { SAMPLE_LEVEL } from './presentation/game/sampleLevel';
-import type { BoardViewModel } from './presentation/viewModel';
+import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from './domain/value-objects/Score';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvides';
 
-const BOARD_SIZE = 420;
+const BOARD_SIZE = 560;
 
 /**
- * App — Demo interactiva del tablero con animaciones y Sincronización Bidireccional.
+ * App — Demo interactiva del tablero (B1 + B3) con persistencia local y
+ * sincronización bidireccional (Feature 13).
+ *
+ * Flujo de un toque:
+ *   1. La capa de input resuelve la flecha tocada (B3).
+ *   2. El controlador desliza la flecha tick-a-tick (un click = una jugada) hasta
+ *      colisión o salida, reproyectando la forma real del dominio en cada paso.
+ *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
 const App: React.FC = () => {
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
@@ -27,12 +32,12 @@ const App: React.FC = () => {
     const bootstrapGame = async () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-        
-        // 🚀 Inyectamos el proveedor nativo de Capacitor
+
+        // Inyectamos el proveedor nativo de Capacitor
         const tokenProvider = new CapacitorTokenProvider();
 
         const module = await LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider);
-        
+
         if (isMounted) {
           setProgressModule(module);
 
@@ -41,17 +46,17 @@ const App: React.FC = () => {
             .then(() => console.log('[App] Sincronización background completada.'))
             .catch(async (error: unknown) => {
               console.warn('[App] Sincronización background detenida:', error);
-              
-              // Si el error es de sesión (401 SessionExpiredError), 
+
+              // Si el error es de sesión (401 SessionExpiredError),
               // podemos borrar el token inválido automáticamente.
               if (error instanceof Error && error.name === 'SessionExpiredError') {
-                 await tokenProvider.removeToken();
-                 // TODO: Despachar evento para redirigir al Login
+                await tokenProvider.removeToken();
+                // TODO: Despachar evento para redirigir al Login
               }
             });
         }
       } catch (error) {
-        console.error("Error arrancando el motor de base de datos", error);
+        console.error('Error arrancando el motor de base de datos', error);
       } finally {
         if (isMounted) setIsInitializing(false);
       }
@@ -64,33 +69,22 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // ─────────────────────────────────────────────
-  // 2. HOOKS DEL JUEGO
-  // ─────────────────────────────────────────────
-  const game = useGameController(SAMPLE_LEVEL);
-  const anim = useTickAnimation();
+  const game = useGameController(SAMPLE_LEVEL_2);
 
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
-  // ─────────────────────────────────────────────
-  // 3. PERSISTENCIA AUTOMÁTICA AL GANAR (UPSTREAM ENCOLADO)
-  // ─────────────────────────────────────────────
+  // Persistencia automática al ganar (upstream encolado)
   useEffect(() => {
-    if (game.status === 'WON' && progressModule && game.score) {
-      
-      const levelData = SAMPLE_LEVEL as unknown as { id?: string; movesAllowed?: number };
-      const levelId = levelData.id ?? 'level_01'; 
-      const totalMoves = levelData.movesAllowed ?? 20; 
-      
-      const movesUsed = totalMoves - game.movesRemaining;
-      const timeElapsedSeconds = 45; 
+    if (game.status === 'WON' && progressModule && game.score !== null) {
+      const movesUsed = SAMPLE_LEVEL_2.allowedMoves - game.movesRemaining;
+      // TODO(feature13): el motor aún no expone tiempo de partida; valor provisional.
+      const timeElapsedSeconds = 45;
 
       progressModule.saveLocalProgress
-        .execute(levelId, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
+        .execute(SAMPLE_LEVEL_2.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
-          console.log(`[App] Progreso local guardado para el nivel ${levelId}`);
-          // Opcional: Podrías llamar a syncProgress.execute() aquí mismo para 
-          // intentar subir el récord de inmediato tras ganar, si hay internet.
+          console.log(`[App] Progreso local guardado para el nivel ${SAMPLE_LEVEL_2.id}`);
+          // Intentamos subir el récord de inmediato tras ganar, si hay internet.
           return progressModule.syncProgress.execute();
         })
         .catch((error: unknown) => {
@@ -99,41 +93,15 @@ const App: React.FC = () => {
     }
   }, [game.status, game.score, game.movesRemaining, progressModule]);
 
-  // ─────────────────────────────────────────────
-  // 4. ANIMACIONES Y RENDERIZADO CONDICIONAL
-  // ─────────────────────────────────────────────
-  const viewModel: BoardViewModel = useMemo(() => {
-    if (anim.ghostArrow === null) {
-      return game.viewModel;
-    }
-    return {
-      cells: game.viewModel.cells,
-      arrows: [...game.viewModel.arrows, anim.ghostArrow],
-    };
-  }, [game.viewModel, anim.ghostArrow]);
-
   const onPointerDown = useBoardInput({
     width: BOARD_SIZE,
     height: BOARD_SIZE,
     layout,
-    enabled: game.status === 'IN_PROGRESS' && !anim.inFlight && !isInitializing,
+    // Bloqueo: input deshabilitado en estado terminal, con un slide en vuelo
+    // o mientras arranca el módulo de persistencia.
+    enabled: game.status === 'IN_PROGRESS' && !game.inFlight && !isInitializing,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => {
-      const preArrow = game.viewModel.arrows.find((a) => a.id === command.arrowId);
-      if (preArrow === undefined) {
-        return;
-      }
-      const result = game.playMove(command);
-      if (result === null || !result.success || result.outcome === undefined) {
-        return;
-      }
-      anim.run({
-        arrowId: command.arrowId,
-        preArrow,
-        outcome: result.outcome,
-        cellSize: layout.cellSize,
-      });
-    },
+    onPlayMove: (command) => game.playMove(command),
   });
 
   if (isInitializing) {
@@ -153,9 +121,15 @@ const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
-        <p>
-          Movimientos: {game.movesRemaining} · Estado: {game.status}
-        </p>
+        <div className="app-stats">
+          <div className="stat-moves">
+            <span className="stat-label">Movimientos</span>
+            <span className="stat-value">{game.movesRemaining}</span>
+          </div>
+          <div className="stat-status">
+            {game.status === 'IN_PROGRESS' ? '▶ En juego' : `✓ ${game.status}`}
+          </div>
+        </div>
       </header>
       <main className="app-main">
         <div
@@ -166,11 +140,13 @@ const App: React.FC = () => {
           }}
         >
           <BoardComponent
-            board={viewModel}
+            board={game.viewModel}
             width={BOARD_SIZE}
             height={BOARD_SIZE}
             onPointerDown={onPointerDown}
-            motions={anim.motions}
+            collision={game.collision ?? undefined}
+            vanishing={game.vanishing ?? undefined}
+            headDisintegrating={game.headDisintegrating ?? undefined}
           />
           <GameOverlay status={game.status} score={game.score} />
         </div>

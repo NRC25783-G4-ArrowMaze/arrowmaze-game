@@ -25,6 +25,17 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-06-14 | A5 — Game Session Scoring: Evaluation & Implementation | [`2026-06-14-game-session-scoring-evaluation-implementation.md`](./2026-06-14-game-session-scoring-evaluation-implementation.md) | Claude Opus 4.8 (evaluation) + Sonnet 4.6 (impl init) + Haiku 4.5 (impl final) |
 | 2026-06-15 | Motor de Juego: Constructores de Tablero y Flechas (Frontend) | [`2026-06-15-level-load.md`](./2026-06-15-level-load.md) | Gemini (versión no especificada) |
 | 2026-06-22 | Validación PR #10 + saneo registro AI usage + spec movimiento continuo | [`2026-06-22-pr10-validation-ai-usage-cleanup.md`](./2026-06-22-pr10-validation-ai-usage-cleanup.md) | Claude Opus 4.8 |
+| 2026-06-26 | Planning de fixes de movimiento — FIX-1 (slide, aplicación) + FIX-2 (colisión de cola, dominio) | [`2026-06-26-movement-fixes-planning.md`](./2026-06-26-movement-fixes-planning.md) | Claude Opus 4.8 |
+| 2026-06-26 | FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase (aplicación) | [`2026-06-26-slide-arrow-movement-impl.md`](./2026-06-26-slide-arrow-movement-impl.md) | Claude Opus 4.8 |
+| 2026-06-26 | FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio) | [`2026-06-26-tail-collision-detection-impl.md`](./2026-06-26-tail-collision-detection-impl.md) | Claude Opus 4.8 |
+| 2026-06-27 | Animación de slide tick-a-tick + recoil de colisión (presentación) | [`2026-06-27-slide-animation-recoil-presentation.md`](./2026-06-27-slide-animation-recoil-presentation.md) | Claude Sonnet 4.6 + Claude Opus 4.8 |
+| 2026-06-27 | Mapa de preview "corazón": tablero-grafo esquemático y resoluble | [`2026-06-27-heart-preview-map.md`](./2026-06-27-heart-preview-map.md) | Claude Opus 4.8 |
+| 2026-06-27 | Animaciones desaparición, deformación colisión, UI mejorado | [`2026-06-27-animaciones-desaparicion-deformacion-ui.md`](./2026-06-27-animaciones-desaparicion-deformacion-ui.md) | Claude Haiku 4.5 + Opus 4.8 |
+| 2026-06-27 | Persistencia local del progreso (Offline-First, SQLite + sync bidireccional) | [`2026-06-27-progreso-local.md`](./2026-06-27-progreso-local.md) | Gemini (versión no especificada) |
+| 2026-06-28 | Colisión configurable (return por defecto) + mapa decorado 6×6 | [`2026-06-28-colision-return-y-mapa-decorado.md`](./2026-06-28-colision-return-y-mapa-decorado.md) | Claude Opus 4.8 |
+| 2026-07-03 | Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta | [`2026-07-03-pulido-visual-animaciones.md`](./2026-07-03-pulido-visual-animaciones.md) | Claude Fable 5 |
+| 2026-07-03 | Auditoría del repo: reglas sincronizadas y tooling corregido | [`2026-07-03-analisis-repo-sync-reglas-tooling.md`](./2026-07-03-analisis-repo-sync-reglas-tooling.md) | Claude Fable 5 |
+| 2026-07-04 | Resolución de conflictos PR #16 + matriz de decisiones de merge | [`2026-07-04-resolucion-conflictos-pr16.md`](./2026-07-04-resolucion-conflictos-pr16.md) | Claude Fable 5 + Haiku 4.5 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -50,9 +61,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 19
-- **Última actualización:** 2026-06-22
-- **Suite de tests (actual):** 197/197 ✅ en 16 suites (tras corregir `__tests__/application/LevelDataBoardBuilder.spec.ts`)
+- **Total de reportes:** 30
+- **Última actualización:** 2026-07-04
+- **Suite de tests (actual):** 247/247 ✅ en 24 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
