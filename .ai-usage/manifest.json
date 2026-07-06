@@ -1691,11 +1691,51 @@
           "DTOs / dirs: ELIMINAR (LeaderboardDTO, ProgressDTO muertos; src/infrastructure/shared/contracts/ violaba fronteras de #14)"
         ],
         "notes": "Sesión de resolución exhaustiva con matriz de decisiones explícita. Todos los conflictos eran resolubles sin pérdida de lógica. Segunda fase de la misma sesión: deuda de revisión saldada — puertos movidos a application/ports/ (12 imports), InvalidLevelProgressError tipado (+2 tests), renombres archivo=clase con git mv, timer de presentación real en App.tsx (reemplaza 45s hardcodeado), classes.puml regenerado. Pendiente de Santiago: Gherkin y plan en doc/."
+      },
+      {
+        "id": "2026-07-06-001",
+        "date": "2026-07-06",
+        "title": "Sincronización de especificaciones con arrowmaze-project-core",
+        "file": "2026-07-06-sincronizar-specs-con-project-core.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-haiku-4-5-20251001",
+        "author": "@Jrgil20",
+        "phase": "alignment",
+        "feature": "spec-sync-project-core",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 2,
+          "files_deleted": 11,
+          "files_renamed": 0,
+          "feature_files_synchronized": 18
+        },
+        "areas": [
+          "documentation",
+          "specification-sync",
+          "clean-architecture",
+          "feature-files",
+          "gherkin-bdd",
+          "architecture-alignment"
+        ],
+        "validation": {
+          "feature_files_sync": "passed — 18 files de project-core copiados a arrowmaze-game",
+          "git_status": "passed — working tree clean",
+          "documentation_consistency": "passed — README y CLAUDE.md actualizados con referencias a project-core"
+        },
+        "decisions": [
+          "Copiar ALL feature files (A1-G3) aunque no estén implementados en arrowmaze-game",
+          "Usar patrón de nomenclatura estándar de project-core (A1-*, A2-*, etc.) para todos los features",
+          "Establecer project-core como fuente única de especificaciones en documentación",
+          "Eliminar 11 archivos duplicados con nombres antiguos para evitar confusión"
+        ],
+        "notes": "Sesión de alineación de documentación entre arrowmaze-game y arrowmaze-project-core. El objetivo fue establecer project-core como único repositorio de especificaciones (Gherkin, decisiones arquitectónicas, SDD historial). Todos los feature files ahora tienen versión única, sincronizados desde project-core."
       }
     ],
     "statistics": {
-      "totalReports": 30,
-      "lastUpdated": "2026-07-04T00:00:00Z",
+      "totalReports": 31,
+      "lastUpdated": "2026-07-06T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1725,8 +1765,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-03-002",
-      "summary": "Auditoría del repo: reglas sincronizadas y tooling corregido"
+      "id": "2026-07-06-001",
+      "summary": "Sincronización de especificaciones con arrowmaze-project-core como fuente única"
     }
   }
 }
