@@ -1,6 +1,17 @@
 # Arrow Maze — Client
 
-> Motor de juego de laberinto de flechas sobre grafo de nodos. Implementado con Clean Architecture y Domain-Driven Design en TypeScript + React + Vite.
+> Implementación del cliente (React + TypeScript + Vite + Capacitor) para el juego de puzzle de flechas. Especificaciones y decisiones centralizadas en [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core).
+
+---
+
+## ⚠️ Referencia — Fuente única de verdad
+
+**Las especificaciones, decisiones de arquitectura y roadmap están centralizados en `arrowmaze-project-core`:**
+
+- 📋 **Specs Gherkin:** `features/` (sincronizados con project-core)
+- 🗂️ **Matriz de features:** [`arrowmaze-project-core/docs/FEATURES.md`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/docs/FEATURES.md)
+- 🏗️ **Arquitectura:** [`arrowmaze-project-core/CLAUDE.md`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/CLAUDE.md)
+- 📝 **Historial SDD:** [`arrowmaze-project-core/.ai-usage/`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/tree/main/.ai-usage)
 
 ---
 
@@ -66,41 +77,71 @@ src/
 
 ---
 
-## Features implementadas
+## Features — Estado sincronizado con arrowmaze-project-core
+
+> **Leyenda:** ✅ Implementado · ⚠️ Parcial · ❌ Pendiente · 📝 Spec lista (sin implementar)
+>
+> **Fuente única de verdad:** [`arrowmaze-project-core/docs/FEATURES.md`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/docs/FEATURES.md)
+>
+> Para detalles de decisiones de diseño, ver `.ai-usage/` en project-core.
 
 ### Grupo A — Motor de juego
 
-| # | Feature | Estado |
-|---|---|---|
-| **A1** | Tablero como grafo de nodos en memoria — `Board` / `Cell` con topología port-based | ✅ Completo |
-| **A2** | Flechas como listas enlazadas — `Arrow → Head → Segment` sobre el grafo | ✅ Completo |
-| **A3** | Resolución y desplazamiento — motor cinemático Head-push con rollback atómico | ✅ Completo |
-| **A4** | Detección de victoria y derrota por vaciado del tablero / agotamiento de movimientos | ✅ Completo |
-| **A5** | Cálculo y composición de la puntuación por sesión de juego | ✅ Completo |
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [A1](./features/A1-board_graph.feature) | Inicialización y representación del tablero como grafo de nodos en memoria | — | ✅ Implementado |
+| [A2](./features/A2-arrow_placement.feature) | Definición y colocación de entidades como listas enlazadas sobre el grafo | A1 | ✅ Implementado |
+| [A3](./features/A3-arrow_movement.feature) | Resolución y desplazamiento de entidades direccionales | A1, A2 | ✅ Implementado |
+| [A4](./features/A4-game_end_detection.feature) | Detección de victoria por vaciado del tablero y de derrota por agotamiento de movimientos disponibles | A3 | ✅ Implementado |
+| [A5](./features/A5-game_session_scoring.feature) | Cálculo y composición de la puntuación por sesión de juego | A4 | ✅ Implementado |
 
 ### Grupo B — Renderizado y presentación
 
-| # | Feature | Estado |
-|---|---|---|
-| **B1** | Renderizado visual del tablero sobre el grafo de nodos | ✅ Completo |
-| **B2** | Animaciones y retroalimentación visual de acciones del motor | ⚠️ En progreso (`feature/animaciones`) |
-| **B3** | Captura y enrutamiento de entrada del jugador hacia el motor | ✅ Completo |
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [B1](./features/B1-board-rendering.feature) | Renderizado visual del tablero y sus entidades sobre el grafo de nodos | A1, A2 | ✅ Implementado (SVG) |
+| [B2](./features/B2-animation_feedback.feature) | Sistema de animaciones y retroalimentación visual de acciones del motor | A3, B1 | ✅ Implementado |
+| [B3](./features/B3-input-routing.feature) | Captura y enrutamiento de la entrada del jugador hacia el motor de juego | B1 | ✅ Implementado |
 
-### Grupo C — Flujo y estados
+### Grupo C — Flujo y estados del juego
 
-| # | Feature | Estado |
-|---|---|---|
-| **C1** | Máquina de estados del ciclo de vida de una partida (`GameSession`) | ✅ Completo |
-| **C2** | Carga y deserialización de niveles — `LevelLoader` + `InMemoryLevelRepository` listos; falta repositorio JSON/remoto | ⚠️ Parcial |
-| **C3** | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | ❌ Pendiente |
-| **C4** | Pantallas de soporte: inicio, victoria, derrota, pausa, ajustes | ❌ Pendiente |
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| C1 | Máquina de estados del ciclo de vida de una partida | A4 | ✅ Implementado (falta flujo UI PAUSED/MENU, ver C4) |
+| [C2](./features/C2-carga-deserializacion-niveles.feature) | Carga y deserialización de definiciones de niveles desde archivos locales | A1, A2 | ✅ Implementado |
+| [C3](./features/C3-seleccion-niveles-progreso.feature) | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | C2, D1 | 📝 Spec lista (Presentation; desbloqueo por grafo, lee D1) |
+| C4 | Pantallas de soporte del juego (inicio, victoria, derrota, pausa, ajustes) | C1 | ⚠️ Parcial (`GameOverlay` de fin de partida) |
 
-### Grupo D — Persistencia
+### Grupo D — Persistencia local
 
-| # | Feature | Estado |
-|---|---|---|
-| **D1** | Persistencia local del progreso y puntuaciones en SQLite | ❌ Pendiente |
-| **D2** | Sincronización del progreso local con servidor remoto | ❌ Pendiente |
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| D1 | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ❌ Pendiente |
+| D2 | Sincronización del progreso local con el servidor remoto | D1, E2 | ❌ Pendiente |
+
+### Grupo E — Identidad y sesión
+
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [E1](./features/E1-register_and_login.feature) | Registro e inicio de sesión de usuario | — | 📝 Spec lista (backend) |
+| [E2](./features/E2-active_session_management.feature) | Gestión de sesión activa y renovación de credenciales JWT | E1 | 📝 Spec lista (backend) |
+
+### Grupo F — Backend / API REST
+
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [F1](./features/F1-api_users_auth.feature) | API de autenticación de usuarios (registro, login, logout con JWT) | — | 📝 Spec lista (backend) |
+| [F2](./features/F2-level-api-distribution.feature) | API de distribución y actualización remota de definiciones de niveles | Contrato C2 | 📝 Spec lista (backend) |
+| [F3](./features/F3-recepcion-consulta-progreso.feature) | API de recepción y consulta del progreso del jugador | F1 | 📝 Spec lista (backend) |
+| F4 | Sistema de clasificación por nivel (leaderboard) | F1, F3 | ❌ Pendiente (sin spec) |
+
+### Grupo G — Características de producto
+
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [G1](./features/G1-audio-sfx-musica.feature) | Sistema de reproducción de audio, efectos sonoros y música de fondo | B2 | 📝 Spec lista |
+| [G2](./features/G2-internacionalizacion.feature) | Soporte de internacionalización y cambio de idioma (ES/EN) | C4 | 📝 Spec lista |
+| [G3](./features/G3-temporizador-nivel.feature) | Temporizador visual por nivel (mm:ss, pausa, IClock) | C1 | 📝 Spec lista (solo Presentation; integración con score pendiente de P23) |
 
 ---
 

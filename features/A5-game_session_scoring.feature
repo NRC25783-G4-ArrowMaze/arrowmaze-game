@@ -187,4 +187,5 @@ Característica: Cálculo y composición de la puntuación por sesión de juego
       | 13     | 910          | 0     |
       | 20     | 2100         | 0     |
     # fórmula de penalización acumulada: BASE_PENALTY × Σ(1..fallas) = 10 × n(n+1)/2
-    # score = max(0, 800 − penalizació
+    # score = max(0, 800 − penalización)
+

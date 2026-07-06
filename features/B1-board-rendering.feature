@@ -2,7 +2,7 @@
 
 Feature: Board Static Rendering
   As a player on a web/Android client
-  I want the board, its dot grid and its arrows drawn on screen
+  I want the board, its cells and its arrows drawn on screen
   So that I can perceive the puzzle state visually
 
   Background:
@@ -10,14 +10,7 @@ Feature: Board Static Rendering
     And each CellData carries grid coordinates "col" and "row" as non-negative integers
     And each ArrowData carries a "color" field as a CSS-compatible string
     And the rendering target is an SVG element inside a web view
-    And the SVG background is a solid white fill
-
-  # NOTA: el look de referencia es TEMA CLARO. Esto cambia dos cosas respecto a la
-  # versión original del spec:
-  #   1. El fondo pasó de azul marino (navy) a BLANCO.
-  #   2. La Pasada 1 ya no pinta un punto por Cell del tablero, sino un punto por
-  #      cada posición del BOUNDING BOX (grilla completa estilo referencia).
-  # Los puntos siguen siendo homogéneos y de un único color neutro (gris claro).
+    And the SVG background is a dark navy fill
 
   Rule: The JSON is the single source of truth for layout and color
 
@@ -30,7 +23,7 @@ Feature: Board Static Rendering
       Given a Cell with col=3 and row=5
       And a computed cellSize of 40 pixels
       When the renderer positions that Cell
-      Then its center is at screen coordinates x = 3 * 40, y = 5 * 40 plus the centering offset
+      Then its center is at screen coordinates x = 3 * 40, y = 5 * 40
       And no other source of position is consulted
 
     Scenario: Arrow color comes from ArrowData
@@ -47,11 +40,12 @@ Feature: Board Static Rendering
 
   Rule: Rendering happens in two ordered passes
 
-    Scenario: Pass 1 paints a dot for every position of the bounding box
-      Given a Board whose cells span a bounding box of (maxCol + 1) by (maxRow + 1)
+    Scenario: Pass 1 paints a dot for every Cell
+      Given a Board with N Cells
       When the renderer paints the board
-      Then it draws a small filled circle at every grid position of that bounding box
-      And every dot uses the same neutral light-gray foreground color
+      Then it first iterates every Cell in the Board
+      And for each Cell it draws a small filled circle at the Cell's center
+      And every dot uses the same neutral foreground color
 
     Scenario: Pass 2 paints every Arrow on top of the dots
       Given Pass 1 has completed
@@ -61,7 +55,7 @@ Feature: Board Static Rendering
       And for each Arrow it draws a stroked path connecting the centers of the Cells it occupies, in occupation order
       And the path visually occludes any dot underneath it
 
-    Scenario: An empty board still renders the dot grid
+    Scenario: An empty board still renders dots
       Given a Board with K = 0 Arrows
       When the renderer paints the board
       Then only Pass 1 produces output
@@ -86,17 +80,12 @@ Feature: Board Static Rendering
 
   Rule: Arrow head style
 
-    Scenario: Arrow head is a filled triangle at the LEADING cell, pointing toward travel
-      Given an Arrow occupies an ordered sequence of Cells
-      # En este motor la cabeza (Head) ocupa el extremo TRASERO y el cuerpo se
-      # extiende hacia adelante (en dirección del exitPort). La punta visual va,
-      # por tanto, en la celda LÍDER (la última en orden de ocupación), no en la
-      # celda-cabeza del dominio.
-      And the leading cell is the last cell in occupation order
+    Scenario: Arrow head is a filled triangle at the head Cell, pointing toward exitDir
+      Given an Arrow whose head segment lies in Cell H
+      And the head segment has exitDir equal to port index P
       When the renderer draws the head
-      Then a filled triangle is drawn centered on the leading cell
-      And the triangle apex points along the last body segment's direction
-        (or exitDir for a single-cell Arrow)
+      Then a filled triangle is drawn centered on Cell H
+      And the triangle apex points in the screen direction associated with port P
       And the triangle fill matches the Arrow's color
 
     Scenario: Head is drawn after the body of the same Arrow
@@ -137,8 +126,9 @@ Feature: Board Static Rendering
       And the board is centered inside the viewport with equal margins on the unused axis
 
 # Out of scope for this feature (deferred to later specs):
-#   - Animation of Arrow movement between ticks (B2)
-#   - User input (taps on Arrows) (B3)
+#   - Animation of Arrow movement between ticks
+#   - In-flight Arrow rendering during AdvanceArrowUseCase
+#   - User input (taps on Arrows)
 #   - Debug overlays (port numbers, cell ids)
 #   - Non-square cell shapes (hex, triangular)
 #   - Theme switching / palette variants

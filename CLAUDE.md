@@ -1,4 +1,4 @@
-# Arrow Maze — Claude Code Guide
+# Arrow Maze — Claude Code Guide (Client Implementation)
 
 ## Project Overview
 
@@ -6,6 +6,19 @@ Arrow Maze is a browser + mobile puzzle game (React + TypeScript + Vite + Capaci
 The codebase follows **Clean Architecture** and **DDD (Domain-Driven Design)** strictly across all layers.
 
 Package manager: **pnpm**
+
+---
+
+## ⚠️ Fuente única de verdad — arrowmaze-project-core
+
+**Este repositorio implementa especificaciones definidas en [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core).**
+
+- **Specs Gherkin:** `features/*.feature` (sincronizados desde project-core)
+- **Matriz de features y roadmap:** [`arrowmaze-project-core/docs/FEATURES.md`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/docs/FEATURES.md)
+- **Decisiones arquitectónicas:** [`arrowmaze-project-core/CLAUDE.md`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/CLAUDE.md)
+- **Historial de sesiones SDD:** [`arrowmaze-project-core/.ai-usage/`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/tree/main/.ai-usage)
+
+Para cambios de especificación: actualiza primero en project-core, luego sincroniza aquí.
 
 ---
 
