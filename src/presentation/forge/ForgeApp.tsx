@@ -19,6 +19,7 @@ const ForgeApp: React.FC = () => {
   const selectedArrowId = useForgeStore((s) => s.selectedArrowId)
   const setTool = useForgeStore((s) => s.setTool)
   const selectArrow = useForgeStore((s) => s.selectArrow)
+  const rotateHead = useForgeStore((s) => s.rotateHead)
   const undo = useForgeStore((s) => s.undo)
   const redo = useForgeStore((s) => s.redo)
 
@@ -35,9 +36,10 @@ const ForgeApp: React.FC = () => {
         e.preventDefault()
         redo()
       }
-      // R: rotar cabeza seleccionada (TODO: cuando esté implementado)
-      if (e.key === 'r' || e.key === 'R') {
-        // TODO: rotateHead(selectedArrowId)
+      // R: rotar cabeza seleccionada
+      if ((e.key === 'r' || e.key === 'R') && selectedArrowId) {
+        e.preventDefault()
+        rotateHead(selectedArrowId)
       }
       // Escape: deseleccionar
       if (e.key === 'Escape') {
@@ -47,7 +49,7 @@ const ForgeApp: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, selectedArrowId, selectArrow])
+  }, [undo, redo, selectedArrowId, selectArrow, rotateHead])
 
   return (
     <div style={{ display: 'flex', height: '100vh', gap: '16px', padding: '16px' }}>

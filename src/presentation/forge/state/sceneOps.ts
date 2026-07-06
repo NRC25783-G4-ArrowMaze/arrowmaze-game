@@ -1,5 +1,4 @@
 import type { Scene, SceneCell, SceneArrow } from '../../game/scene'
-import { portDelta } from '../../rendering/boardLayout'
 
 /**
  * sceneOps — Operaciones puras sobre Scene.

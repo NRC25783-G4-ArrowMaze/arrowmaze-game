@@ -54,7 +54,7 @@ const EMPTY_SCENE: Scene = {
   arrows: [],
 }
 
-export const useForgeStore = create<ForgeState>((set, get) => {
+export const useForgeStore = create<ForgeState>((set) => {
   // Helper: aplica una mutación de Scene y gestiona historial
   const commit = (fn: (scene: Scene) => Scene) =>
     set((s) => {
@@ -132,7 +132,7 @@ export const useForgeStore = create<ForgeState>((set, get) => {
     // Undo/Redo
     undo: () =>
       set((s) => {
-        const prev = s.history.past.at(-1)
+        const prev = s.history.past[s.history.past.length - 1]
         if (!prev) return s
         return {
           scene: prev,
@@ -144,7 +144,7 @@ export const useForgeStore = create<ForgeState>((set, get) => {
       }),
     redo: () =>
       set((s) => {
-        const next = s.history.future.at(0)
+        const next = s.history.future[0]
         if (!next) return s
         return {
           scene: next,
