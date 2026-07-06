@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import type { Scene } from '../../game/scene'
+import * as sceneOps from './sceneOps'
 
 export type ToolMode = 'select' | 'cell' | 'connect' | 'arrowHead' | 'extend' | 'erase'
 
@@ -84,38 +85,39 @@ export const useForgeStore = create<ForgeState>((set, get) => {
     setPendingConnectFrom: (cellId) => set({ pendingConnectFrom: cellId }),
     setSession: (token, email) => set({ session: { token, email } }),
 
-    // Mutaciones (placeholder; se completarán cuando sceneOps esté implementado)
+    // Mutaciones (usando sceneOps)
     addCell: (col, row) => {
-      // TODO: implementar con sceneOps.addCell
-      commit((scene) => scene)
+      commit((scene) => sceneOps.addCell(scene, col, row))
     },
     removeCell: (cellId) => {
-      // TODO: implementar con sceneOps.removeCell
-      commit((scene) => scene)
+      commit((scene) => sceneOps.removeCell(scene, cellId))
     },
     toggleConnection: (cellIdA, cellIdB) => {
-      // TODO: implementar con sceneOps.toggleConnection
-      commit((scene) => scene)
+      commit((scene) => {
+        const result = sceneOps.toggleConnection(scene, cellIdA, cellIdB)
+        return result ?? scene
+      })
     },
     placeHead: (cellId) => {
-      // TODO: implementar con sceneOps.placeHead
-      commit((scene) => scene)
+      commit((scene) => {
+        const result = sceneOps.placeHead(scene, cellId)
+        return result ?? scene
+      })
     },
     rotateHead: (arrowId) => {
-      // TODO: implementar con sceneOps.rotateHead
-      commit((scene) => scene)
+      commit((scene) => sceneOps.rotateHead(scene, arrowId))
     },
     extendArrow: (arrowId, cellId) => {
-      // TODO: implementar con sceneOps.extendArrow
-      commit((scene) => scene)
+      commit((scene) => {
+        const result = sceneOps.extendArrow(scene, arrowId, cellId)
+        return result ?? scene
+      })
     },
     retractArrow: (arrowId) => {
-      // TODO: implementar con sceneOps.retractArrow
-      commit((scene) => scene)
+      commit((scene) => sceneOps.retractArrow(scene, arrowId))
     },
     deleteArrow: (arrowId) => {
-      // TODO: implementar con sceneOps.deleteArrow
-      commit((scene) => scene)
+      commit((scene) => sceneOps.deleteArrow(scene, arrowId))
     },
     setLevelProps: (id, name, difficulty, allowedMoves) => {
       commit((scene) => ({
