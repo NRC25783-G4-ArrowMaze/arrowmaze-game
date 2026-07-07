@@ -31,20 +31,28 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
       onClick={handleClick}
       className={`level-node-card ${node.state} ${isFocal ? 'focal' : ''}`}
       style={{
-        opacity: isBlocked ? 0.5 : 1,
         cursor: isBlocked ? 'not-allowed' : 'pointer',
         transform: isFocal ? 'scale(1.1)' : isBlocked ? 'scale(0.9)' : 'scale(1)',
         transition: 'all 0.2s ease',
         padding: '16px',
         margin: '8px',
-        border: isFocal ? '2px solid #4CAF50' : '1px solid #ccc',
+        border: isFocal ? '2px solid #4CAF50' : '1px solid #d1d5db',
         borderRadius: '8px',
-        backgroundColor: isBlocked ? '#f5f5f5' : '#fff',
+        backgroundColor: isBlocked ? '#f3f4f6' : '#fff',
         minWidth: '140px',
         textAlign: 'center',
       }}
     >
-      <div className="level-node-title" style={{ fontWeight: 'bold', marginBottom: '8px' }}>
+      {/* Color SIEMPRE explícito: heredarlo del sistema (modo oscuro) lo
+          volvía blanco sobre la card clara — título invisible. */}
+      <div
+        className="level-node-title"
+        style={{
+          fontWeight: 'bold',
+          marginBottom: '8px',
+          color: isBlocked ? '#9ca3af' : '#1f2937',
+        }}
+      >
         {metadata?.name || node.levelId}
       </div>
 

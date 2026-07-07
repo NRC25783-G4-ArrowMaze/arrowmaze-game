@@ -26,8 +26,10 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
 
   return (
     <div className="level-select-screen" style={{ padding: '20px' }}>
-      <header style={{ marginBottom: '30px' }}>
-        <h1>{t('c3.title')}</h1>
+      <header style={{ marginBottom: '24px' }}>
+        {/* Color explícito: sin él, el modo oscuro del sistema lo heredaba
+            blanco sobre la pantalla clara y el título desaparecía. */}
+        <h1 style={{ color: '#1f2937', fontSize: '24px' }}>{t('c3.title')}</h1>
       </header>
 
       <main
