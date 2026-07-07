@@ -1,0 +1,118 @@
+/* ─────────────────────────────────────────────────────────────────── */
+/* App Layout */
+/* ─────────────────────────────────────────────────────────────────── */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+}
+
+.app-header {
+  padding: 28px 32px;
+  background: white;
+  border-bottom: 3px solid #e0e4e8;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.app-header h1 {
+  margin: 0 0 16px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.app-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.stat-moves {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: #3b82f6;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-status {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  padding: 8px 12px;
+  background: #f0f4f8;
+  border-radius: 6px;
+  min-width: 100px;
+  text-align: center;
+}
+
+.app-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 20px;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* Board Container */
+/* ─────────────────────────────────────────────────────────────────── */
+
+.app-main > div {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* Responsive */
+/* ─────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 20px 16px;
+  }
+
+  .app-header h1 {
+    font-size: 24px;
+    margin-bottom: 12px;
+  }
+
+  .app-stats {
+    gap: 16px;
+  }
+
+  .stat-value {
+    font-size: 28px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .stat-status {
+    font-size: 12px;
+  }
+
+  .app-main {
+    padding: 16px 12px;
+  }
+}
