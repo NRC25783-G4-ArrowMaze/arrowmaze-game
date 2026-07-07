@@ -45,7 +45,9 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClo
         <h3 style={{ margin: '4px 0' }}>Audio</h3>
         <p style={{ margin: 0, color: '#6b7280' }}>Próximamente</p>
       </section>
-      <button onClick={onClose}>Volver</button>
+      <button onClick={onClose} style={{ minWidth: '180px' }}>
+        Volver
+      </button>
     </div>
   );
 };
