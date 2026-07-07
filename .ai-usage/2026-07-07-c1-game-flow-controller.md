@@ -20,6 +20,9 @@
   - `jest.config.cjs` \[FIX\] — `ignoreDeprecations: '6.0'` (TypeScript 6 deprecó `moduleResolution: 'node'`; las 29 suites fallaban al compilar).
   - `__tests__/domain/LevelSelectionProjection.spec.ts` \[FIX\] — Test de C3 movido desde `src/domain/services/` (importaba `vitest`, nunca instalado — jamás corrió) a la convención `__tests__/` con jest; sus 12 tests ahora corren.
   - `classes.puml` \[REGEN\] — Diagrama regenerado con `GameFlowController`.
+  - `src/presentation/game/useGameController.ts` \[MODIFY\] — Integración B3 del plan: instancia el `GameFlowController`, expone `flowState` + acciones (`pause/resume/openSettings/closeSettings/restart`) para C4, y descarta `PlayMoveCommand` cuando el tope de la pila no es `ACTIVE`.
+  - `src/presentation/game/GameController.ts` \[MODIFY\] — Getter `gameSession` para que el flujo de UI envuelva la sesión viva sin copiarla.
+  - `src/presentation/components/GameView.tsx` \[MODIFY\] — El adaptador de input (B3) también se deshabilita cuando `flowState !== 'ACTIVE'`.
 - **Modificaciones manuales del equipo:** Ninguna sobre el código; las decisiones de diseño (D1–D5 de la sesión SDD) fueron del humano vía Q&A estructurada.
 - **Validación realizada:** `pnpm test` — 29 suites / 292 tests, todos pasan (incluye los 18 nuevos y los 12 de C3 que nunca habían corrido); `pnpm type-check` limpio; eslint limpio en los archivos nuevos (8 errores globales preexistentes ajenos, documentados); `pnpm gen-uml` ejecutado.
 

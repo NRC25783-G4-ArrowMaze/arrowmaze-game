@@ -87,6 +87,11 @@ export class GameController {
     return this.session.status;
   }
 
+  /** Sesión de Dominio viva, para que el flujo de UI (C1) la envuelva sin copiarla. */
+  get gameSession(): GameSession {
+    return this.session;
+  }
+
   get movesRemaining(): number {
     return this.session.movesRemaining;
   }

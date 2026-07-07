@@ -597,6 +597,7 @@ class GameController {
     -layoutByCellId: Map<string, { col: number; row: number; }>
     -cellIdByPosition: Map<string, string>
     +status: GameStatus
+    +gameSession: GameSession
     +movesRemaining: number
     +score: number | null
     +collisionBehavior: CollisionBehavior
@@ -648,6 +649,12 @@ interface GameControllerState {
     +vanishing: VanishSignal | null
     +headDisintegrating: HeadDisintegratingSignal | null
     +playMove: (command: PlayMoveCommand) => void
+    +flowState: GameFlowState
+    +pause: () => void
+    +resume: () => void
+    +openSettings: () => void
+    +closeSettings: () => void
+    +restart: () => void
 }
 interface RunTickParams {
     +arrowId: string

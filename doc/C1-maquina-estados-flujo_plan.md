@@ -241,18 +241,19 @@ describe('GameFlowController — invariante de Dominio')
 ## Criterios de Completitud
 
 ```
-[ ] GameFlowState definido: 'ACTIVE' | 'PAUSED' | 'SETTINGS'
-[ ] InvalidFlowTransitionError lanzado con action + estado actual en el mensaje
-[ ] GameFlowController inicializa stack = ['ACTIVE']
-[ ] pause() exige tope ACTIVE y session.status === IN_PROGRESS
-[ ] resume() exige tope PAUSED
-[ ] openSettings() exige tope PAUSED; closeSettings() exige tope SETTINGS y vuelve a PAUSED
-[ ] restart() exige tope PAUSED, reemplaza session, colapsa stack a [ACTIVE]
-[ ] Ningún método muta GameSession salvo restart (reemplazo total de la referencia)
-[ ] Todos los escenarios del .feature C1 cubiertos por tests
-[ ] pnpm test pasa sin errores (incluye tests existentes de GameSession/PlayMoveUseCase sin modificación)
-[ ] pnpm lint sin errores
-[ ] pnpm gen-uml ejecutado (classes.puml actualizado)
-[ ] Domain (GameSession, GameStatus, GameErrors) sin cambios
-[ ] Entradas .ai-usage/ generadas (planning + implementation)
+[x] GameFlowState definido: 'ACTIVE' | 'PAUSED' | 'SETTINGS'
+[x] InvalidFlowTransitionError lanzado con action + estado actual en el mensaje
+[x] GameFlowController inicializa stack = ['ACTIVE']
+[x] pause() exige tope ACTIVE y session.status === IN_PROGRESS
+[x] resume() exige tope PAUSED
+[x] openSettings() exige tope PAUSED; closeSettings() exige tope SETTINGS y vuelve a PAUSED
+[x] restart() exige tope PAUSED, reemplaza session, colapsa stack a [ACTIVE]
+[x] Ningún método muta GameSession salvo restart (reemplazo total de la referencia)
+[x] Todos los escenarios del .feature C1 cubiertos por tests
+[x] pnpm test pasa sin errores (incluye tests existentes de GameSession/PlayMoveUseCase sin modificación)
+[x] pnpm lint sin errores
+[x] pnpm gen-uml ejecutado (classes.puml actualizado)
+[x] Domain (GameSession, GameStatus, GameErrors) sin cambios
+[x] Entradas .ai-usage/ generadas (planning + implementation)
+[x] Integración B3: useGameController/GameView descartan input cuando el tope de la pila no es ACTIVE; flowState + acciones de flujo expuestas para C4
 ```
