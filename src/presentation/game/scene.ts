@@ -48,6 +48,12 @@ export interface Scene {
   collisionBehavior?: CollisionBehavior
 }
 
+/**
+ * Paleta por defecto para flechas de niveles remotos (F2): los 8 colores de
+ * SAMPLE_LEVEL_2 en su orden. El contrato C2 no transporta color, así que un
+ * nivel bajado de la API se colorea por índice de flecha; para sample-level-2
+ * el resultado es idéntico al módulo local (JSON preserva el orden del array).
+ */
 export const DEFAULT_ARROW_PALETTE: readonly string[] = [
   '#3b82f6', // blue
   '#22c55e', // green
@@ -73,6 +79,12 @@ export function toLevelDataDTO(scene: Scene): LevelDataDTO {
   }
 }
 
+/**
+ * Reconstruye una Scene desde el LevelDataDTO que sirve la API (inversa de
+ * toLevelDataDTO): la posición de rejilla se recupera parseando el id de celda
+ * "col,row" y el color se asigna por paleta. Lanza si un id no codifica
+ * posición — el caller decide el fallback.
+ */
 export function sceneFromLevelData(
   dto: LevelDataDTO,
   palette: readonly string[] = DEFAULT_ARROW_PALETTE,

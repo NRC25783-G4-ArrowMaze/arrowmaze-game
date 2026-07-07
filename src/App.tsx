@@ -1,18 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import { BoardComponent } from './presentation/components/BoardComponent';
-import { GameOverlay } from './presentation/components/GameOverlay';
-import { computeBoardLayout } from './presentation/rendering/boardLayout';
-import { useGameController } from './presentation/game/useGameController';
-import { useBoardInput } from './presentation/input/useBoardInput';
+import { GameView } from './presentation/components/GameView';
 import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
+import { fetchSceneWithFallback } from './presentation/game/loadScene';
+import type { Scene } from './presentation/game/scene';
+import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
 import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
-import { Score } from './domain/value-objects/Score';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 import type { LevelProgress } from './domain/entities/LevelProgress';
-
-const BOARD_SIZE = 560;
 
 const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
   'level-initial': { name: 'Nivel Inicial', difficulty: 'Fácil' },
@@ -23,12 +19,18 @@ const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
 };
 
 /**
- * App — Máquina de pantallas SELECT (mapa C3) → PLAYING (tablero B1+B3).
- * Persiste progreso local (D1) y sincroniza con servidor (D2, background).
+ * App — Máquina de pantallas SELECT (mapa C3) → PLAYING (GameView).
+ *
+ * En el bootstrap resuelve en paralelo la escena a jugar y el módulo de
+ * persistencia: la escena se pide a la API de niveles (F2, `GET
+ * /api/v1/levels/:id`) con fallback offline-first a SAMPLE_LEVEL_2, y el módulo
+ * carga el progreso local (D1) que alimenta el mapa de selección y sincroniza
+ * con el servidor (D2, background). El fallo de una inicialización no bloquea la
+ * otra.
  */
 const App: React.FC = () => {
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
-  const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [scene, setScene] = useState<Scene | null>(null);
   const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
   const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
 
@@ -36,88 +38,71 @@ const App: React.FC = () => {
     let isMounted = true;
 
     const bootstrapGame = async () => {
-      try {
-        const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-        const tokenProvider = new CapacitorTokenProvider();
-        const module = await LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider);
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-        if (isMounted) {
-          setProgressModule(module);
+      // Inyectamos el proveedor nativo de Capacitor
+      const tokenProvider = new CapacitorTokenProvider();
 
-          // Cargar progreso inicial para el mapa de selección
-          const progress = await module.getLocalProgress.getAll();
-          if (isMounted) setAllProgress(progress);
+      const [sceneResult, moduleResult] = await Promise.allSettled([
+        fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2),
+        LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider),
+      ]);
 
-          // Sincronización background
-          module.syncProgress.execute()
-            .then(() => console.log('[App] Sincronización background completada.'))
-            .catch(async (error: unknown) => {
-              console.warn('[App] Sincronización background detenida:', error);
-              if (error instanceof Error && error.name === 'SessionExpiredError') {
-                await tokenProvider.removeToken();
-              }
-            });
-        }
-      } catch (error) {
-        console.error('Error arrancando el motor de base de datos', error);
-      } finally {
-        if (isMounted) setIsInitializing(false);
+      if (!isMounted) return;
+
+      // fetchSceneWithFallback nunca rechaza (fallback interno); el allSettled
+      // es por simetría y para que un throw inesperado no deje la app colgada.
+      setScene(sceneResult.status === 'fulfilled' ? sceneResult.value : SAMPLE_LEVEL_2);
+
+      if (moduleResult.status === 'fulfilled') {
+        const module = moduleResult.value;
+        setProgressModule(module);
+
+        // Progreso inicial para el mapa de selección (C3)
+        module.getLocalProgress.getAll()
+          .then((progress) => { if (isMounted) setAllProgress(progress); })
+          .catch((error: unknown) => console.warn('[App] No se pudo cargar el progreso inicial:', error));
+
+        // Sincronización background (Bloque 4)
+        module.syncProgress.execute()
+          .then(() => console.log('[App] Sincronización background completada.'))
+          .catch(async (error: unknown) => {
+            console.warn('[App] Sincronización background detenida:', error);
+
+            // Si el error es de sesión (401 SessionExpiredError),
+            // podemos borrar el token inválido automáticamente.
+            if (error instanceof Error && error.name === 'SessionExpiredError') {
+              await tokenProvider.removeToken();
+              // TODO: Despachar evento para redirigir al Login
+            }
+          });
+      } else {
+        console.error('Error arrancando el motor de base de datos', moduleResult.reason);
       }
     };
 
     bootstrapGame();
-    return () => { isMounted = false; };
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
-
-  // Estados de pantalla de juego (solo se usa cuando screen === 'PLAYING')
-  const game = useGameController(SAMPLE_LEVEL_2);
-  const levelStartRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    levelStartRef.current = Date.now();
-  }, []);
-
-  const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
-
-  // Persistencia automática al ganar + volver a SELECT
-  useEffect(() => {
-    if (game.status === 'WON' && progressModule && game.score !== null) {
-      const movesUsed = SAMPLE_LEVEL_2.allowedMoves - game.movesRemaining;
-      const startedAt = levelStartRef.current ?? Date.now();
-      const timeElapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
-
-      progressModule.saveLocalProgress
-        .execute(SAMPLE_LEVEL_2.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
-        .then(() => {
-          console.log(`[App] Progreso guardado para ${SAMPLE_LEVEL_2.id}`);
-          // Recargar progreso y volver a selección
-          return progressModule.getLocalProgress.getAll();
-        })
-        .then((updatedProgress) => {
-          setAllProgress(updatedProgress);
-          setScreen('SELECT');
-        })
-        .catch((error: unknown) => {
-          console.error('[App] Error guardando progreso:', error);
-        });
-    }
-  }, [game.status, game.score, game.movesRemaining, progressModule]);
-
-  const onPointerDown = useBoardInput({
-    width: BOARD_SIZE,
-    height: BOARD_SIZE,
-    layout,
-    enabled: game.status === 'IN_PROGRESS' && !game.inFlight && !isInitializing,
-    resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => game.playMove(command),
-  });
 
   const handleSelectLevel = (levelId: string) => {
     console.log(`[App] Seleccionado nivel: ${levelId}`);
     setScreen('PLAYING');
   };
 
-  if (isInitializing) {
+  // Al volver del juego recargamos el progreso para que el mapa refleje el
+  // récord recién guardado por GameView tras ganar.
+  const handleBackToSelect = () => {
+    setScreen('SELECT');
+    progressModule?.getLocalProgress.getAll()
+      .then((progress) => setAllProgress(progress))
+      .catch((error: unknown) => console.warn('[App] No se pudo recargar el progreso:', error));
+  };
+
+  if (scene === null) {
     return (
       <div className="app">
         <header className="app-header"><h1>Arrow Maze</h1></header>
@@ -143,39 +128,7 @@ const App: React.FC = () => {
     );
   }
 
-  return (
-    <div className="app">
-      <header className="app-header">
-        <h1>Arrow Maze</h1>
-        <button onClick={() => setScreen('SELECT')} style={{ marginLeft: 'auto' }}>
-          ← Volver
-        </button>
-        <div className="app-stats">
-          <div className="stat-moves">
-            <span className="stat-label">Movimientos</span>
-            <span className="stat-value">{game.movesRemaining}</span>
-          </div>
-          <div className="stat-status">
-            {game.status === 'IN_PROGRESS' ? '▶ En juego' : `✓ ${game.status}`}
-          </div>
-        </div>
-      </header>
-      <main className="app-main">
-        <div style={{ position: 'relative', width: BOARD_SIZE, height: BOARD_SIZE }}>
-          <BoardComponent
-            board={game.viewModel}
-            width={BOARD_SIZE}
-            height={BOARD_SIZE}
-            onPointerDown={onPointerDown}
-            collision={game.collision ?? undefined}
-            vanishing={game.vanishing ?? undefined}
-            headDisintegrating={game.headDisintegrating ?? undefined}
-          />
-          <GameOverlay status={game.status} score={game.score} />
-        </div>
-      </main>
-    </div>
-  );
+  return <GameView scene={scene} progressModule={progressModule} onBack={handleBackToSelect} />;
 };
 
 export default App;
