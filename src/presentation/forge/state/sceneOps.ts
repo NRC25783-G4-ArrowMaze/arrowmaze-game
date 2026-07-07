@@ -173,21 +173,17 @@ export function lastCellOf(arrow: SceneArrow): string {
 }
 
 /**
- * Verifica si cellId está conectada al lastCell (adyacencia + conexión).
+ * Verifica si toCellId está conectada desde fromCellId vía algún puerto.
+ * NO asume adyacencia ortogonal: verifica si hay una conexión directa
+ * entre las celdas (pueden estar en cualquier dirección si tienen un puerto conectado).
  */
 function isConnectedTo(scene: Scene, fromCellId: string, toCellId: string): boolean {
-  const fromPos = cellFromId(fromCellId)
-  const toPos = cellFromId(toCellId)
-  if (!fromPos || !toPos) return false
-
-  const dCol = toPos.col - fromPos.col
-  const dRow = toPos.row - fromPos.row
-
-  const fromPort = deltaToPort(dCol, dRow)
-  if (fromPort === -1) return false // No adyacente
-
-  // Verificar si hay conexión
-  return scene.connections.some((c) => c.fromCell === fromCellId && c.fromPort === fromPort)
+  // Buscar cualquier conexión desde fromCellId a toCellId
+  return scene.connections.some(
+    (c) =>
+      (c.fromCell === fromCellId && c.toCell === toCellId) ||
+      (c.fromCell === toCellId && c.toCell === fromCellId),
+  )
 }
 
 export function extendArrow(scene: Scene, arrowId: string, cellId: string): Scene | null {

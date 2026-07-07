@@ -22,12 +22,13 @@ interface ForgeCanvasProps {
 
 const BOARD_SIZE = 560
 const BACKGROUND_COLOR = '#f5f5f5'
-const GHOST_DOT_COLOR = '#999'
-const GHOST_DOT_RADIUS_RATIO = 0.08
-const CELL_DOT_COLOR = '#333'
-const CELL_DOT_RADIUS_RATIO = 0.12
-const ARROW_BODY_STROKE_WIDTH = 2
-const ARROW_HEAD_INDICATOR_LENGTH = 8
+const GHOST_DOT_COLOR = '#ddd'
+const GHOST_DOT_RADIUS_RATIO = 0.15
+const CELL_DOT_COLOR = '#000'
+const CELL_DOT_RADIUS_RATIO = 0.2
+const CELL_BORDER_WIDTH = 1.5
+const ARROW_BODY_STROKE_WIDTH = 3
+const ARROW_HEAD_INDICATOR_LENGTH = 12
 
 /**
  * ForgeCanvas — Lienzo SVG de edición del nivel.
@@ -187,17 +188,34 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
         const center = cellCenter(cell.col, cell.row, cellSize, offset)
         const isHighlighted =
           tool === 'connect' && (pendingConnectFrom === cell.id || pendingConnectFrom !== null)
+        const squareSize = cellRadius * 2
         return (
-          <circle
-            key={`cell-${cell.id}`}
-            cx={center.x}
-            cy={center.y}
-            r={cellRadius}
-            fill={isHighlighted ? '#ff6b6b' : CELL_DOT_COLOR}
-            opacity={isHighlighted ? 0.8 : 1}
-            style={{ pointerEvents: 'auto' }}
-            data-testid={`cell-${cell.id}`}
-          />
+          <g key={`cell-${cell.id}`} style={{ pointerEvents: 'auto' }}>
+            {/* Cuadrado relleno */}
+            <rect
+              x={center.x - squareSize / 2}
+              y={center.y - squareSize / 2}
+              width={squareSize}
+              height={squareSize}
+              fill={isHighlighted ? '#ff6b6b' : CELL_DOT_COLOR}
+              stroke={isHighlighted ? '#cc0000' : '#666'}
+              strokeWidth={CELL_BORDER_WIDTH}
+              rx={2}
+            />
+            {/* Etiqueta de id */}
+            <text
+              x={center.x}
+              y={center.y}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              fontSize="10"
+              fill="#fff"
+              pointerEvents="none"
+              data-testid={`cell-${cell.id}`}
+            >
+              {cell.id}
+            </text>
+          </g>
         )
       })}
 
@@ -227,22 +245,31 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
       })}
 
       {/* Capa 5: Flechas */}
-      {scene.arrows.map((arrow, arrowIndex) => {
-        const headCell = scene.cells.find((c) => c.id === arrow.head.cellId)
-        if (!headCell) return null
+      {scene.arrows.length > 0 && (
+        <g data-testid="arrows-layer">
+          {scene.arrows.map((arrow, arrowIndex) => {
+            const headCell = scene.cells.find((c) => c.id === arrow.head.cellId)
+            if (!headCell) {
+              console.warn(`[ForgeCanvas] Arrow ${arrow.id} head cell not found: ${arrow.head.cellId}`)
+              return null
+            }
 
-        const centers: Point[] = [cellCenter(headCell.col, headCell.row, cellSize, offset)]
-        for (const bodyId of arrow.body) {
-          const bodyCell = scene.cells.find((c) => c.id === bodyId)
-          if (bodyCell) {
-            centers.push(cellCenter(bodyCell.col, bodyCell.row, cellSize, offset))
-          }
-        }
+            const centers: Point[] = [cellCenter(headCell.col, headCell.row, cellSize, offset)]
+            for (const bodyId of arrow.body) {
+              const bodyCell = scene.cells.find((c) => c.id === bodyId)
+              if (!bodyCell) {
+                console.warn(`[ForgeCanvas] Arrow ${arrow.id} body cell not found: ${bodyId}`)
+                continue
+              }
+              centers.push(cellCenter(bodyCell.col, bodyCell.row, cellSize, offset))
+            }
 
-        const color = DEFAULT_ARROW_PALETTE[arrowIndex % DEFAULT_ARROW_PALETTE.length]
-        const isSelected = arrow.id === selectedArrowId
-        const strokeWidth = isSelected ? 3 : ARROW_BODY_STROKE_WIDTH
-        const strokeColor = isSelected ? '#ff6b6b' : color
+            const color = DEFAULT_ARROW_PALETTE[arrowIndex % DEFAULT_ARROW_PALETTE.length]
+            const isSelected = arrow.id === selectedArrowId
+            const strokeWidth = isSelected ? 3 : ARROW_BODY_STROKE_WIDTH
+            const strokeColor = isSelected ? '#ff6b6b' : color
+
+            if (centers.length === 0) return null
 
         return (
           <g key={`arrow-${arrow.id}`}>
@@ -314,6 +341,8 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
           </g>
         )
       })}
+        </g>
+      )}
 
       {/* Capa 6: Overlays */}
       {/* Candidatas en modo extend */}
@@ -323,24 +352,30 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
           if (!selectedArrow) return null
 
           const lastCellId = sceneOps.lastCellOf(selectedArrow)
-          const lastCell = scene.cells.find((c) => c.id === lastCellId)
-          if (!lastCell) return null
-
           const candidates: Point[] = []
-          for (let row = 0; row <= maxRow; row++) {
-            for (let col = 0; col <= maxCol; col++) {
-              const candCellId = sceneOps.cellIdAt(col, row)
-              if (candCellId === lastCellId) continue // No la misma
-              if (occupiedCells.has(candCellId) && sceneOps.occupiedBy(scene, candCellId) !== selectedArrow.id)
-                continue // Ocupada por otro
+          const candidateCellIds = new Set<string>()
 
-              // Verificar si es candidata (adyacente + conectada + libre)
-              const result = sceneOps.extendArrow(scene, selectedArrow.id, candCellId)
-              if (result) {
-                // Es válida
-                const center = cellCenter(col, row, cellSize, offset)
-                candidates.push(center)
-              }
+          // Encontrar todas las celdas conectadas a lastCellId
+          for (const conn of scene.connections) {
+            if (conn.fromCell === lastCellId) {
+              candidateCellIds.add(conn.toCell)
+            }
+            if (conn.toCell === lastCellId) {
+              candidateCellIds.add(conn.fromCell)
+            }
+          }
+
+          // Filtrar: no ocupadas (o ocupadas por la misma flecha), no es la última celda
+          for (const candCellId of candidateCellIds) {
+            if (candCellId === lastCellId) continue
+
+            const occupyingArrow = sceneOps.occupiedBy(scene, candCellId)
+            if (occupyingArrow && occupyingArrow !== selectedArrow.id) continue // Ocupada por otro
+
+            const candCell = scene.cells.find((c) => c.id === candCellId)
+            if (candCell) {
+              const center = cellCenter(candCell.col, candCell.row, cellSize, offset)
+              candidates.push(center)
             }
           }
 
@@ -349,11 +384,11 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
               key={`candidate-${idx}`}
               cx={pos.x}
               cy={pos.y}
-              r={cellRadius * 0.6}
+              r={cellRadius * 1.1}
               fill="none"
               stroke="#fff700"
-              strokeWidth={2}
-              opacity={0.6}
+              strokeWidth={3}
+              opacity={0.8}
               pointerEvents="none"
               data-testid={`extend-candidate-${idx}`}
             />
