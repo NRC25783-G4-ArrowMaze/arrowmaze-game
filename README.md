@@ -107,17 +107,17 @@ src/
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| C1 | Máquina de estados del ciclo de vida de una partida | A4 | ✅ Implementado (falta flujo UI PAUSED/MENU, ver C4) |
+| [C1](./features/C1-maquina_estados_partida.feature) | Máquina de estados del flujo de una partida (autómata de pila: ACTIVE/PAUSED/SETTINGS) | A4 | ✅ Implementado (`GameFlowController`, PR #22/#23) |
 | [C2](./features/C2-carga-deserializacion-niveles.feature) | Carga y deserialización de definiciones de niveles desde archivos locales | A1, A2 | ✅ Implementado |
 | [C3](./features/C3-seleccion-niveles-progreso.feature) | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | C2, D1 | 📝 Spec lista (Presentation; desbloqueo por grafo, lee D1) |
-| C4 | Pantallas de soporte del juego (inicio, victoria, derrota, pausa, ajustes) | C1 | ⚠️ Parcial (`GameOverlay` de fin de partida) |
+| [C4](./features/C4-pantallas-soporte.feature) | Pantallas de soporte del juego (inicio, victoria, derrota, pausa, ajustes) | C1 | ⚠️ Parcial (`GameOverlay` de fin de partida); escenarios Gherkin sin redactar |
 
 ### Grupo D — Persistencia local
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| D1 | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ❌ Pendiente |
-| D2 | Sincronización del progreso local con el servidor remoto | D1, E2 | ❌ Pendiente |
+| [D1](./features/D1-persistencia-local.feature) | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ❌ Pendiente |
+| [D2](./features/D2-sincronizacion-local-remota.feature) | Sincronización del progreso local con el servidor remoto | D1, E2 | ❌ Pendiente |
 
 ### Grupo E — Identidad y sesión
 
@@ -142,6 +142,12 @@ src/
 | [G1](./features/G1-audio-sfx-musica.feature) | Sistema de reproducción de audio, efectos sonoros y música de fondo | B2 | 📝 Spec lista |
 | [G2](./features/G2-internacionalizacion.feature) | Soporte de internacionalización y cambio de idioma (ES/EN) | C4 | 📝 Spec lista |
 | [G3](./features/G3-temporizador-nivel.feature) | Temporizador visual por nivel (mm:ss, pausa, IClock) | C1 | 📝 Spec lista (solo Presentation; integración con score pendiente de P23) |
+
+### Grupo H — Herramientas internas
+
+| # | Feature | Depende de | Estado |
+|---|---|---|---|
+| [H1](./features/H1-forge-editor-niveles.feature) | FORGE — Editor visual interactivo de niveles (herramienta ADMIN) | C2, F2 | ✅ Implementado (Fases 0–6, PR #19) |
 
 ---
 
