@@ -47,6 +47,7 @@ export interface ForgeState {
   retractArrow: (arrowId: string) => void
   deleteArrow: (arrowId: string) => void
   setLevelProps: (updates: Partial<Scene>) => void
+  loadScene: (newScene: Scene) => void
 
   // Historial
   undo: () => void
@@ -131,6 +132,9 @@ export const useForgeStore = create<ForgeState>((set) => {
     },
     setLevelProps: (updates) => {
       commit((scene) => ({ ...scene, ...updates }))
+    },
+    loadScene: (newScene) => {
+      set({ scene: newScene, history: { past: [], future: [] } })
     },
 
     // Undo/Redo

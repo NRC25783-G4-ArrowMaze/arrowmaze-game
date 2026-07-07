@@ -4,6 +4,7 @@ import { ForgeCanvas } from './components/ForgeCanvas'
 import { LevelPropertiesPanel } from './components/LevelPropertiesPanel'
 import { ValidationPanel } from './components/ValidationPanel'
 import { PlaytestOverlay } from './components/PlaytestOverlay'
+import { PublishPanel } from './components/PublishPanel'
 import { isValidScene } from './state/validateScene'
 
 const TOOL_HINTS: Record<ToolMode, string> = {
@@ -33,6 +34,7 @@ const ForgeApp: React.FC = () => {
   const tool = useForgeStore((s) => s.tool)
   const selectedArrowId = useForgeStore((s) => s.selectedArrowId)
   const history = useForgeStore((s) => s.history)
+  const session = useForgeStore((s) => s.session)
   const setTool = useForgeStore((s) => s.setTool)
   const setGridCols = useForgeStore((s) => s.setGridCols)
   const setGridRows = useForgeStore((s) => s.setGridRows)
@@ -40,6 +42,8 @@ const ForgeApp: React.FC = () => {
   const setPendingConnect = useForgeStore((s) => s.setPendingConnect)
   const rotateHead = useForgeStore((s) => s.rotateHead)
   const setLevelProps = useForgeStore((s) => s.setLevelProps)
+  const setSession = useForgeStore((s) => s.setSession)
+  const loadScene = useForgeStore((s) => s.loadScene)
   const undo = useForgeStore((s) => s.undo)
   const redo = useForgeStore((s) => s.redo)
 
@@ -170,12 +174,15 @@ const ForgeApp: React.FC = () => {
         {/* Panel de Validación */}
         <ValidationPanel scene={scene} />
 
-        {/* TODO: PublishPanel - Fase 6 */}
-        <div style={{ padding: '8px', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #ccc' }}>
-          <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>
-            [TODO: PublishPanel - Fase 6]
-          </p>
-        </div>
+        {/* Panel de Publicación */}
+        <PublishPanel
+          scene={scene}
+          token={session.token}
+          email={session.email}
+          onLogin={(token, loginEmail) => setSession(token, loginEmail)}
+          onLogout={() => setSession(null, null)}
+          onLoadScene={loadScene}
+        />
       </div>
 
       {/* Playtest modal */}
