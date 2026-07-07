@@ -14,6 +14,12 @@ import { Capacitor } from '@capacitor/core';
  *
  * El wasm se sirve desde /assets/sql-wasm.wasm (public/assets), la ruta por
  * defecto que espera jeep-sqlite.
+ *
+ * OJO — acoplamiento de versiones: el binario public/assets/sql-wasm.wasm debe
+ * corresponder al glue de sql.js que jeep-sqlite lleva EMPAQUETADO en su build
+ * publicado (jeep-sqlite 2.8.0 ↔ sql.js 1.12.x), no al sql.js que resuelva
+ * node_modules (su rango ^1.11 instala 1.14, cuyo wasm produce LinkError).
+ * Si se actualiza jeep-sqlite, hay que re-verificar el wasm en navegador.
  */
 export async function initSqliteWebStore(): Promise<void> {
   if (Capacitor.getPlatform() !== 'web') return;

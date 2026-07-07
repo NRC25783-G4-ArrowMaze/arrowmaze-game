@@ -52,12 +52,17 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
       const startedAt = levelStartRef.current ?? Date.now();
       const timeElapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
 
+      // En el build offline no hay backend: se guarda local y no se sincroniza.
+      const offlineMode = import.meta.env.VITE_OFFLINE_MODE === 'true';
+
       progressModule.saveLocalProgress
         .execute(scene.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
           console.log(`[GameView] Progreso local guardado para el nivel ${scene.id}`);
           // Intentamos subir el récord de inmediato tras ganar, si hay internet.
-          return progressModule.syncProgress.execute();
+          if (!offlineMode) {
+            return progressModule.syncProgress.execute();
+          }
         })
         .catch((error: unknown) => {
           console.error('[GameView] Error guardando o sincronizando el récord:', error);
@@ -80,23 +85,35 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
-        {onBack && (
-          <button onClick={onBack} style={{ marginLeft: 'auto' }}>
-            ← Volver
-          </button>
-        )}
-        {game.status === 'IN_PROGRESS' && (
-          <button onClick={game.pause} disabled={game.inFlight} style={{ marginLeft: '8px' }}>
-            ⏸ Pausa
-          </button>
-        )}
+        <div className="app-actions">
+          {onBack && (
+            <button onClick={onBack}>← Volver</button>
+          )}
+          {game.status === 'IN_PROGRESS' && (
+            <button onClick={game.pause} disabled={game.inFlight}>
+              ⏸ Pausa
+            </button>
+          )}
+        </div>
         <div className="app-stats">
           <div className="stat-moves">
             <span className="stat-label">Movimientos</span>
             <span className="stat-value">{game.movesRemaining}</span>
           </div>
-          <div className="stat-status">
-            {game.status === 'IN_PROGRESS' ? '▶ En juego' : `✓ ${game.status}`}
+          <div
+            className={
+              game.status === 'WON'
+                ? 'stat-status stat-status--won'
+                : game.status === 'LOST'
+                  ? 'stat-status stat-status--lost'
+                  : 'stat-status'
+            }
+          >
+            {game.status === 'IN_PROGRESS'
+              ? '▶ En juego'
+              : game.status === 'WON'
+                ? '✓ Victoria'
+                : '✗ Derrota'}
           </div>
         </div>
       </header>
@@ -104,8 +121,11 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
         <div
           style={{
             position: 'relative',
-            width: BOARD_SIZE,
-            height: BOARD_SIZE,
+            // Fluido: ocupa el ancho disponible (cuadrado) con tope en desktop.
+            // BOARD_SIZE queda como tamaño lógico del viewBox del SVG.
+            width: '100%',
+            maxWidth: BOARD_SIZE,
+            aspectRatio: '1 / 1',
           }}
         >
           <BoardComponent

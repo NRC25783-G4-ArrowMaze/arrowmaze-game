@@ -46,45 +46,50 @@ const App: React.FC = () => {
       // Inyectamos el proveedor nativo de Capacitor
       const tokenProvider = new CapacitorTokenProvider();
 
-      const [sceneResult, moduleResult] = await Promise.allSettled([
-        offlineMode
-          ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
-          : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2),
-        LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider),
-      ]);
+      // La escena NO espera a la persistencia: si SQLite tarda o falla (p.ej.
+      // wasm ausente en web), el juego debe abrir igual — sin guardado, pero
+      // jugable. Antes un allSettled conjunto dejaba la app en "Cargando..."
+      // para siempre si la factory colgaba.
+      const scenePromise = offlineMode
+        ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
+        : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2);
 
+      scenePromise
+        // fetchSceneWithFallback nunca rechaza (fallback interno); el catch es
+        // para que un throw inesperado no deje la app colgada.
+        .catch(() => SAMPLE_LEVEL_2)
+        .then((resolved) => { if (isMounted) setScene(resolved); });
+
+      let module: LocalProgressModule;
+      try {
+        module = await LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider);
+      } catch (error) {
+        console.error('Error arrancando el motor de base de datos', error);
+        return;
+      }
       if (!isMounted) return;
 
-      // fetchSceneWithFallback nunca rechaza (fallback interno); el allSettled
-      // es por simetría y para que un throw inesperado no deje la app colgada.
-      setScene(sceneResult.status === 'fulfilled' ? sceneResult.value : SAMPLE_LEVEL_2);
+      setProgressModule(module);
 
-      if (moduleResult.status === 'fulfilled') {
-        const module = moduleResult.value;
-        setProgressModule(module);
+      // Progreso inicial para el mapa de selección (C3)
+      module.getLocalProgress.getAll()
+        .then((progress) => { if (isMounted) setAllProgress(progress); })
+        .catch((error: unknown) => console.warn('[App] No se pudo cargar el progreso inicial:', error));
 
-        // Progreso inicial para el mapa de selección (C3)
-        module.getLocalProgress.getAll()
-          .then((progress) => { if (isMounted) setAllProgress(progress); })
-          .catch((error: unknown) => console.warn('[App] No se pudo cargar el progreso inicial:', error));
+      // Sincronización background (Bloque 4); en offline no hay backend.
+      if (!offlineMode) {
+        module.syncProgress.execute()
+          .then(() => console.log('[App] Sincronización background completada.'))
+          .catch(async (error: unknown) => {
+            console.warn('[App] Sincronización background detenida:', error);
 
-        // Sincronización background (Bloque 4); en offline no hay backend.
-        if (!offlineMode) {
-          module.syncProgress.execute()
-            .then(() => console.log('[App] Sincronización background completada.'))
-            .catch(async (error: unknown) => {
-              console.warn('[App] Sincronización background detenida:', error);
-
-              // Si el error es de sesión (401 SessionExpiredError),
-              // podemos borrar el token inválido automáticamente.
-              if (error instanceof Error && error.name === 'SessionExpiredError') {
-                await tokenProvider.removeToken();
-                // TODO: Despachar evento para redirigir al Login
-              }
-            });
-        }
-      } else {
-        console.error('Error arrancando el motor de base de datos', moduleResult.reason);
+            // Si el error es de sesión (401 SessionExpiredError),
+            // podemos borrar el token inválido automáticamente.
+            if (error instanceof Error && error.name === 'SessionExpiredError') {
+              await tokenProvider.removeToken();
+              // TODO: Despachar evento para redirigir al Login
+            }
+          });
       }
     };
 

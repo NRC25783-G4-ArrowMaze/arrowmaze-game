@@ -93,11 +93,11 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   return (
     <svg
       data-testid="board"
-      width={width}
-      height={height}
+      // width/height son las unidades LÓGICAS del viewBox; el elemento llena su
+      // contenedor y escala el contenido (el input ya reescala en toViewBoxPoint).
       viewBox={`0 0 ${width} ${height}`}
       onPointerDown={onPointerDown}
-      style={{ touchAction: 'none' }}
+      style={{ touchAction: 'none', display: 'block', width: '100%', height: '100%' }}
     >
       {/* Fondo blanco a pantalla completa (tema claro). */}
       <rect

@@ -50,10 +50,18 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
       }}
     >
       <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>Pausa</div>
-      <button onClick={onResume}>Reanudar</button>
-      <button onClick={onRestart}>Reiniciar</button>
-      <button onClick={onOpenSettings}>Ajustes</button>
-      <button onClick={onExit}>Salir</button>
+      <button className="btn-primary" onClick={onResume} style={{ minWidth: '180px' }}>
+        Reanudar
+      </button>
+      <button onClick={onRestart} style={{ minWidth: '180px' }}>
+        Reiniciar
+      </button>
+      <button onClick={onOpenSettings} style={{ minWidth: '180px' }}>
+        Ajustes
+      </button>
+      <button onClick={onExit} style={{ minWidth: '180px' }}>
+        Salir
+      </button>
     </div>
   );
 };
