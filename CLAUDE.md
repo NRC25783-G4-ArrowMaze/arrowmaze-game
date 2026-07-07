@@ -36,8 +36,10 @@ src/
 │   ├── use-cases/     # BuildBoardUseCase, LevelLoader, PlaceArrowUseCase, AdvanceArrowUseCase,
 │   │                  # PlayMoveUseCase, SlideArrowUseCase, QueryTopologyUseCase,
 │   │                  # SaveLocalProgress, GetLocalProgress, SyncOfflineProgress, SyncProgress
-│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs
-│   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder
+│   ├── dtos/          # ArrowDTOs, MovementDTOs, GameDTOs, SessionDTOs, SlideDTOs, LevelDataDTOs,
+│   │                  # GameFlowDTOs (C1)
+│   ├── services/      # LevelDataArrowBuilder, LevelDataBoardBuilder, GameFlowController (C1)
+│   ├── errors/        # GameFlowErrors (C1)
 │   └── ports/         # IArrowBuilder, IBoardBuilder, ILocalProgressRepository,
 │                      # IProgressApiClient, IAuthTokenProvider
 ├── infrastructure/    # Layer 3 — Frameworks, adapters
