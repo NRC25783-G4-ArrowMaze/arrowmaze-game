@@ -80,7 +80,10 @@ export const ArrowBurst: React.FC<ArrowBurstProps> = ({ origin, color, cellSize 
     let raf = 0;
     const start = performance.now();
     const frame = (now: number): void => {
-      const p = Math.min((now - start) / BURST_MS, 1);
+      // El timestamp del primer frame puede ser ANTERIOR al performance.now()
+      // capturado arriba: sin el clamp inferior, un progreso negativo produce
+      // radios negativos en el anillo (error de <circle> en consola).
+      const p = Math.min(Math.max((now - start) / BURST_MS, 0), 1);
       setProgress(p);
       if (p < 1) {
         raf = requestAnimationFrame(frame);

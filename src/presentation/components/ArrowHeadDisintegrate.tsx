@@ -111,7 +111,9 @@ export const ArrowHeadDisintegrate: React.FC<ArrowHeadDisintegrateProps> = ({
     let raf = 0;
     const start = performance.now();
     const frame = (now: number): void => {
-      const p = Math.min((now - start) / DISINTEGRATE_MS, 1);
+      // Clamp inferior: el timestamp del primer frame puede preceder al
+      // performance.now() capturado arriba (mismo caso que ArrowBurst).
+      const p = Math.min(Math.max((now - start) / DISINTEGRATE_MS, 0), 1);
       setProgress(p);
       if (p < 1) {
         raf = requestAnimationFrame(frame);
