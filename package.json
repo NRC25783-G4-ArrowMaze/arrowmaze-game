@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:apk": "tsc -b && vite build --mode offline",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs",
