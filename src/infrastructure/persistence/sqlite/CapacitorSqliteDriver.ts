@@ -1,9 +1,14 @@
 import { CapacitorSQLite, SQLiteConnection, type SQLiteDBConnection } from '@capacitor-community/sqlite';
+import { Capacitor } from '@capacitor/core';
 import { type IDatabaseDriver } from './sqliteProgressRepository';
 
 export class CapacitorSqliteDriver implements IDatabaseDriver {
   private readonly _sqlite: SQLiteConnection;
   private _db: SQLiteDBConnection | null = null;
+
+  /** En web la BD vive en memoria (jeep-sqlite): hay que volcarla al store tras cada mutación. */
+  private readonly _isWeb = Capacitor.getPlatform() === 'web';
+  private _dbName = '';
 
   constructor() {
     // Inicializamos el puente nativo de Capacitor
@@ -15,6 +20,7 @@ export class CapacitorSqliteDriver implements IDatabaseDriver {
    */
   async openDatabase(dbName: string = 'game_progress_db'): Promise<void> {
     try {
+      this._dbName = dbName;
       // Verifica si la conexión ya existe para evitar errores en recargas en caliente (HMR de Vite)
       const isConnection = await this._sqlite.isConnection(dbName, false);
       
@@ -47,6 +53,10 @@ export class CapacitorSqliteDriver implements IDatabaseDriver {
         return (result.values as T[]) || [];
       } else {
         await this._db.run(query, params);
+        if (this._isWeb) {
+          // Vuelca la BD en memoria al IndexedDB de jeep-sqlite (en nativo no aplica).
+          await this._sqlite.saveToStore(this._dbName);
+        }
         return [];
       }
     } catch (error) {
