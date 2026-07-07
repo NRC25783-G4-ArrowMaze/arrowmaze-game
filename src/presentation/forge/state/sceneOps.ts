@@ -154,6 +154,10 @@ export function rotateHead(scene: Scene, arrowId: string): Scene {
   const arrow = scene.arrows.find((a) => a.id === arrowId)
   if (!arrow) return scene
 
+  // Solo tiene sentido rotar cuando la flecha aún no tiene cuerpo: en cuanto hay
+  // un primer segmento, el exitPort queda determinado por él (ver extendArrow).
+  if (arrow.body.length > 0) return scene
+
   const newExitPort = (arrow.head.exitPort + 1) % 4
   const newArrows = scene.arrows.map((a) =>
     a.id === arrowId ? { ...a, head: { ...a.head, exitPort: newExitPort } } : a,
@@ -180,6 +184,23 @@ function isConnectedTo(scene: Scene, fromCellId: string, toCellId: string): bool
   )
 }
 
+/**
+ * Devuelve el puerto del lado de `fromCellId` en la conexión que la une con
+ * `toCellId`, o null si no hay conexión. Es el puerto por el que se "sale" de
+ * fromCell hacia toCell.
+ */
+export function portBetween(
+  scene: Scene,
+  fromCellId: string,
+  toCellId: string,
+): number | null {
+  for (const c of scene.connections) {
+    if (c.fromCell === fromCellId && c.toCell === toCellId) return c.fromPort
+    if (c.fromCell === toCellId && c.toCell === fromCellId) return c.toPort
+  }
+  return null
+}
+
 export function extendArrow(scene: Scene, arrowId: string, cellId: string): Scene | null {
   const arrow = scene.arrows.find((a) => a.id === arrowId)
   if (!arrow) return null
@@ -196,10 +217,19 @@ export function extendArrow(scene: Scene, arrowId: string, cellId: string): Scen
   // Verificar adyacencia y conexión
   if (!isConnectedTo(scene, lastCell, cellId)) return null
 
-  // Extender
-  const newArrows = scene.arrows.map((a) =>
-    a.id === arrowId ? { ...a, body: [...a.body, cellId] } : a,
-  )
+  // Al añadir el PRIMER segmento, el exitPort de la cabeza debe apuntar al puerto
+  // por el que la flecha sale de la cabeza hacia ese primer segmento. Así el
+  // exitPort siempre es coherente con el cuerpo (regla del dominio) y la cabeza
+  // no se ve "apuntando al lado contrario".
+  const isFirstSegment = arrow.body.length === 0
+  const derivedExitPort = isFirstSegment ? portBetween(scene, arrow.head.cellId, cellId) : null
+
+  const newArrows = scene.arrows.map((a) => {
+    if (a.id !== arrowId) return a
+    const head =
+      derivedExitPort !== null ? { ...a.head, exitPort: derivedExitPort } : a.head
+    return { ...a, head, body: [...a.body, cellId] }
+  })
 
   return { ...scene, arrows: newArrows }
 }
