@@ -17,6 +17,11 @@ interface GameViewProps {
   progressModule: LocalProgressModule | null;
   /** Si se provee, muestra un botón para volver al mapa de selección (C3). */
   onBack?: () => void;
+  /**
+   * Si se provee, el overlay de victoria ofrece avanzar directo al siguiente
+   * nivel del mapa sin pasar por la selección.
+   */
+  onNextLevel?: () => void;
 }
 
 /**
@@ -32,7 +37,7 @@ interface GameViewProps {
  *      colisión o salida, reproyectando la forma real del dominio en cada paso.
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
-export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack }) => {
+export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel }) => {
   const game = useGameController(scene);
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
@@ -137,7 +142,12 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             vanishing={game.vanishing ?? undefined}
             headDisintegrating={game.headDisintegrating ?? undefined}
           />
-          <GameOverlay status={game.status} score={game.score} />
+          <GameOverlay
+            status={game.status}
+            score={game.score}
+            onNextLevel={onNextLevel}
+            onBackToMap={onBack}
+          />
           <PauseOverlay
             visible={game.flowState === 'PAUSED'}
             onResume={game.resume}

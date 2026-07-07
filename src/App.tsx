@@ -7,9 +7,17 @@ import type { Scene } from './presentation/game/scene';
 import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
 import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
 import { LOCAL_LEVELS } from './presentation/game/levels/localLevels';
+import { LEVEL_MAP } from './presentation/game/levelMap';
+import { LevelSelectionProjection } from './domain/services/LevelSelectionProjection';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 import type { LevelProgress } from './domain/entities/LevelProgress';
+
+/** Siguiente nivel en el orden del LEVEL_MAP, o undefined si es el último. */
+const nextLevelIdOf = (levelId: string): string | undefined => {
+  const index = LEVEL_MAP.findIndex((node) => node.levelId === levelId);
+  return index === -1 ? undefined : LEVEL_MAP[index + 1]?.levelId;
+};
 
 const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
   'level-initial': { name: 'Nivel Inicial', difficulty: 'Fácil' },
@@ -120,6 +128,38 @@ const App: React.FC = () => {
       .catch((error: unknown) => console.warn('[App] No se pudo recargar el progreso:', error));
   };
 
+  // Siguiente nivel en el orden del mapa (undefined tras el último).
+  const nextLevelId = scene === null ? undefined : nextLevelIdOf(scene.id);
+
+  // Avance directo al siguiente nivel desde el overlay de victoria, sin pasar
+  // por el mapa. Verifica el desbloqueo con el progreso fresco (el récord se
+  // guardó al ganar): si el siguiente sigue bloqueado (p.ej. 'advanced' exige
+  // ambos intermedios), cae al mapa para que el jugador elija.
+  const handleNextLevel = async () => {
+    const nextScene = nextLevelId === undefined ? undefined : LOCAL_LEVELS[nextLevelId];
+    if (nextScene === undefined) {
+      handleBackToSelect();
+      return;
+    }
+
+    if (progressModule !== null) {
+      try {
+        const progress = await progressModule.getLocalProgress.getAll();
+        setAllProgress(progress);
+        const nodes = LevelSelectionProjection.project(LEVEL_MAP, progress);
+        if (nodes.find((n) => n.levelId === nextLevelId)?.state === 'bloqueado') {
+          setScreen('SELECT');
+          return;
+        }
+      } catch (error: unknown) {
+        console.warn('[App] No se pudo verificar el desbloqueo del siguiente nivel:', error);
+      }
+    }
+
+    console.log(`[App] Avanzando al siguiente nivel: ${nextLevelId}`);
+    setScene(nextScene);
+  };
+
   if (scene === null) {
     return (
       <div className="app">
@@ -146,7 +186,17 @@ const App: React.FC = () => {
     );
   }
 
-  return <GameView scene={scene} progressModule={progressModule} onBack={handleBackToSelect} />;
+  return (
+    <GameView
+      // key: useGameController congela la Scene en el primer render; el remount
+      // por id es lo que arranca la partida nueva al avanzar de nivel.
+      key={scene.id}
+      scene={scene}
+      progressModule={progressModule}
+      onBack={handleBackToSelect}
+      onNextLevel={nextLevelId === undefined ? undefined : handleNextLevel}
+    />
+  );
 };
 
 export default App;
