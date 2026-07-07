@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GameController } from './GameController';
 import type { Scene } from './scene';
 import type { GameStatus } from '../../domain/entities/GameSession';
+import type { GameFlowState } from '../../application/dtos/GameFlowDTOs';
+import { GameFlowController } from '../../application/services/GameFlowController';
 import type { BoardViewModel } from '../viewModel';
 import type { PlayMoveCommand } from '../input/PlayMoveCommand';
 
@@ -79,6 +81,18 @@ export interface GameControllerState {
   headDisintegrating: HeadDisintegratingSignal | null;
   /** Inicia un slide: avanza la flecha tick-a-tick hasta colisión o salida. */
   playMove: (command: PlayMoveCommand) => void;
+  /** Tope de la pila de flujo (C1). Solo con 'ACTIVE' el tablero recibe input. */
+  flowState: GameFlowState;
+  /** Apila PAUSED. No-op si hay un slide en vuelo (se pausa entre jugadas). */
+  pause: () => void;
+  /** Desapila PAUSED y retoma exactamente donde quedó. */
+  resume: () => void;
+  /** Apila SETTINGS sobre PAUSED. */
+  openSettings: () => void;
+  /** Desapila SETTINGS: vuelve a PAUSED, nunca directo a ACTIVE. */
+  closeSettings: () => void;
+  /** Descarta la partida y arranca una nueva sobre la misma escena (pila → [ACTIVE]). */
+  restart: () => void;
 }
 
 /**
@@ -97,7 +111,12 @@ export interface GameControllerState {
 export function useGameController(scene: Scene): GameControllerState {
   // Instancia estable del controlador: el inicializador de useState corre una vez.
   // Se sostiene en estado (no en ref) para poder leerla durante el render.
-  const [controller] = useState(() => new GameController(scene));
+  // restart() la reemplaza por una fresca (misma escena, GameSession nueva).
+  const [controller, setController] = useState(() => new GameController(scene));
+
+  // Autómata de pila del flujo de partida (C1). Envuelve la GameSession viva;
+  // sobrevive al restart (solo cambia la sesión que envuelve).
+  const [flow] = useState(() => new GameFlowController(controller.gameSession));
 
   // Cada tick bumpea la versión → recalcula las proyecciones derivadas.
   const [version, setVersion] = useState(0);
@@ -172,10 +191,17 @@ export function useGameController(scene: Scene): GameControllerState {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [controller, version],
   );
+  const flowState = useMemo(
+    () => flow.current,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [flow, version],
+  );
 
   const playMove = useCallback(
     (command: PlayMoveCommand): void => {
-      if (controller.status !== 'IN_PROGRESS') {
+      // Rule C1: solo el tope ACTIVE de la pila recibe input — con PAUSED/SETTINGS
+      // apilados, ningún PlayMoveCommand llega al motor.
+      if (controller.status !== 'IN_PROGRESS' || flow.current !== 'ACTIVE') {
         return;
       }
       setInFlight(true);
@@ -294,8 +320,52 @@ export function useGameController(scene: Scene): GameControllerState {
 
       step();
     },
-    [controller],
+    [controller, flow],
   );
+
+  // ─── Acciones de flujo (C1) ────────────────────────────────────────────
+  // Wrappers finos sobre GameFlowController: la validación (y el
+  // InvalidFlowTransitionError) es del autómata; aquí solo se re-renderiza.
+
+  const pause = useCallback((): void => {
+    // Detalle de presentación: no se pausa a mitad de un slide en vuelo;
+    // el toque de pausa se descarta igual que el input de tablero (B2).
+    if (inFlight) {
+      return;
+    }
+    flow.pause();
+    setVersion((v) => v + 1);
+  }, [flow, inFlight]);
+
+  const resume = useCallback((): void => {
+    flow.resume();
+    setVersion((v) => v + 1);
+  }, [flow]);
+
+  const openSettings = useCallback((): void => {
+    flow.openSettings();
+    setVersion((v) => v + 1);
+  }, [flow]);
+
+  const closeSettings = useCallback((): void => {
+    flow.closeSettings();
+    setVersion((v) => v + 1);
+  }, [flow]);
+
+  const restart = useCallback((): void => {
+    // La nueva partida se construye ANTES de transicionar: si la pila no está
+    // en PAUSED, flow.restart lanza y el controller actual queda intacto.
+    const fresh = new GameController(scene);
+    flow.restart(fresh.gameSession);
+    setController(fresh);
+    // Limpia los residuos visuales de la partida descartada.
+    setRenderOverride(null);
+    setCollision(null);
+    setVanishing(null);
+    setHeadDisintegrating(null);
+    setInFlight(false);
+    setVersion((v) => v + 1);
+  }, [flow, scene]);
 
   return {
     controller,
@@ -308,5 +378,11 @@ export function useGameController(scene: Scene): GameControllerState {
     vanishing,
     headDisintegrating,
     playMove,
+    flowState,
+    pause,
+    resume,
+    openSettings,
+    closeSettings,
+    restart,
   };
 }

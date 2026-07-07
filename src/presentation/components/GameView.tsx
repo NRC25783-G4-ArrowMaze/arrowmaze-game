@@ -67,8 +67,9 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
     width: BOARD_SIZE,
     height: BOARD_SIZE,
     layout,
-    // Bloqueo: input deshabilitado en estado terminal o con un slide en vuelo.
-    enabled: game.status === 'IN_PROGRESS' && !game.inFlight,
+    // Bloqueo: input deshabilitado en estado terminal, con un slide en vuelo,
+    // o cuando el tope de la pila de flujo no es ACTIVE (C1: PAUSED/SETTINGS).
+    enabled: game.status === 'IN_PROGRESS' && !game.inFlight && game.flowState === 'ACTIVE',
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
     onPlayMove: (command) => game.playMove(command),
   });
