@@ -52,12 +52,17 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
       const startedAt = levelStartRef.current ?? Date.now();
       const timeElapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
 
+      // En el build offline no hay backend: se guarda local y no se sincroniza.
+      const offlineMode = import.meta.env.VITE_OFFLINE_MODE === 'true';
+
       progressModule.saveLocalProgress
         .execute(scene.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
           console.log(`[GameView] Progreso local guardado para el nivel ${scene.id}`);
           // Intentamos subir el récord de inmediato tras ganar, si hay internet.
-          return progressModule.syncProgress.execute();
+          if (!offlineMode) {
+            return progressModule.syncProgress.execute();
+          }
         })
         .catch((error: unknown) => {
           console.error('[GameView] Error guardando o sincronizando el récord:', error);
