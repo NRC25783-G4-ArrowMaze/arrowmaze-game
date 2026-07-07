@@ -46,7 +46,7 @@ export interface ForgeState {
   extendArrow: (arrowId: string, cellId: string) => void
   retractArrow: (arrowId: string) => void
   deleteArrow: (arrowId: string) => void
-  setLevelProps: (id?: string, name?: string, difficulty?: string, allowedMoves?: number) => void
+  setLevelProps: (updates: Partial<Scene>) => void
 
   // Historial
   undo: () => void
@@ -129,14 +129,8 @@ export const useForgeStore = create<ForgeState>((set) => {
     deleteArrow: (arrowId) => {
       commit((scene) => sceneOps.deleteArrow(scene, arrowId))
     },
-    setLevelProps: (id, name, difficulty, allowedMoves) => {
-      commit((scene) => ({
-        ...scene,
-        ...(id !== undefined && { id }),
-        ...(name !== undefined && { name }),
-        ...(difficulty !== undefined && { difficulty }),
-        ...(allowedMoves !== undefined && { allowedMoves }),
-      }))
+    setLevelProps: (updates) => {
+      commit((scene) => ({ ...scene, ...updates }))
     },
 
     // Undo/Redo

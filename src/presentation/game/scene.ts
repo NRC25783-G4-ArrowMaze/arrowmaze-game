@@ -39,6 +39,8 @@ export type CollisionBehavior = 'stay' | 'return'
 
 export interface Scene {
   id: string
+  name?: string
+  difficulty?: string
   allowedMoves: number
   cells: SceneCell[]
   connections: LevelConnectionDTO[]

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { useForgeStore, type ToolMode } from './state/forgeStore'
 import { ForgeCanvas } from './components/ForgeCanvas'
+import { LevelPropertiesPanel } from './components/LevelPropertiesPanel'
+import { ValidationPanel } from './components/ValidationPanel'
 
 const TOOL_HINTS: Record<ToolMode, string> = {
   select: 'Clic en una flecha para seleccionarla. R rota su cabeza.',
@@ -26,10 +28,14 @@ const ForgeApp: React.FC = () => {
   const gridRows = useForgeStore((s) => s.gridRows)
   const tool = useForgeStore((s) => s.tool)
   const selectedArrowId = useForgeStore((s) => s.selectedArrowId)
+  const history = useForgeStore((s) => s.history)
   const setTool = useForgeStore((s) => s.setTool)
+  const setGridCols = useForgeStore((s) => s.setGridCols)
+  const setGridRows = useForgeStore((s) => s.setGridRows)
   const selectArrow = useForgeStore((s) => s.selectArrow)
   const setPendingConnect = useForgeStore((s) => s.setPendingConnect)
   const rotateHead = useForgeStore((s) => s.rotateHead)
+  const setLevelProps = useForgeStore((s) => s.setLevelProps)
   const undo = useForgeStore((s) => s.undo)
   const redo = useForgeStore((s) => s.redo)
 
@@ -92,7 +98,7 @@ const ForgeApp: React.FC = () => {
           </select>
           <span style={{ fontSize: '12px', color: '#0369a1' }}>{TOOL_HINTS[tool]}</span>
           <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#666' }}>
-            Ctrl+Z: undo | Ctrl+Shift+Z: redo | R: rotate | Esc: deselect
+            Ctrl+Z: undo ({history.past.length}) | Ctrl+Shift+Z: redo ({history.future.length}) | R: rotate | Esc: deselect
           </span>
         </div>
 
@@ -127,17 +133,22 @@ const ForgeApp: React.FC = () => {
           </p>
         </div>
 
-        {/* Placeholders para paneles futuros */}
-        <div style={{ padding: '8px', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #ccc' }}>
-          <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>
-            [TODO: LevelPropertiesPanel - Fase 4]
-          </p>
-        </div>
-        <div style={{ padding: '8px', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #ccc' }}>
-          <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>
-            [TODO: ValidationPanel - Fase 4]
-          </p>
-        </div>
+        {/* Panel de Propiedades */}
+        <LevelPropertiesPanel
+          scene={scene}
+          gridCols={gridCols}
+          gridRows={gridRows}
+          onSceneUpdate={setLevelProps}
+          onGridUpdate={(cols, rows) => {
+            setGridCols(cols)
+            setGridRows(rows)
+          }}
+        />
+
+        {/* Panel de Validación */}
+        <ValidationPanel scene={scene} />
+
+        {/* TODO: PublishPanel - Fase 6 */}
         <div style={{ padding: '8px', backgroundColor: '#fff', borderRadius: '4px', border: '1px solid #ccc' }}>
           <p style={{ margin: 0, fontSize: '12px', color: '#999' }}>
             [TODO: PublishPanel - Fase 6]
