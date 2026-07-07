@@ -1,6 +1,15 @@
 import React, { useEffect } from 'react'
-import { useForgeStore } from './state/forgeStore'
+import { useForgeStore, type ToolMode } from './state/forgeStore'
 import { ForgeCanvas } from './components/ForgeCanvas'
+
+const TOOL_HINTS: Record<ToolMode, string> = {
+  select: 'Clic en una flecha para seleccionarla. R rota su cabeza.',
+  cell: 'Clic en un slot vacío para crear celda; clic en celda existente para borrarla.',
+  connect: 'Clic en un puerto (N/E/S/O) de una celda y luego en un puerto de otra. Cualquier par sirve.',
+  arrowHead: 'Clic en una celda libre para colocar la cabeza de una flecha.',
+  extend: 'Selecciona una flecha (clic) y luego clic en una celda conectada resaltada para extenderla.',
+  erase: 'Clic en una flecha para eliminarla.',
+}
 
 /**
  * ForgeApp — Shell principal del editor de niveles.
@@ -19,6 +28,7 @@ const ForgeApp: React.FC = () => {
   const selectedArrowId = useForgeStore((s) => s.selectedArrowId)
   const setTool = useForgeStore((s) => s.setTool)
   const selectArrow = useForgeStore((s) => s.selectArrow)
+  const setPendingConnect = useForgeStore((s) => s.setPendingConnect)
   const rotateHead = useForgeStore((s) => s.rotateHead)
   const undo = useForgeStore((s) => s.undo)
   const redo = useForgeStore((s) => s.redo)
@@ -41,15 +51,16 @@ const ForgeApp: React.FC = () => {
         e.preventDefault()
         rotateHead(selectedArrowId)
       }
-      // Escape: deseleccionar
+      // Escape: deseleccionar y cancelar conexión pendiente
       if (e.key === 'Escape') {
         selectArrow(null)
+        setPendingConnect(null)
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [undo, redo, selectedArrowId, selectArrow, rotateHead])
+  }, [undo, redo, selectedArrowId, selectArrow, setPendingConnect, rotateHead])
 
   return (
     <div style={{ display: 'flex', height: '100vh', gap: '16px', padding: '16px' }}>
@@ -79,6 +90,7 @@ const ForgeApp: React.FC = () => {
             <option value="extend">Extend</option>
             <option value="erase">Erase</option>
           </select>
+          <span style={{ fontSize: '12px', color: '#0369a1' }}>{TOOL_HINTS[tool]}</span>
           <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#666' }}>
             Ctrl+Z: undo | Ctrl+Shift+Z: redo | R: rotate | Esc: deselect
           </span>

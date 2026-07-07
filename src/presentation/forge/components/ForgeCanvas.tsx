@@ -23,12 +23,12 @@ interface ForgeCanvasProps {
 const BOARD_SIZE = 560
 const BACKGROUND_COLOR = '#f5f5f5'
 const GHOST_DOT_COLOR = '#ddd'
-const GHOST_DOT_RADIUS_RATIO = 0.15
-const CELL_DOT_COLOR = '#000'
-const CELL_DOT_RADIUS_RATIO = 0.2
-const CELL_BORDER_WIDTH = 1.5
-const ARROW_BODY_STROKE_WIDTH = 3
-const ARROW_HEAD_INDICATOR_LENGTH = 12
+const GHOST_DOT_RADIUS_RATIO = 0.12
+// Celdas: tiles claros (el tablero). Las flechas se dibujan encima con color.
+const CELL_TILE_RATIO = 0.72 // lado del tile como fracción de cellSize
+const CELL_TILE_FILL = '#e8e8e8'
+const CELL_TILE_STROKE = '#bbb'
+const CELL_TILE_STROKE_SELECTED = '#ff6b6b'
 
 /**
  * ForgeCanvas — Lienzo SVG de edición del nivel.
@@ -52,9 +52,10 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
   const tool = useForgeStore((s) => s.tool)
   const addCell = useForgeStore((s) => s.addCell)
   const removeCell = useForgeStore((s) => s.removeCell)
-  const toggleConnection = useForgeStore((s) => s.toggleConnection)
-  const setPendingConnectFrom = useForgeStore((s) => s.setPendingConnectFrom)
-  const pendingConnectFrom = useForgeStore((s) => s.pendingConnectFrom)
+  const connectPorts = useForgeStore((s) => s.connectPorts)
+  const disconnectPort = useForgeStore((s) => s.disconnectPort)
+  const setPendingConnect = useForgeStore((s) => s.setPendingConnect)
+  const pendingConnect = useForgeStore((s) => s.pendingConnect)
   const placeHead = useForgeStore((s) => s.placeHead)
   const selectArrow = useForgeStore((s) => s.selectArrow)
   const extendArrow = useForgeStore((s) => s.extendArrow)
@@ -83,9 +84,48 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
   }
 
   const ghostRadius = GHOST_DOT_RADIUS_RATIO * cellSize
-  const cellRadius = CELL_DOT_RADIUS_RATIO * cellSize
+  const tileSize = CELL_TILE_RATIO * cellSize
+  const portDist = tileSize / 2
 
-  // Manejo de clicks
+  // Posición en pixeles de un puerto de una celda (centro del tile + delta del puerto)
+  const portPoint = (center: Point, port: number): Point => {
+    const d = portDelta(port)
+    return { x: center.x + d.dCol * portDist, y: center.y + d.dRow * portDist }
+  }
+
+  // Click en un puerto (solo modo connect). Lógica puerto-a-puerto.
+  const handlePortClick = (cellId: string, port: number) => {
+    const existing = sceneOps.portConnection(scene, cellId, port)
+
+    if (!pendingConnect) {
+      // Sin pendiente: si el puerto ya está conectado, desconectar; si no, marcar origen.
+      if (existing) {
+        disconnectPort(cellId, port)
+      } else {
+        setPendingConnect({ cellId, port })
+      }
+      return
+    }
+
+    // Hay un origen pendiente
+    if (pendingConnect.cellId === cellId && pendingConnect.port === port) {
+      // Click en el mismo puerto: cancelar
+      setPendingConnect(null)
+      return
+    }
+
+    if (existing) {
+      // Destino ocupado: un puerto solo admite una conexión. Cancela la selección.
+      setPendingConnect(null)
+      return
+    }
+
+    // Crear conexión origen → destino (cualquier par de puertos, sin exigir opuestos)
+    connectPorts(pendingConnect.cellId, pendingConnect.port, cellId, port)
+    setPendingConnect(null)
+  }
+
+  // Manejo de clicks a nivel de celda (para tools que no son connect)
   const handleCellClick = (col: number, row: number) => {
     const cellId = sceneOps.cellIdAt(col, row)
     const isCellOccupied = occupiedCells.has(cellId)
@@ -102,19 +142,9 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
         addCell(col, row)
       }
     } else if (tool === 'connect') {
-      if (isCellOccupied) {
-        if (!pendingConnectFrom) {
-          // Primer click: marcar este como origen
-          setPendingConnectFrom(cellId)
-        } else if (pendingConnectFrom === cellId) {
-          // Click en el mismo: cancelar
-          setPendingConnectFrom(null)
-        } else {
-          // Segundo click: intentar conectar
-          toggleConnection(pendingConnectFrom, cellId)
-          setPendingConnectFrom(null)
-        }
-      }
+      // En modo connect, los clicks en celda vacía cancelan la selección pendiente.
+      // (Los clicks en puertos los maneja handlePortClick vía sus propios elementos.)
+      if (pendingConnect) setPendingConnect(null)
     } else if (tool === 'arrowHead') {
       if (!isCellOccupied) {
         // Click en celda libre: colocar cabeza de flecha
@@ -183,33 +213,31 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
           />
         ))}
 
-      {/* Capa 3: Celdas (existentes) */}
+      {/* Capa 3: Celdas (existentes) — tiles claros del tablero */}
       {scene.cells.map((cell) => {
         const center = cellCenter(cell.col, cell.row, cellSize, offset)
-        const isHighlighted =
-          tool === 'connect' && (pendingConnectFrom === cell.id || pendingConnectFrom !== null)
-        const squareSize = cellRadius * 2
+        const isConnectPending = tool === 'connect' && pendingConnect?.cellId === cell.id
         return (
           <g key={`cell-${cell.id}`} style={{ pointerEvents: 'auto' }}>
-            {/* Cuadrado relleno */}
+            {/* Tile de fondo */}
             <rect
-              x={center.x - squareSize / 2}
-              y={center.y - squareSize / 2}
-              width={squareSize}
-              height={squareSize}
-              fill={isHighlighted ? '#ff6b6b' : CELL_DOT_COLOR}
-              stroke={isHighlighted ? '#cc0000' : '#666'}
-              strokeWidth={CELL_BORDER_WIDTH}
-              rx={2}
+              x={center.x - tileSize / 2}
+              y={center.y - tileSize / 2}
+              width={tileSize}
+              height={tileSize}
+              fill={CELL_TILE_FILL}
+              stroke={isConnectPending ? CELL_TILE_STROKE_SELECTED : CELL_TILE_STROKE}
+              strokeWidth={isConnectPending ? 3 : 1.5}
+              rx={4}
             />
-            {/* Etiqueta de id */}
+            {/* Etiqueta de id (esquina superior izquierda, tenue) */}
             <text
-              x={center.x}
-              y={center.y}
-              textAnchor="middle"
-              dominantBaseline="middle"
-              fontSize="10"
-              fill="#fff"
+              x={center.x - tileSize / 2 + 4}
+              y={center.y - tileSize / 2 + 4}
+              textAnchor="start"
+              dominantBaseline="hanging"
+              fontSize="9"
+              fill="#999"
               pointerEvents="none"
               data-testid={`cell-${cell.id}`}
             >
@@ -219,8 +247,7 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
         )
       })}
 
-      {/* Capa 4: Conexiones (TODO: Fase 2+) */}
-      {/* Líneas entre celdas conectadas */}
+      {/* Capa 4: Conexiones — líneas puerto-a-puerto */}
       {scene.connections.map((conn, idx) => {
         const fromCell = scene.cells.find((c) => c.id === conn.fromCell)
         const toCell = scene.cells.find((c) => c.id === conn.toCell)
@@ -228,37 +255,79 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
 
         const fromCenter = cellCenter(fromCell.col, fromCell.row, cellSize, offset)
         const toCenter = cellCenter(toCell.col, toCell.row, cellSize, offset)
+        const fromPort = portPoint(fromCenter, conn.fromPort)
+        const toPort = portPoint(toCenter, conn.toPort)
 
         return (
-          <line
-            key={`connection-${idx}`}
-            x1={fromCenter.x}
-            y1={fromCenter.y}
-            x2={toCenter.x}
-            y2={toCenter.y}
-            stroke="#aaa"
-            strokeWidth={2}
-            opacity={0.5}
-            data-testid={`connection-${conn.fromCell}-${conn.toCell}`}
-          />
+          <g key={`connection-${idx}`}>
+            {/* Línea entre los dos puertos */}
+            <line
+              x1={fromPort.x}
+              y1={fromPort.y}
+              x2={toPort.x}
+              y2={toPort.y}
+              stroke="#7c9cb5"
+              strokeWidth={2.5}
+              opacity={0.7}
+              data-testid={`connection-${conn.fromCell}-${conn.toCell}`}
+            />
+            {/* Puntos en cada extremo (marcan el puerto exacto) */}
+            <circle cx={fromPort.x} cy={fromPort.y} r={3} fill="#5a7d99" />
+            <circle cx={toPort.x} cy={toPort.y} r={3} fill="#5a7d99" />
+          </g>
         )
       })}
 
-      {/* Capa 5: Flechas */}
+      {/* Capa 4b: Puertos clicables (solo en modo connect) */}
+      {tool === 'connect' &&
+        scene.cells.map((cell) => {
+          const center = cellCenter(cell.col, cell.row, cellSize, offset)
+          return [0, 1, 2, 3].map((port) => {
+            const pt = portPoint(center, port)
+            const isConnected = sceneOps.portConnection(scene, cell.id, port) !== null
+            const isPending =
+              pendingConnect?.cellId === cell.id && pendingConnect?.port === port
+            const fill = isPending ? '#ff6b6b' : isConnected ? '#5a7d99' : '#fff'
+            return (
+              <circle
+                key={`port-${cell.id}-${port}`}
+                cx={pt.x}
+                cy={pt.y}
+                r={7}
+                fill={fill}
+                stroke="#333"
+                strokeWidth={1.5}
+                style={{ cursor: 'pointer', pointerEvents: 'auto' }}
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  handlePortClick(cell.id, port)
+                }}
+                data-testid={`port-${cell.id}-${port}`}
+              />
+            )
+          })
+        })}
+
+      {/* Capa 5: Flechas — formas coloridas grandes sobre los tiles */}
       {scene.arrows.length > 0 && (
         <g data-testid="arrows-layer">
           {scene.arrows.map((arrow, arrowIndex) => {
             const headCell = scene.cells.find((c) => c.id === arrow.head.cellId)
             if (!headCell) {
-              console.warn(`[ForgeCanvas] Arrow ${arrow.id} head cell not found: ${arrow.head.cellId}`)
+              console.warn(
+                `[ForgeCanvas] Arrow ${arrow.id} head cell not found: ${arrow.head.cellId}`,
+              )
               return null
             }
 
-            const centers: Point[] = [cellCenter(headCell.col, headCell.row, cellSize, offset)]
+            const headCenter = cellCenter(headCell.col, headCell.row, cellSize, offset)
+            const centers: Point[] = [headCenter]
             for (const bodyId of arrow.body) {
               const bodyCell = scene.cells.find((c) => c.id === bodyId)
               if (!bodyCell) {
-                console.warn(`[ForgeCanvas] Arrow ${arrow.id} body cell not found: ${bodyId}`)
+                console.warn(
+                  `[ForgeCanvas] Arrow ${arrow.id} body cell not found: ${bodyId}`,
+                )
                 continue
               }
               centers.push(cellCenter(bodyCell.col, bodyCell.row, cellSize, offset))
@@ -266,81 +335,83 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
 
             const color = DEFAULT_ARROW_PALETTE[arrowIndex % DEFAULT_ARROW_PALETTE.length]
             const isSelected = arrow.id === selectedArrowId
-            const strokeWidth = isSelected ? 3 : ARROW_BODY_STROKE_WIDTH
-            const strokeColor = isSelected ? '#ff6b6b' : color
+            const bodyWidth = tileSize * 0.32
+            const nodeRadius = tileSize * 0.28
+            const dir = portDelta(arrow.head.exitPort)
+            const tipCenter = centers[centers.length - 1]
 
-            if (centers.length === 0) return null
+            // Triángulo de la punta, orientado según exitPort, en la última celda
+            const tipLen = tileSize * 0.4
+            const tipHalf = tileSize * 0.28
+            const perpX = -dir.dRow
+            const perpY = dir.dCol
+            const apexX = tipCenter.x + dir.dCol * tipLen
+            const apexY = tipCenter.y + dir.dRow * tipLen
+            const b1X = tipCenter.x + perpX * tipHalf
+            const b1Y = tipCenter.y + perpY * tipHalf
+            const b2X = tipCenter.x - perpX * tipHalf
+            const b2Y = tipCenter.y - perpY * tipHalf
 
-        return (
-          <g key={`arrow-${arrow.id}`}>
-            {/* Líneas conectando centros */}
-            {centers.length > 1 &&
-              centers.map((point, i) => {
-                if (i === 0) return null
-                const prev = centers[i - 1]
-                return (
-                  <line
-                    key={`arrow-${arrow.id}-segment-${i}`}
-                    x1={prev.x}
-                    y1={prev.y}
-                    x2={point.x}
-                    y2={point.y}
-                    stroke={strokeColor}
-                    strokeWidth={strokeWidth}
-                    opacity={0.8}
-                    pointerEvents="none"
+            return (
+              <g key={`arrow-${arrow.id}`} pointerEvents="none">
+                {/* Halo de selección */}
+                {isSelected &&
+                  centers.map((p, i) => (
+                    <circle
+                      key={`halo-${i}`}
+                      cx={p.x}
+                      cy={p.y}
+                      r={nodeRadius + 5}
+                      fill="none"
+                      stroke="#ff6b6b"
+                      strokeWidth={3}
+                      opacity={0.7}
+                    />
+                  ))}
+
+                {/* Cuerpo: línea gruesa por los centros */}
+                {centers.length > 1 && (
+                  <polyline
+                    points={centers.map((p) => `${p.x},${p.y}`).join(' ')}
+                    fill="none"
+                    stroke={color}
+                    strokeWidth={bodyWidth}
+                    strokeLinejoin="round"
+                    strokeLinecap="round"
+                    opacity={0.95}
                   />
-                )
-              })}
+                )}
 
-            {/* Indicador de exitPort (línea pequeña desde cabeza en dirección) */}
-            {(() => {
-              const delta = portDelta(arrow.head.exitPort)
-              const headCenter = centers[0]
-              const indicatorLen = ARROW_HEAD_INDICATOR_LENGTH
-              return (
-                <line
-                  key={`arrow-${arrow.id}-direction`}
-                  x1={headCenter.x}
-                  y1={headCenter.y}
-                  x2={headCenter.x + delta.dCol * indicatorLen}
-                  y2={headCenter.y + delta.dRow * indicatorLen}
-                  stroke={strokeColor}
-                  strokeWidth={2}
-                  opacity={0.6}
-                  pointerEvents="none"
+                {/* Nodo en cada celda ocupada */}
+                {centers.map((p, i) => (
+                  <circle
+                    key={`node-${i}`}
+                    cx={p.x}
+                    cy={p.y}
+                    r={nodeRadius}
+                    fill={color}
+                    opacity={0.95}
+                  />
+                ))}
+
+                {/* Marca de la cabeza (aro blanco en la celda trasera) */}
+                <circle
+                  cx={headCenter.x}
+                  cy={headCenter.y}
+                  r={nodeRadius * 0.5}
+                  fill="#fff"
+                  opacity={0.9}
                 />
-              )
-            })()}
 
-            {/* Punta (triángulo) en última celda */}
-            {centers.length > 0 && (() => {
-              const tipPoint = centers[centers.length - 1]
-              const delta = portDelta(arrow.head.exitPort)
-              const tipSize = 6
-              // Triángulo orientado según exitPort
-              const baseX = tipPoint.x - delta.dCol * tipSize
-              const baseY = tipPoint.y - delta.dRow * tipSize
-              const perpX = -delta.dRow // perpendicular al delta
-              const perpY = delta.dCol
-
-              const p1 = `${tipPoint.x},${tipPoint.y}`
-              const p2 = `${baseX + perpX * (tipSize / 2)},${baseY + perpY * (tipSize / 2)}`
-              const p3 = `${baseX - perpX * (tipSize / 2)},${baseY - perpY * (tipSize / 2)}`
-
-              return (
+                {/* Punta triangular en la última celda, según exitPort */}
                 <polygon
-                  key={`arrow-${arrow.id}-tip`}
-                  points={`${p1} ${p2} ${p3}`}
-                  fill={strokeColor}
-                  opacity={0.8}
-                  pointerEvents="none"
+                  points={`${apexX},${apexY} ${b1X},${b1Y} ${b2X},${b2Y}`}
+                  fill={color}
+                  opacity={0.95}
                 />
-              )
-            })()}
-          </g>
-        )
-      })}
+              </g>
+            )
+          })}
         </g>
       )}
 
@@ -384,11 +455,11 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
               key={`candidate-${idx}`}
               cx={pos.x}
               cy={pos.y}
-              r={cellRadius * 1.1}
+              r={tileSize * 0.5}
               fill="none"
-              stroke="#fff700"
-              strokeWidth={3}
-              opacity={0.8}
+              stroke="#fbbf24"
+              strokeWidth={4}
+              opacity={0.9}
               pointerEvents="none"
               data-testid={`extend-candidate-${idx}`}
             />

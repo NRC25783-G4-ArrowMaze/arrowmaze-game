@@ -59,74 +59,68 @@ export function removeCell(scene: Scene, cellId: string): Scene {
 }
 
 /**
- * Calcula el puerto de salida derivado del delta entre dos celdas.
- * Inverso de portDelta: dado que B está en dirección delta respecto a A,
- * qué puerto de A apunta hacia B.
+ * Devuelve la conexión que ocupa un puerto concreto de una celda, o null.
+ * Un puerto solo puede tener UNA conexión (regla del dominio A1/BLOQUE 3).
  */
-function deltaToPort(dCol: number, dRow: number): number {
-  if (dRow === -1 && dCol === 0) return 0 // N
-  if (dRow === 0 && dCol === 1) return 1 // E
-  if (dRow === 1 && dCol === 0) return 2 // S
-  if (dRow === 0 && dCol === -1) return 3 // O
-  return -1 // No adyacente
+export function portConnection(
+  scene: Scene,
+  cellId: string,
+  port: number,
+): Scene['connections'][number] | null {
+  return (
+    scene.connections.find(
+      (c) =>
+        (c.fromCell === cellId && c.fromPort === port) ||
+        (c.toCell === cellId && c.toPort === port),
+    ) ?? null
+  )
 }
 
 /**
- * Intenta conectar dos celdas. Devuelve null si no son adyacentes ortogonales.
- * Si ya están conectadas, las desconecta (toggle).
+ * Conecta un puerto de una celda con un puerto de otra.
+ * Modelo del dominio (A1/BLOQUE 3): enlace puerto-a-puerto arbitrario.
+ * NO exige adyacencia espacial ni puertos opuestos.
+ * Devuelve null si:
+ *  - alguna celda no existe
+ *  - es la misma celda (auto-conexión prohibida)
+ *  - alguno de los puertos ya está ocupado
  */
-export function toggleConnection(
+export function connectPorts(
   scene: Scene,
   cellIdA: string,
+  portA: number,
   cellIdB: string,
+  portB: number,
 ): Scene | null {
+  if (cellIdA === cellIdB) return null // auto-conexión prohibida
+
   const cellA = scene.cells.find((c) => c.id === cellIdA)
   const cellB = scene.cells.find((c) => c.id === cellIdB)
-
   if (!cellA || !cellB) return null
 
-  const posA = cellFromId(cellIdA)
-  const posB = cellFromId(cellIdB)
-  if (!posA || !posB) return null
+  // Puertos deben estar libres
+  if (portConnection(scene, cellIdA, portA)) return null
+  if (portConnection(scene, cellIdB, portB)) return null
 
-  const dCol = posB.col - posA.col
-  const dRow = posB.row - posA.row
-
-  // Derivar puertos
-  const fromPort = deltaToPort(dCol, dRow)
-  const toPort = deltaToPort(-dCol, -dRow)
-
-  if (fromPort === -1 || toPort === -1) {
-    return null // No son adyacentes ortogonales
-  }
-
-  // Verificar si ya existe la conexión (en cualquier dirección)
-  const exists = scene.connections.some(
-    (c) =>
-      (c.fromCell === cellIdA && c.fromPort === fromPort && c.toCell === cellIdB && c.toPort === toPort) ||
-      (c.fromCell === cellIdB && c.fromPort === toPort && c.toCell === cellIdA && c.toPort === fromPort),
-  )
-
-  if (exists) {
-    // Toggle: quitar la conexión
-    const newConnections = scene.connections.filter(
-      (c) =>
-        !(
-          (c.fromCell === cellIdA && c.fromPort === fromPort && c.toCell === cellIdB && c.toPort === toPort) ||
-          (c.fromCell === cellIdB && c.fromPort === toPort && c.toCell === cellIdA && c.toPort === fromPort)
-        ),
-    )
-    return { ...scene, connections: newConnections }
-  }
-
-  // Agregar conexión bidireccional (pero solo un entry en el array, en forma canónica: menor cellId primero)
   const newConnection = {
     fromCell: cellIdA,
-    fromPort,
+    fromPort: portA,
     toCell: cellIdB,
-    toPort,
+    toPort: portB,
   }
   return { ...scene, connections: [...scene.connections, newConnection] }
+}
+
+/**
+ * Elimina la conexión que toca el puerto (cellId, port), si existe.
+ */
+export function disconnectPort(scene: Scene, cellId: string, port: number): Scene {
+  const conn = portConnection(scene, cellId, port)
+  if (!conn) return scene
+  return {
+    ...scene,
+    connections: scene.connections.filter((c) => c !== conn),
+  }
 }
 
 export function nextArrowId(scene: Scene): string {

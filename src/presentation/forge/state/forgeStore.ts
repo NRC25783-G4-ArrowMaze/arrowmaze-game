@@ -4,6 +4,12 @@ import * as sceneOps from './sceneOps'
 
 export type ToolMode = 'select' | 'cell' | 'connect' | 'arrowHead' | 'extend' | 'erase'
 
+/** Puerto elegido como primer extremo en modo 'connect'. */
+export interface PendingConnect {
+  cellId: string
+  port: number
+}
+
 export interface ForgeState {
   // Edición
   scene: Scene
@@ -13,7 +19,7 @@ export interface ForgeState {
   // Herramientas y selección
   tool: ToolMode
   selectedArrowId: string | null
-  pendingConnectFrom: string | null
+  pendingConnect: PendingConnect | null
 
   // Historial (undo/redo)
   history: { past: Scene[]; future: Scene[] }
@@ -27,13 +33,14 @@ export interface ForgeState {
   setGridRows: (rows: number) => void
   setTool: (tool: ToolMode) => void
   selectArrow: (arrowId: string | null) => void
-  setPendingConnectFrom: (cellId: string | null) => void
+  setPendingConnect: (pending: PendingConnect | null) => void
   setSession: (token: string | null, email: string | null) => void
 
   // Mutations (pasan por commit para historial)
   addCell: (col: number, row: number) => void
   removeCell: (cellId: string) => void
-  toggleConnection: (cellIdA: string, cellIdB: string) => void
+  connectPorts: (cellIdA: string, portA: number, cellIdB: string, portB: number) => void
+  disconnectPort: (cellId: string, port: number) => void
   placeHead: (cellId: string) => void
   rotateHead: (arrowId: string) => void
   extendArrow: (arrowId: string, cellId: string) => void
@@ -72,7 +79,7 @@ export const useForgeStore = create<ForgeState>((set) => {
     gridRows: 8,
     tool: 'select',
     selectedArrowId: null,
-    pendingConnectFrom: null,
+    pendingConnect: null,
     history: { past: [], future: [] },
     session: { token: null, email: null },
 
@@ -80,9 +87,9 @@ export const useForgeStore = create<ForgeState>((set) => {
     setScene: (scene) => set({ scene }),
     setGridCols: (cols) => set({ gridCols: cols }),
     setGridRows: (rows) => set({ gridRows: rows }),
-    setTool: (tool) => set({ tool }),
+    setTool: (tool) => set({ tool, pendingConnect: null }),
     selectArrow: (arrowId) => set({ selectedArrowId: arrowId }),
-    setPendingConnectFrom: (cellId) => set({ pendingConnectFrom: cellId }),
+    setPendingConnect: (pending) => set({ pendingConnect: pending }),
     setSession: (token, email) => set({ session: { token, email } }),
 
     // Mutaciones (usando sceneOps)
@@ -92,11 +99,14 @@ export const useForgeStore = create<ForgeState>((set) => {
     removeCell: (cellId) => {
       commit((scene) => sceneOps.removeCell(scene, cellId))
     },
-    toggleConnection: (cellIdA, cellIdB) => {
+    connectPorts: (cellIdA, portA, cellIdB, portB) => {
       commit((scene) => {
-        const result = sceneOps.toggleConnection(scene, cellIdA, cellIdB)
+        const result = sceneOps.connectPorts(scene, cellIdA, portA, cellIdB, portB)
         return result ?? scene
       })
+    },
+    disconnectPort: (cellId, port) => {
+      commit((scene) => sceneOps.disconnectPort(scene, cellId, port))
     },
     placeHead: (cellId) => {
       commit((scene) => {
