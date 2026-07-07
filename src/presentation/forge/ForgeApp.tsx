@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForgeStore, type ToolMode } from './state/forgeStore'
 import { ForgeCanvas } from './components/ForgeCanvas'
 import { LevelPropertiesPanel } from './components/LevelPropertiesPanel'
 import { ValidationPanel } from './components/ValidationPanel'
+import { PlaytestOverlay } from './components/PlaytestOverlay'
+import { isValidScene } from './state/validateScene'
 
 const TOOL_HINTS: Record<ToolMode, string> = {
   select: 'Clic en una flecha para seleccionarla. R rota su cabeza.',
@@ -23,6 +25,8 @@ const TOOL_HINTS: Record<ToolMode, string> = {
  * Gestiona atajos globales (R, Ctrl+Z, Ctrl+Shift+Z, Escape).
  */
 const ForgeApp: React.FC = () => {
+  const [isPlaytesting, setIsPlaytesting] = useState(false)
+
   const scene = useForgeStore((s) => s.scene)
   const gridCols = useForgeStore((s) => s.gridCols)
   const gridRows = useForgeStore((s) => s.gridRows)
@@ -97,7 +101,25 @@ const ForgeApp: React.FC = () => {
             <option value="erase">Erase</option>
           </select>
           <span style={{ fontSize: '12px', color: '#0369a1' }}>{TOOL_HINTS[tool]}</span>
-          <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#666' }}>
+
+          <button
+            onClick={() => setIsPlaytesting(true)}
+            disabled={!isValidScene(scene)}
+            style={{
+              marginLeft: 'auto',
+              padding: '6px 12px',
+              fontSize: '12px',
+              backgroundColor: isValidScene(scene) ? '#16a34a' : '#d1d5db',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: isValidScene(scene) ? 'pointer' : 'not-allowed',
+            }}
+          >
+            ▶ Probar nivel
+          </button>
+
+          <span style={{ marginLeft: '12px', fontSize: '12px', color: '#666' }}>
             Ctrl+Z: undo ({history.past.length}) | Ctrl+Shift+Z: redo ({history.future.length}) | R: rotate | Esc: deselect
           </span>
         </div>
@@ -155,6 +177,9 @@ const ForgeApp: React.FC = () => {
           </p>
         </div>
       </div>
+
+      {/* Playtest modal */}
+      {isPlaytesting && <PlaytestOverlay scene={scene} onClose={() => setIsPlaytesting(false)} />}
     </div>
   )
 }
