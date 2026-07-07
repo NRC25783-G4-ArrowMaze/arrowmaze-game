@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { BoardComponent } from './BoardComponent';
 import { GameOverlay } from './GameOverlay';
+import { PauseOverlay } from './PauseOverlay';
+import { SettingsOverlay } from './SettingsOverlay';
 import { computeBoardLayout } from '../rendering/boardLayout';
 import { useGameController } from '../game/useGameController';
 import { useBoardInput } from '../input/useBoardInput';
@@ -83,6 +85,11 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             ← Volver
           </button>
         )}
+        {game.status === 'IN_PROGRESS' && (
+          <button onClick={game.pause} disabled={game.inFlight} style={{ marginLeft: '8px' }}>
+            ⏸ Pausa
+          </button>
+        )}
         <div className="app-stats">
           <div className="stat-moves">
             <span className="stat-label">Movimientos</span>
@@ -111,6 +118,14 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             headDisintegrating={game.headDisintegrating ?? undefined}
           />
           <GameOverlay status={game.status} score={game.score} />
+          <PauseOverlay
+            visible={game.flowState === 'PAUSED'}
+            onResume={game.resume}
+            onRestart={game.restart}
+            onOpenSettings={game.openSettings}
+            onExit={() => onBack?.()}
+          />
+          <SettingsOverlay visible={game.flowState === 'SETTINGS'} onClose={game.closeSettings} />
         </div>
       </main>
     </div>
