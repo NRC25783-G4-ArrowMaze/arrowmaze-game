@@ -80,23 +80,35 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
-        {onBack && (
-          <button onClick={onBack} style={{ marginLeft: 'auto' }}>
-            ← Volver
-          </button>
-        )}
-        {game.status === 'IN_PROGRESS' && (
-          <button onClick={game.pause} disabled={game.inFlight} style={{ marginLeft: '8px' }}>
-            ⏸ Pausa
-          </button>
-        )}
+        <div className="app-actions">
+          {onBack && (
+            <button onClick={onBack}>← Volver</button>
+          )}
+          {game.status === 'IN_PROGRESS' && (
+            <button onClick={game.pause} disabled={game.inFlight}>
+              ⏸ Pausa
+            </button>
+          )}
+        </div>
         <div className="app-stats">
           <div className="stat-moves">
             <span className="stat-label">Movimientos</span>
             <span className="stat-value">{game.movesRemaining}</span>
           </div>
-          <div className="stat-status">
-            {game.status === 'IN_PROGRESS' ? '▶ En juego' : `✓ ${game.status}`}
+          <div
+            className={
+              game.status === 'WON'
+                ? 'stat-status stat-status--won'
+                : game.status === 'LOST'
+                  ? 'stat-status stat-status--lost'
+                  : 'stat-status'
+            }
+          >
+            {game.status === 'IN_PROGRESS'
+              ? '▶ En juego'
+              : game.status === 'WON'
+                ? '✓ Victoria'
+                : '✗ Derrota'}
           </div>
         </div>
       </header>

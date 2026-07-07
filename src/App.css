@@ -10,18 +10,29 @@
 }
 
 .app-header {
-  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 24px;
   background: white;
   border-bottom: 3px solid #e0e4e8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .app-header h1 {
-  margin: 0 0 16px 0;
-  font-size: 32px;
+  margin: 0 auto 0 0; /* empuja acciones y stats a la derecha */
+  font-size: 28px;
   font-weight: 700;
   color: #1a1a1a;
   letter-spacing: -0.5px;
+}
+
+/* Botones de navegación/flujo del header (Volver, Pausa). */
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .app-stats {
@@ -63,6 +74,16 @@
   text-align: center;
 }
 
+.stat-status--won {
+  color: var(--success);
+  background: #f0fdf4;
+}
+
+.stat-status--lost {
+  color: var(--danger);
+  background: #fef2f2;
+}
+
 .app-main {
   flex: 1;
   display: flex;
@@ -88,16 +109,16 @@
 
 @media (max-width: 768px) {
   .app-header {
-    padding: 20px 16px;
+    padding: 12px 12px;
+    gap: 8px;
   }
 
   .app-header h1 {
-    font-size: 24px;
-    margin-bottom: 12px;
+    font-size: 20px;
   }
 
   .app-stats {
-    gap: 16px;
+    gap: 12px;
   }
 
   .stat-value {
