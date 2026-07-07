@@ -48,7 +48,7 @@ export class LocalProgressModuleFactory {
       };
     } catch (error) {
       console.error('[LocalProgressModuleFactory] Fallo crítico al ensamblar el módulo:', error);
-      throw new Error('No se pudo inicializar el almacenamiento y sincronización del juego.', { cause: error });
+      throw new Error('No se pudo inicializar el almacenamiento y sincronización del juego.');
     }
   }
 }

@@ -13,6 +13,8 @@ const BOARD_SIZE = 560;
 interface GameViewProps {
   scene: Scene;
   progressModule: LocalProgressModule | null;
+  /** Si se provee, muestra un botón para volver al mapa de selección (C3). */
+  onBack?: () => void;
 }
 
 /**
@@ -28,7 +30,7 @@ interface GameViewProps {
  *      colisión o salida, reproyectando la forma real del dominio en cada paso.
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
-export const GameView: React.FC<GameViewProps> = ({ scene, progressModule }) => {
+export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack }) => {
   const game = useGameController(scene);
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
@@ -75,6 +77,11 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule }) => 
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
+        {onBack && (
+          <button onClick={onBack} style={{ marginLeft: 'auto' }}>
+            ← Volver
+          </button>
+        )}
         <div className="app-stats">
           <div className="stat-moves">
             <span className="stat-label">Movimientos</span>

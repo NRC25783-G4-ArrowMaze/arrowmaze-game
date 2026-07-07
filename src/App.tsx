@@ -5,21 +5,34 @@ import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
 import { fetchSceneWithFallback } from './presentation/game/loadScene';
 import type { Scene } from './presentation/game/scene';
 import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
+import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
+import type { LevelProgress } from './domain/entities/LevelProgress';
+
+const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
+  'level-initial': { name: 'Nivel Inicial', difficulty: 'Fácil' },
+  'level-intermediate-a': { name: 'Desafío A', difficulty: 'Medio' },
+  'level-intermediate-b': { name: 'Desafío B', difficulty: 'Medio' },
+  'level-advanced': { name: 'Avanzado', difficulty: 'Difícil' },
+  'level-expert': { name: 'Experto', difficulty: 'Muy difícil' },
+};
 
 /**
- * App — Bootstrap de la demo: resuelve la escena a jugar y el módulo de
- * persistencia, y recién entonces monta la partida (GameView).
+ * App — Máquina de pantallas SELECT (mapa C3) → PLAYING (GameView).
  *
- * La escena se pide a la API de niveles (F2, `GET /api/v1/levels/:id`) con
- * fallback offline-first a la copia local: sin red o con el backend caído la
- * app arranca igual con SAMPLE_LEVEL_2. Ambas inicializaciones corren en
- * paralelo y el fallo de una no bloquea a la otra.
+ * En el bootstrap resuelve en paralelo la escena a jugar y el módulo de
+ * persistencia: la escena se pide a la API de niveles (F2, `GET
+ * /api/v1/levels/:id`) con fallback offline-first a SAMPLE_LEVEL_2, y el módulo
+ * carga el progreso local (D1) que alimenta el mapa de selección y sincroniza
+ * con el servidor (D2, background). El fallo de una inicialización no bloquea la
+ * otra.
  */
 const App: React.FC = () => {
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
   const [scene, setScene] = useState<Scene | null>(null);
+  const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
+  const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -44,6 +57,11 @@ const App: React.FC = () => {
       if (moduleResult.status === 'fulfilled') {
         const module = moduleResult.value;
         setProgressModule(module);
+
+        // Progreso inicial para el mapa de selección (C3)
+        module.getLocalProgress.getAll()
+          .then((progress) => { if (isMounted) setAllProgress(progress); })
+          .catch((error: unknown) => console.warn('[App] No se pudo cargar el progreso inicial:', error));
 
         // Sincronización background (Bloque 4)
         module.syncProgress.execute()
@@ -70,12 +88,24 @@ const App: React.FC = () => {
     };
   }, []);
 
+  const handleSelectLevel = (levelId: string) => {
+    console.log(`[App] Seleccionado nivel: ${levelId}`);
+    setScreen('PLAYING');
+  };
+
+  // Al volver del juego recargamos el progreso para que el mapa refleje el
+  // récord recién guardado por GameView tras ganar.
+  const handleBackToSelect = () => {
+    setScreen('SELECT');
+    progressModule?.getLocalProgress.getAll()
+      .then((progress) => setAllProgress(progress))
+      .catch((error: unknown) => console.warn('[App] No se pudo recargar el progreso:', error));
+  };
+
   if (scene === null) {
     return (
       <div className="app">
-        <header className="app-header">
-          <h1>Arrow Maze</h1>
-        </header>
+        <header className="app-header"><h1>Arrow Maze</h1></header>
         <main className="app-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p>Cargando motor del juego...</p>
         </main>
@@ -83,7 +113,22 @@ const App: React.FC = () => {
     );
   }
 
-  return <GameView scene={scene} progressModule={progressModule} />;
+  if (screen === 'SELECT') {
+    return (
+      <div className="app">
+        <header className="app-header"><h1>Arrow Maze</h1></header>
+        <main className="app-main">
+          <LevelSelectScreen
+            progress={allProgress}
+            onSelectLevel={handleSelectLevel}
+            levelMetadata={LEVEL_METADATA}
+          />
+        </main>
+      </div>
+    );
+  }
+
+  return <GameView scene={scene} progressModule={progressModule} onBack={handleBackToSelect} />;
 };
 
 export default App;
