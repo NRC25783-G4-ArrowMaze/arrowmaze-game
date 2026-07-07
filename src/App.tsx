@@ -6,6 +6,7 @@ import { fetchSceneWithFallback } from './presentation/game/loadScene';
 import type { Scene } from './presentation/game/scene';
 import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
 import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
+import { LOCAL_LEVELS } from './presentation/game/levels/localLevels';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 import type { LevelProgress } from './domain/entities/LevelProgress';
@@ -39,12 +40,16 @@ const App: React.FC = () => {
 
     const bootstrapGame = async () => {
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+      // Modo offline (build de distribución): sin fetch remoto ni sync.
+      const offlineMode = import.meta.env.VITE_OFFLINE_MODE === 'true';
 
       // Inyectamos el proveedor nativo de Capacitor
       const tokenProvider = new CapacitorTokenProvider();
 
       const [sceneResult, moduleResult] = await Promise.allSettled([
-        fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2),
+        offlineMode
+          ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
+          : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2),
         LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider),
       ]);
 
@@ -63,19 +68,21 @@ const App: React.FC = () => {
           .then((progress) => { if (isMounted) setAllProgress(progress); })
           .catch((error: unknown) => console.warn('[App] No se pudo cargar el progreso inicial:', error));
 
-        // Sincronización background (Bloque 4)
-        module.syncProgress.execute()
-          .then(() => console.log('[App] Sincronización background completada.'))
-          .catch(async (error: unknown) => {
-            console.warn('[App] Sincronización background detenida:', error);
+        // Sincronización background (Bloque 4); en offline no hay backend.
+        if (!offlineMode) {
+          module.syncProgress.execute()
+            .then(() => console.log('[App] Sincronización background completada.'))
+            .catch(async (error: unknown) => {
+              console.warn('[App] Sincronización background detenida:', error);
 
-            // Si el error es de sesión (401 SessionExpiredError),
-            // podemos borrar el token inválido automáticamente.
-            if (error instanceof Error && error.name === 'SessionExpiredError') {
-              await tokenProvider.removeToken();
-              // TODO: Despachar evento para redirigir al Login
-            }
-          });
+              // Si el error es de sesión (401 SessionExpiredError),
+              // podemos borrar el token inválido automáticamente.
+              if (error instanceof Error && error.name === 'SessionExpiredError') {
+                await tokenProvider.removeToken();
+                // TODO: Despachar evento para redirigir al Login
+              }
+            });
+        }
       } else {
         console.error('Error arrancando el motor de base de datos', moduleResult.reason);
       }
@@ -88,8 +95,14 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Cada nodo del mapa juega su nivel del catálogo local: scene.id === levelId,
+  // de modo que el progreso guardado (D1) desbloquea el mapa (C3).
   const handleSelectLevel = (levelId: string) => {
     console.log(`[App] Seleccionado nivel: ${levelId}`);
+    const selected = LOCAL_LEVELS[levelId];
+    if (selected !== undefined) {
+      setScene(selected);
+    }
     setScreen('PLAYING');
   };
 
