@@ -104,8 +104,11 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
         <div
           style={{
             position: 'relative',
-            width: BOARD_SIZE,
-            height: BOARD_SIZE,
+            // Fluido: ocupa el ancho disponible (cuadrado) con tope en desktop.
+            // BOARD_SIZE queda como tamaño lógico del viewBox del SVG.
+            width: '100%',
+            maxWidth: BOARD_SIZE,
+            aspectRatio: '1 / 1',
           }}
         >
           <BoardComponent
