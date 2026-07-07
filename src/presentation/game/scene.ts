@@ -1,57 +1,64 @@
-import type {
-  LevelDataDTO,
-  LevelConnectionDTO,
-} from '../../application/dtos/LevelDataDTOs';
-
-/**
- * scene — Modelo de ESCENA de presentación.
- *
- * El dominio no modela posición (col/row) ni color: son datos de presentación.
- * Una Scene reúne ambos mundos para alimentar a la vez:
- *   - al motor: vía toLevelDataDTO() (solo id/portCount/conexiones/flechas).
- *   - al renderer: vía los col/row y color que el motor ignora.
- *
- * Convención de puertos (B1): 0=N, 1=E, 2=S, 3=O.
- */
-
-/** Celda de la escena: identidad + posición de rejilla + geometría de puertos. */
-export interface SceneCell {
-  id: string;
-  col: number;
-  row: number;
-  portCount: number;
+export interface LevelCellDTO {
+  id: string
+  portCount: number
 }
 
-/** Flecha de la escena: color (presentación) + cabeza/cuerpo (dominio). */
-export interface SceneArrow {
-  id: string;
-  color: string;
-  head: { cellId: string; exitPort: number };
-  body: string[];
+export interface LevelConnectionDTO {
+  fromCell: string
+  fromPort: number
+  toCell: string
+  toPort: number
 }
 
-/**
- * Comportamiento de una flecha al chocar (dato de presentación; el motor lo ignora):
- *   - 'return': la flecha se devuelve deslizándose a su posición de inicio de slide (DEFAULT).
- *   - 'stay':   la flecha queda donde chocó (opt-in para mapas puntuales).
- */
-export type CollisionBehavior = 'stay' | 'return';
+export interface LevelArrowDTO {
+  id: string
+  head: { cellId: string; exitPort: number }
+  body: string[]
+}
 
-/** Escena completa: tablero + flechas + presupuesto de movimientos. */
+export interface LevelDataDTO {
+  id: string
+  name?: string
+  difficulty?: string
+  allowedMoves: number
+  cells: LevelCellDTO[]
+  connections?: LevelConnectionDTO[]
+  arrows: LevelArrowDTO[]
+}
+
+export interface SceneCell extends LevelCellDTO {
+  col: number
+  row: number
+}
+
+export interface SceneArrow extends LevelArrowDTO {
+  color: string
+}
+
+export type CollisionBehavior = 'stay' | 'return'
+
 export interface Scene {
-  id: string;
-  allowedMoves: number;
-  cells: SceneCell[];
-  connections: LevelConnectionDTO[];
-  arrows: SceneArrow[];
-  /** Qué hace una flecha al chocar. Default 'return'. */
-  collisionBehavior?: CollisionBehavior;
+  id: string
+  name?: string
+  difficulty?: string
+  allowedMoves: number
+  cells: SceneCell[]
+  connections: LevelConnectionDTO[]
+  arrows: SceneArrow[]
+  collisionBehavior?: CollisionBehavior
 }
 
-/**
- * Proyecta una Scene al LevelDataDTO que consume el motor, descartando los
- * datos de presentación (col/row, color) que el dominio no conoce.
- */
+export const DEFAULT_ARROW_PALETTE: readonly string[] = [
+  '#3b82f6', // blue
+  '#22c55e', // green
+  '#f97316', // orange
+  '#ec4899', // magenta
+  '#8b5cf6', // violet
+  '#06b6d4', // cyan
+  '#f59e0b', // amber
+  '#fb7185', // rose
+]
+
 export function toLevelDataDTO(scene: Scene): LevelDataDTO {
   return {
     id: scene.id,
@@ -63,7 +70,31 @@ export function toLevelDataDTO(scene: Scene): LevelDataDTO {
       head: { cellId: a.head.cellId, exitPort: a.head.exitPort },
       body: a.body,
     })),
-  };
+  }
+}
+
+export function sceneFromLevelData(
+  dto: LevelDataDTO,
+  palette: readonly string[] = DEFAULT_ARROW_PALETTE,
+): Scene {
+  return {
+    id: dto.id,
+    allowedMoves: dto.allowedMoves,
+    cells: dto.cells.map((c) => {
+      const [col, row] = c.id.split(',').map(Number)
+      if (!Number.isFinite(col) || !Number.isFinite(row)) {
+        throw new Error(`id de celda sin posición "col,row": "${c.id}"`)
+      }
+      return { id: c.id, col, row, portCount: c.portCount }
+    }),
+    connections: dto.connections ?? [],
+    arrows: dto.arrows.map((a, i) => ({
+      id: a.id,
+      color: palette[i % palette.length],
+      head: { cellId: a.head.cellId, exitPort: a.head.exitPort },
+      body: a.body,
+    })),
+  }
 }
 
 /**

@@ -1,16 +1,16 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
     rollupOptions: {
       input: {
-        // App principal.
+        // Juego principal (App real)
         main: 'index.html',
-        // Página OCULTA de preview del mock (no enlazada desde la app).
-        preview: 'preview.html',
+        // FORGE: editor de niveles (página oculta, herramienta ADMIN)
+        forge: 'forge.html',
       },
     },
   },
