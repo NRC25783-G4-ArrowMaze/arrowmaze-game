@@ -24,6 +24,7 @@ module.exports = {
           lib: ['ES2023', 'DOM'],
           module: 'CommonJS',
           moduleResolution: 'node',
+          ignoreDeprecations: '6.0',
           skipLibCheck: true,
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
