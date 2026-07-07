@@ -6,25 +6,31 @@ import { computeBoardLayout } from './presentation/rendering/boardLayout';
 import { useGameController } from './presentation/game/useGameController';
 import { useBoardInput } from './presentation/input/useBoardInput';
 import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
+import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from './domain/value-objects/Score';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
+import type { LevelProgress } from './domain/entities/LevelProgress';
 
 const BOARD_SIZE = 560;
 
+const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
+  'level-initial': { name: 'Nivel Inicial', difficulty: 'Fácil' },
+  'level-intermediate-a': { name: 'Desafío A', difficulty: 'Medio' },
+  'level-intermediate-b': { name: 'Desafío B', difficulty: 'Medio' },
+  'level-advanced': { name: 'Avanzado', difficulty: 'Difícil' },
+  'level-expert': { name: 'Experto', difficulty: 'Muy difícil' },
+};
+
 /**
- * App — Demo interactiva del tablero (B1 + B3) con persistencia local y
- * sincronización bidireccional (Feature 13).
- *
- * Flujo de un toque:
- *   1. La capa de input resuelve la flecha tocada (B3).
- *   2. El controlador desliza la flecha tick-a-tick (un click = una jugada) hasta
- *      colisión o salida, reproyectando la forma real del dominio en cada paso.
- *   3. El input queda bloqueado mientras el slide está en vuelo.
+ * App — Máquina de pantallas SELECT (mapa C3) → PLAYING (tablero B1+B3).
+ * Persiste progreso local (D1) y sincroniza con servidor (D2, background).
  */
 const App: React.FC = () => {
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
+  const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
+  const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -32,26 +38,23 @@ const App: React.FC = () => {
     const bootstrapGame = async () => {
       try {
         const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
-
-        // Inyectamos el proveedor nativo de Capacitor
         const tokenProvider = new CapacitorTokenProvider();
-
         const module = await LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider);
 
         if (isMounted) {
           setProgressModule(module);
 
-          // Sincronización background (Bloque 4)
+          // Cargar progreso inicial para el mapa de selección
+          const progress = await module.getLocalProgress.getAll();
+          if (isMounted) setAllProgress(progress);
+
+          // Sincronización background
           module.syncProgress.execute()
             .then(() => console.log('[App] Sincronización background completada.'))
             .catch(async (error: unknown) => {
               console.warn('[App] Sincronización background detenida:', error);
-
-              // Si el error es de sesión (401 SessionExpiredError),
-              // podemos borrar el token inválido automáticamente.
               if (error instanceof Error && error.name === 'SessionExpiredError') {
                 await tokenProvider.removeToken();
-                // TODO: Despachar evento para redirigir al Login
               }
             });
         }
@@ -63,16 +66,11 @@ const App: React.FC = () => {
     };
 
     bootstrapGame();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { isMounted = false; };
   }, []);
 
+  // Estados de pantalla de juego (solo se usa cuando screen === 'PLAYING')
   const game = useGameController(SAMPLE_LEVEL_2);
-
-  // Marca de inicio del nivel: el tiempo se mide en presentación
-  // (el motor no modela tiempo de partida).
   const levelStartRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -81,7 +79,7 @@ const App: React.FC = () => {
 
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
-  // Persistencia automática al ganar (upstream encolado)
+  // Persistencia automática al ganar + volver a SELECT
   useEffect(() => {
     if (game.status === 'WON' && progressModule && game.score !== null) {
       const movesUsed = SAMPLE_LEVEL_2.allowedMoves - game.movesRemaining;
@@ -91,12 +89,16 @@ const App: React.FC = () => {
       progressModule.saveLocalProgress
         .execute(SAMPLE_LEVEL_2.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
-          console.log(`[App] Progreso local guardado para el nivel ${SAMPLE_LEVEL_2.id}`);
-          // Intentamos subir el récord de inmediato tras ganar, si hay internet.
-          return progressModule.syncProgress.execute();
+          console.log(`[App] Progreso guardado para ${SAMPLE_LEVEL_2.id}`);
+          // Recargar progreso y volver a selección
+          return progressModule.getLocalProgress.getAll();
+        })
+        .then((updatedProgress) => {
+          setAllProgress(updatedProgress);
+          setScreen('SELECT');
         })
         .catch((error: unknown) => {
-          console.error('[App] Error guardando o sincronizando el récord:', error);
+          console.error('[App] Error guardando progreso:', error);
         });
     }
   }, [game.status, game.score, game.movesRemaining, progressModule]);
@@ -105,21 +107,37 @@ const App: React.FC = () => {
     width: BOARD_SIZE,
     height: BOARD_SIZE,
     layout,
-    // Bloqueo: input deshabilitado en estado terminal, con un slide en vuelo
-    // o mientras arranca el módulo de persistencia.
     enabled: game.status === 'IN_PROGRESS' && !game.inFlight && !isInitializing,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
     onPlayMove: (command) => game.playMove(command),
   });
 
+  const handleSelectLevel = (levelId: string) => {
+    console.log(`[App] Seleccionado nivel: ${levelId}`);
+    setScreen('PLAYING');
+  };
+
   if (isInitializing) {
     return (
       <div className="app">
-        <header className="app-header">
-          <h1>Arrow Maze</h1>
-        </header>
+        <header className="app-header"><h1>Arrow Maze</h1></header>
         <main className="app-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <p>Cargando motor del juego...</p>
+        </main>
+      </div>
+    );
+  }
+
+  if (screen === 'SELECT') {
+    return (
+      <div className="app">
+        <header className="app-header"><h1>Arrow Maze</h1></header>
+        <main className="app-main">
+          <LevelSelectScreen
+            progress={allProgress}
+            onSelectLevel={handleSelectLevel}
+            levelMetadata={LEVEL_METADATA}
+          />
         </main>
       </div>
     );
@@ -129,6 +147,9 @@ const App: React.FC = () => {
     <div className="app">
       <header className="app-header">
         <h1>Arrow Maze</h1>
+        <button onClick={() => setScreen('SELECT')} style={{ marginLeft: 'auto' }}>
+          ← Volver
+        </button>
         <div className="app-stats">
           <div className="stat-moves">
             <span className="stat-label">Movimientos</span>
@@ -140,13 +161,7 @@ const App: React.FC = () => {
         </div>
       </header>
       <main className="app-main">
-        <div
-          style={{
-            position: 'relative',
-            width: BOARD_SIZE,
-            height: BOARD_SIZE,
-          }}
-        >
+        <div style={{ position: 'relative', width: BOARD_SIZE, height: BOARD_SIZE }}>
           <BoardComponent
             board={game.viewModel}
             width={BOARD_SIZE}
