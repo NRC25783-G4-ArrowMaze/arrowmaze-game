@@ -13,21 +13,21 @@ class Cell {
     -portCount: number
     -ports: readonly Port[]
     -connections: Map<number, { neighborCell: Cell; neighborPortIndex: number; }>
-    -arrowSegment: { isHead: boolean; cellId: string; }
+    -arrowSegment: { isHead: boolean; cellId: string; } | null
     -occupied: boolean
     +getId(): string
     +getPortCount(): number
     +getPortAtIndex(index: number): Port
-    +getNeighborAtPort(portIndex: number): Cell
-    +getConnection(portIndex: number): { neighbor: Cell; neighborPortIndex: number; }
+    +getNeighborAtPort(portIndex: number): Cell | null
+    +getConnection(portIndex: number): { neighbor: Cell; neighborPortIndex: number; } | null
     +isExit(portIndex: number): boolean
     +canConnect(portIndex: number): boolean
-    +_getNeighborPortIndex(portIndex: number): number
+    +_getNeighborPortIndex(portIndex: number): number | null
     +_connectToNeighbor(portIndex: number, neighborCell: Cell, neighborPortIndex: number): void
     +_disconnectFromNeighbor(portIndex: number): void
     +hasArrowSegment(): boolean
     +isOccupied(): boolean
-    +getArrowSegment(): { isHead: boolean; cellId: string; }
+    +getArrowSegment(): { isHead: boolean; cellId: string; } | null
     +placeArrowSegment(segment: { isHead: boolean; cellId: string; }): void
     +removeArrowSegment(): void
 }
@@ -41,7 +41,7 @@ class Board {
     -cells: Map<string, Cell>
     +getId(): string
     +getAllCells(): Cell[]
-    +getCell(id: string): Cell
+    +getCell(id: string): Cell | undefined
     +addCell(cell: Cell): void
     +removeCell(cellId: string): void
     +connectPorts(cellA: Cell, portIndexA: number, cellB: Cell, portIndexB: number): void
@@ -51,19 +51,19 @@ interface PlaceArrowInput {
     +board: Board
     +headCellId: string
     +exitPort: number
-    +bodyCellIds?: string[]
+    +bodyCellIds?: string[] | undefined
 }
 interface ArrowSegmentDTO {
     +cellId: string
     +isHead: boolean
-    +exitPort: number
-    +entryPort: number
+    +exitPort: number | null
+    +entryPort: number | null
 }
 interface PlaceArrowResult {
     +success: boolean
     +arrowLength: number
     +segments: ArrowSegmentDTO[]
-    +error?: string
+    +error?: string | undefined
 }
 interface CellDTO {
     +id: string
@@ -81,7 +81,7 @@ interface LoadLevelResult {
     +levelId: string
     +cells: CellDTO[]
     +connections: ConnectionDTO[]
-    +error?: string
+    +error?: string | undefined
 }
 interface LevelCellDTO {
     +id: string
@@ -100,17 +100,23 @@ interface LevelArrowDTO {
 }
 interface LevelDataDTO {
     +id: string
-    +name?: string
-    +difficulty?: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
     +allowedMoves: number
     +arrows: LevelArrowDTO[]
     +cells: LevelCellDTO[]
-    +connections?: LevelConnectionDTO[]
+    +connections?: LevelConnectionDTO[] | undefined
+}
+interface LevelMapNodeDTO {
+    +levelId: string
+    +prerequisites: string[]
+    +pathHint?: { x: number; y: number; } | undefined
+    +starThresholds?: [number, number] | undefined
 }
 abstract class ArrowSegment {
     +cell: Cell
-    +prev: ArrowSegment
-    +next: ArrowSegment
+    +prev: ArrowSegment | null
+    +next: ArrowSegment | null
     +{abstract} isHead: boolean
     +getCellId(): string
 }
@@ -142,7 +148,7 @@ class Arrow {
     -_calculateTargets(chain: ArrowSegment[]): { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]
     -_commitAdvance(chain: ArrowSegment[], targets: { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]): AdvanceResult
     -_getTail(): ArrowSegment
-    -_findConnectingPort(fromCell: Cell, toCell: Cell): number
+    -_findConnectingPort(fromCell: Cell, toCell: Cell): number | null
     -_cellBelongsToSelf(cell: Cell): boolean
 }
 interface AdvanceArrowInput {
@@ -156,7 +162,7 @@ interface AdvanceResultDTO {
     +freedCellIds: string[]
     +occupiedCellIds: string[]
     +arrowLength: number
-    +error?: string
+    +error?: string | undefined
 }
 class NoMovesRemainingError extends Error
 class GameAlreadyFinishedError extends Error
@@ -185,10 +191,10 @@ class GameSession {
     -_movesRemaining: number
     -_status: GameStatus
     -_scoringTracker: ScoringTracker
-    -_score: Score
+    -_score: Score | null
     +movesRemaining: number
     +status: GameStatus
-    +score: Score
+    +score: Score | null
     +consumeMove(): void
     +recordMoveOutcome(moveSucceeded: boolean): void
     +evaluateStatus(board: Board): GameStatus
@@ -200,11 +206,11 @@ interface PlayMoveInput {
 }
 interface PlayMoveResult {
     +success: boolean
-    +outcome?: "advanced" | "blocked" | "destroyed"
+    +outcome?: "advanced" | "blocked" | "destroyed" | undefined
     +movesRemaining: number
     +gameStatus: GameStatus
-    +score?: number
-    +error?: string
+    +score?: number | undefined
+    +error?: string | undefined
 }
 interface SlideInput {
     +session: GameSession
@@ -214,20 +220,24 @@ interface SlideInput {
 interface SlideResult {
     +success: boolean
     +trajectory: AdvanceOutcome[]
-    +finalOutcome?: AdvanceOutcome
+    +finalOutcome?: AdvanceOutcome | undefined
     +movesRemaining: number
     +gameStatus: GameStatus
-    +score?: number
-    +error?: string
+    +score?: number | undefined
+    +error?: string | undefined
 }
+class InvalidFlowTransitionError extends Error
 interface IArrowBuilder {
     +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
 }
 interface IAuthTokenProvider {
-    +getToken(): Promise<string>
+    +getToken(): Promise<string | null>
 }
 interface IBoardBuilder {
     +build(data: LevelDataDTO): Board
+}
+interface ILevelApiClient {
+    +fetchLevel(levelId: string): Promise<LevelDataDTO>
 }
 class InvalidLevelProgressError extends Error
 class LevelProgress {
@@ -246,7 +256,7 @@ class LevelProgress {
 }
 interface ILocalProgressRepository {
     +initialize(): Promise<void>
-    +findByLevelId(levelId: string): Promise<LevelProgress>
+    +findByLevelId(levelId: string): Promise<LevelProgress | null>
     +findAll(): Promise<LevelProgress[]>
     +save(progress: LevelProgress): Promise<void>
     +findPendingSync(): Promise<LevelProgress[]>
@@ -255,6 +265,18 @@ interface ILocalProgressRepository {
 interface IProgressApiClient {
     +pushProgress(progress: LevelProgress): Promise<void>
     +fetchUserProgress(): Promise<LevelProgress[]>
+}
+class GameFlowController {
+    -_session: GameSession
+    -_stack: GameFlowState[]
+    +session: GameSession
+    +current: GameFlowState
+    +stack: readonly GameFlowState[]
+    +pause(): void
+    +resume(): void
+    +openSettings(): void
+    +closeSettings(): void
+    +restart(newSession: GameSession): void
 }
 class LevelDataArrowBuilder implements IArrowBuilder {
     +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
@@ -278,7 +300,7 @@ class BuildBoardUseCase {
 class GetLocalProgress {
     -_repository: ILocalProgressRepository
     +getAll(): Promise<LevelProgress[]>
-    +getByLevel(levelId: string): Promise<LevelProgress>
+    +getByLevel(levelId: string): Promise<LevelProgress | null>
 }
 interface LoadedLevel {
     +board: Board
@@ -301,7 +323,7 @@ class PlayMoveUseCase {
     +execute(input: PlayMoveInput): PlayMoveResult
 }
 class TopologyQueryService {
-    +getNeighborCell(cell: Cell, portIndex: number): Cell
+    +getNeighborCell(cell: Cell, portIndex: number): Cell | null
     +isExit(cell: Cell, portIndex: number): boolean
     +getAdjacentCells(cell: Cell): Cell[]
 }
@@ -339,6 +361,23 @@ class SyncProgress {
     -processDownstream(): Promise<void>
     -saveAsSynced(progress: LevelProgress): Promise<void>
 }
+interface DerivedNode {
+    +levelId: string
+    +state: "bloqueado" | "disponible" | "completado"
+    +isFocal: boolean
+    +bestScore?: number | undefined
+    +stars?: number | undefined
+    +prerequisites: string[]
+}
+class LevelSelectionProjection {
+    +{static} project(levelMap: LevelMapDTO, progress: LevelProgress[]): DerivedNode[]
+    -{static} computeStars(bestScore: number, __1: [number, number]): number
+}
+class FetchLevelApiClient implements ILevelApiClient {
+    -_baseUrl: string
+    -_timeoutMs: number
+    +fetchLevel(levelId: string): Promise<LevelDataDTO>
+}
 interface ApiProgressDTO {
     +levelId: string
     +score: number
@@ -353,9 +392,56 @@ class FetchProgressApiClient implements IProgressApiClient {
     +pushProgress(progress: LevelProgress): Promise<void>
     +fetchUserProgress(): Promise<LevelProgress[]>
 }
+interface LevelCellDTO {
+    +id: string
+    +portCount: number
+}
+interface LevelConnectionDTO {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelArrowDTO {
+    +id: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface LevelDataDTO {
+    +id: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
+    +allowedMoves: number
+    +cells: LevelCellDTO[]
+    +connections?: LevelConnectionDTO[] | undefined
+    +arrows: LevelArrowDTO[]
+}
+interface SceneCell extends LevelCellDTO {
+    +col: number
+    +row: number
+}
+interface SceneArrow extends LevelArrowDTO {
+    +color: string
+}
+interface Scene {
+    +id: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
+    +allowedMoves: number
+    +cells: SceneCell[]
+    +connections: LevelConnectionDTO[]
+    +arrows: SceneArrow[]
+    +collisionBehavior?: CollisionBehavior | undefined
+}
+class ForgeApiClient {
+    +{static} login(email: string, password: string): Promise<string>
+    +{static} getLevel(id: string): Promise<LevelDataDTO>
+    +{static} createLevel(dto: LevelDataDTO, token: string): Promise<void>
+    +{static} updateLevel(id: string, dto: LevelDataDTO, token: string): Promise<void>
+}
 class CapacitorTokenProvider implements IAuthTokenProvider {
     -TOKEN_KEY: "auth_session_token"
-    +getToken(): Promise<string>
+    +getToken(): Promise<string | null>
     +setToken(token: string): Promise<void>
     +removeToken(): Promise<void>
 }
@@ -372,12 +458,12 @@ class LocalProgressMapper {
     +{static} toPersistence(domain: LevelProgress, isPendingSync: boolean): LocalRecord
 }
 interface IDatabaseDriver {
-    +executeSql(query: string, params?: (string | number)[]): Promise<T[]>
+    +executeSql(query: string, params?: (string | number)[] | undefined): Promise<T[]>
 }
 class SqliteProgressRepository implements ILocalProgressRepository {
     -_db: IDatabaseDriver
     +initialize(): Promise<void>
-    +findByLevelId(levelId: string): Promise<LevelProgress>
+    +findByLevelId(levelId: string): Promise<LevelProgress | null>
     +findAll(): Promise<LevelProgress[]>
     +save(progress: LevelProgress): Promise<void>
     +findPendingSync(): Promise<LevelProgress[]>
@@ -385,7 +471,7 @@ class SqliteProgressRepository implements ILocalProgressRepository {
 }
 class CapacitorSqliteDriver implements IDatabaseDriver {
     -_sqlite: SQLiteConnection
-    -_db: SQLiteDBConnection
+    -_db: SQLiteDBConnection | null
     +openDatabase(dbName?: string): Promise<void>
     +executeSql(query: string, params?: (string | number)[]): Promise<T[]>
 }
@@ -432,6 +518,52 @@ interface ArrowMotion {
     +dy: number
     +durationMs: number
 }
+interface UseForgeInputParams {
+    +width: number
+    +height: number
+    +layout: BoardLayout
+    +enabled: boolean
+    +onCellClick: (col: number, row: number) => void
+}
+interface PendingConnect {
+    +cellId: string
+    +port: number
+}
+interface ForgeState {
+    +scene: Scene
+    +gridCols: number
+    +gridRows: number
+    +tool: ToolMode
+    +selectedArrowId: string | null
+    +pendingConnect: PendingConnect | null
+    +history: { past: Scene[]; future: Scene[]; }
+    +session: { token: string | null; email: string | null; }
+    +setScene: (scene: Scene) => void
+    +setGridCols: (cols: number) => void
+    +setGridRows: (rows: number) => void
+    +setTool: (tool: ToolMode) => void
+    +selectArrow: (arrowId: string | null) => void
+    +setPendingConnect: (pending: PendingConnect | null) => void
+    +setSession: (token: string | null, email: string | null) => void
+    +addCell: (col: number, row: number) => void
+    +removeCell: (cellId: string) => void
+    +connectPorts: (cellIdA: string, portA: number, cellIdB: string, portB: number) => void
+    +disconnectPort: (cellId: string, port: number) => void
+    +placeHead: (cellId: string) => void
+    +rotateHead: (arrowId: string) => void
+    +extendArrow: (arrowId: string, cellId: string) => void
+    +retractArrow: (arrowId: string) => void
+    +deleteArrow: (arrowId: string) => void
+    +setLevelProps: (updates: Partial<Scene>) => void
+    +loadScene: (newScene: Scene) => void
+    +undo: () => void
+    +redo: () => void
+}
+interface ForgeIssue {
+    +severity: "error" | "warning"
+    +code: string
+    +message: string
+}
 interface CellView {
     +id: string
     +col: number
@@ -450,26 +582,6 @@ interface BoardViewModel {
 interface PlayMoveCommand {
     +arrowId: string
 }
-interface SceneCell {
-    +id: string
-    +col: number
-    +row: number
-    +portCount: number
-}
-interface SceneArrow {
-    +id: string
-    +color: string
-    +head: { cellId: string; exitPort: number; }
-    +body: string[]
-}
-interface Scene {
-    +id: string
-    +allowedMoves: number
-    +cells: SceneCell[]
-    +connections: LevelConnectionDTO[]
-    +arrows: SceneArrow[]
-    +collisionBehavior?: CollisionBehavior
-}
 interface ArrowSnapshot {
     +cellIds: string[]
     +exitPort: number
@@ -486,14 +598,14 @@ class GameController {
     -cellIdByPosition: Map<string, string>
     +status: GameStatus
     +movesRemaining: number
-    +score: number
+    +score: number | null
     +collisionBehavior: CollisionBehavior
     +viewModel(): BoardViewModel
-    +resolveArrowIdAt(col: number, row: number): string
-    +playMove(command: PlayMoveCommand): SlideResult
-    +advanceTick(arrowId: string): AdvanceOutcome
+    +resolveArrowIdAt(col: number, row: number): string | null
+    +playMove(command: PlayMoveCommand): SlideResult | null
+    +advanceTick(arrowId: string): AdvanceOutcome | null
     +commitSlide(finalOutcome: AdvanceOutcome): void
-    +snapshotArrow(arrowId: string): ArrowSnapshot
+    +snapshotArrow(arrowId: string): ArrowSnapshot | null
     +restoreArrow(arrowId: string, snapshot: ArrowSnapshot): void
     -visualExitDir(headExitPort: number, cellIds: string[]): number
     -chainCellIds(arrow: Arrow): string[]
@@ -530,11 +642,11 @@ interface GameControllerState {
     +viewModel: BoardViewModel
     +status: GameStatus
     +movesRemaining: number
-    +score: number
+    +score: number | null
     +inFlight: boolean
-    +collision: CollisionSignal
-    +vanishing: VanishSignal
-    +headDisintegrating: HeadDisintegratingSignal
+    +collision: CollisionSignal | null
+    +vanishing: VanishSignal | null
+    +headDisintegrating: HeadDisintegratingSignal | null
     +playMove: (command: PlayMoveCommand) => void
 }
 interface RunTickParams {
@@ -546,11 +658,12 @@ interface RunTickParams {
 interface TickAnimationState {
     +inFlight: boolean
     +motions: ReadonlyMap<string, ArrowMotion>
-    +ghostArrow: ArrowView
+    +ghostArrow: ArrowView | null
     +enabled: boolean
     +setEnabled: (value: boolean) => void
     +run: (params: RunTickParams) => void
 }
+interface I18nDict
 interface PointerGate {
     +button: number
     +isPrimary: boolean

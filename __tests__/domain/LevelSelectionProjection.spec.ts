@@ -1,8 +1,7 @@
-import { describe, it, expect } from 'vitest';
-import { LevelSelectionProjection } from './LevelSelectionProjection';
-import type { LevelMapDTO } from '../../application/dtos/LevelMapDTOs';
-import { LevelProgress } from '../entities/LevelProgress';
-import { Score } from '../value-objects/Score';
+import { LevelSelectionProjection } from '../../src/domain/services/LevelSelectionProjection';
+import type { LevelMapDTO } from '../../src/application/dtos/LevelMapDTOs';
+import { LevelProgress } from '../../src/domain/entities/LevelProgress';
+import { Score } from '../../src/domain/value-objects/Score';
 
 describe('LevelSelectionProjection', () => {
   const levelMap: LevelMapDTO = [

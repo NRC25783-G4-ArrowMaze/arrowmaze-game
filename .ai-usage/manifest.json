@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-06-26T00:00:00Z",
+    "lastUpdated": "2026-07-07T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1406,8 +1406,12 @@
         "layers": {
           "presentation": {
             "status": "extended",
-            "created": ["preview/heartScene.ts"],
-            "modified": ["preview/NeonInteractiveBoard.tsx"]
+            "created": [
+              "preview/heartScene.ts"
+            ],
+            "modified": [
+              "preview/NeonInteractiveBoard.tsx"
+            ]
           }
         },
         "validation": {
@@ -1462,7 +1466,9 @@
               "repositories/IProgressApiClient.ts",
               "repositories/IAuthTokenProvider.ts"
             ],
-            "modified": ["value-objects/Score.ts (createSimpleScore)"]
+            "modified": [
+              "value-objects/Score.ts (createSimpleScore)"
+            ]
           },
           "application": {
             "status": "extended",
@@ -1520,7 +1526,9 @@
         "layers": {
           "presentation": {
             "status": "extended",
-            "created": ["game/sampleLevel2.ts"],
+            "created": [
+              "game/sampleLevel2.ts"
+            ],
             "modified": [
               "game/scene.ts (CollisionBehavior)",
               "game/GameController.ts (snapshotArrow/restoreArrow)",
@@ -1731,6 +1739,47 @@
           "Eliminar 11 archivos duplicados con nombres antiguos para evitar confusión"
         ],
         "notes": "Sesión de alineación de documentación entre arrowmaze-game y arrowmaze-project-core. El objetivo fue establecer project-core como único repositorio de especificaciones (Gherkin, decisiones arquitectónicas, SDD historial). Todos los feature files ahora tienen versión única, sincronizados desde project-core."
+      },
+      {
+        "id": "2026-07-07-001",
+        "date": "2026-07-07",
+        "title": "Sesión SDD e implementación de C1 (GameFlowController) + fix de infraestructura de tests",
+        "file": "2026-07-07-c1-game-flow-controller.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5 / claude-fable-5",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "C1-maquina-estados-flujo",
+        "linked_session": "arrowmaze-project-core/.ai-usage/2026-07/2026-07-07_c1-fsm-flujo-partida-sdd.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 3,
+          "files_renamed": 1,
+          "tests_added": 18
+        },
+        "areas": [
+          "sdd-session",
+          "gherkin-bdd",
+          "state-machine",
+          "pushdown-automaton",
+          "clean-architecture",
+          "application-layer",
+          "testing-infrastructure-fix"
+        ],
+        "validation": {
+          "tests": "passed — 29 suites / 292 tests (18 nuevos de GameFlowController; 12 de C3 corren por primera vez)",
+          "type_check": "passed — tsc --noEmit limpio",
+          "lint": "passed en archivos nuevos — 8 errores globales preexistentes ajenos a esta sesión",
+          "gen_uml": "passed — classes.puml regenerado con GameFlowController"
+        },
+        "decisions": [
+          "PAUSED como autómata de pila en Aplicación/Presentación, NO en GameStatus de Dominio (reconciliado con spec G3 ya cerrada)",
+          "MENU fuera de la FSM: 'no hay partida' = ausencia de GameFlowController (routing de C3)",
+          "Reloj se congela al pausar; salidas de PAUSED: resume/restart/exit; SETTINGS solo sobre PAUSED",
+          "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
+        ],
+        "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
       }
     ],
     "statistics": {
