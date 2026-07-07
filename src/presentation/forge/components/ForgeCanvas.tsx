@@ -128,11 +128,11 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
   // Manejo de clicks a nivel de celda (para tools que no son connect)
   const handleCellClick = (col: number, row: number) => {
     const cellId = sceneOps.cellIdAt(col, row)
-    const isCellOccupied = occupiedCells.has(cellId)
-    const occupyingArrowId = sceneOps.occupiedBy(scene, cellId)
+    const cellExists = occupiedCells.has(cellId) // ¿hay una celda del tablero en este slot?
+    const occupyingArrowId = sceneOps.occupiedBy(scene, cellId) // ¿la ocupa alguna flecha?
 
     if (tool === 'cell') {
-      if (isCellOccupied) {
+      if (cellExists) {
         // Click en celda existente: eliminar (con confirm)
         if (window.confirm(`¿Eliminar celda ${cellId} y sus conexiones/flechas?`)) {
           removeCell(cellId)
@@ -146,9 +146,11 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
       // (Los clicks en puertos los maneja handlePortClick vía sus propios elementos.)
       if (pendingConnect) setPendingConnect(null)
     } else if (tool === 'arrowHead') {
-      if (!isCellOccupied) {
-        // Click en celda libre: colocar cabeza de flecha
+      // Colocar cabeza requiere una celda existente y libre de flechas.
+      if (cellExists && !occupyingArrowId) {
+        const newId = sceneOps.nextArrowId(scene) // id que recibirá la nueva flecha
         placeHead(cellId)
+        selectArrow(newId) // auto-seleccionar para feedback + rotar con R
       }
     } else if (tool === 'extend') {
       if (occupyingArrowId) {
