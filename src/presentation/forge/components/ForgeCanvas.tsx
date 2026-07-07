@@ -339,20 +339,37 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
             const isSelected = arrow.id === selectedArrowId
             const bodyWidth = tileSize * 0.32
             const nodeRadius = tileSize * 0.28
-            const dir = portDelta(arrow.head.exitPort)
             const tipCenter = centers[centers.length - 1]
 
-            // Triángulo de la punta, orientado según exitPort, en la última celda
+            // Dirección de la punta: a lo largo del último segmento del cuerpo.
+            // Si la flecha solo tiene cabeza (sin cuerpo), usa el exitPort configurado.
+            let tipDir: { dCol: number; dRow: number }
+            if (centers.length > 1) {
+              const prev = centers[centers.length - 2]
+              const dx = tipCenter.x - prev.x
+              const dy = tipCenter.y - prev.y
+              const len = Math.hypot(dx, dy) || 1
+              tipDir = { dCol: dx / len, dRow: dy / len }
+            } else {
+              tipDir = portDelta(arrow.head.exitPort)
+            }
+
+            // Triángulo de la punta en la última celda, orientado según tipDir
             const tipLen = tileSize * 0.4
             const tipHalf = tileSize * 0.28
-            const perpX = -dir.dRow
-            const perpY = dir.dCol
-            const apexX = tipCenter.x + dir.dCol * tipLen
-            const apexY = tipCenter.y + dir.dRow * tipLen
+            const perpX = -tipDir.dRow
+            const perpY = tipDir.dCol
+            const apexX = tipCenter.x + tipDir.dCol * tipLen
+            const apexY = tipCenter.y + tipDir.dRow * tipLen
             const b1X = tipCenter.x + perpX * tipHalf
             const b1Y = tipCenter.y + perpY * tipHalf
             const b2X = tipCenter.x - perpX * tipHalf
             const b2Y = tipCenter.y - perpY * tipHalf
+
+            // Marcador del exitPort en la cabeza (siempre visible, aunque tenga cuerpo)
+            const exitDir = portDelta(arrow.head.exitPort)
+            const exitMarkX = headCenter.x + exitDir.dCol * (nodeRadius + 4)
+            const exitMarkY = headCenter.y + exitDir.dRow * (nodeRadius + 4)
 
             return (
               <g key={`arrow-${arrow.id}`} pointerEvents="none">
@@ -396,16 +413,27 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
                   />
                 ))}
 
-                {/* Marca de la cabeza (aro blanco en la celda trasera) */}
+                {/* Marca de la cabeza (aro blanco en la celda trasera = origen) */}
                 <circle
                   cx={headCenter.x}
                   cy={headCenter.y}
                   r={nodeRadius * 0.5}
                   fill="#fff"
-                  opacity={0.9}
+                  opacity={0.95}
                 />
 
-                {/* Punta triangular en la última celda, según exitPort */}
+                {/* Marcador del exitPort en la cabeza (dirección de salida configurada) */}
+                <line
+                  x1={headCenter.x}
+                  y1={headCenter.y}
+                  x2={exitMarkX}
+                  y2={exitMarkY}
+                  stroke="#fff"
+                  strokeWidth={3}
+                  opacity={0.95}
+                />
+
+                {/* Punta triangular en la última celda, a lo largo del cuerpo */}
                 <polygon
                   points={`${apexX},${apexY} ${b1X},${b1Y} ${b2X},${b2Y}`}
                   fill={color}
