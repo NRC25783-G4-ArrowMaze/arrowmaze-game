@@ -6,6 +6,7 @@ import { fetchSceneWithFallback } from './presentation/game/loadScene';
 import type { Scene } from './presentation/game/scene';
 import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
 import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
+import { LOCAL_LEVELS } from './presentation/game/levels/localLevels';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 import type { LevelProgress } from './domain/entities/LevelProgress';
@@ -47,7 +48,7 @@ const App: React.FC = () => {
 
       const [sceneResult, moduleResult] = await Promise.allSettled([
         offlineMode
-          ? Promise.resolve<Scene>(SAMPLE_LEVEL_2)
+          ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
           : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2),
         LocalProgressModuleFactory.create(apiBaseUrl, tokenProvider),
       ]);
@@ -94,8 +95,14 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Cada nodo del mapa juega su nivel del catálogo local: scene.id === levelId,
+  // de modo que el progreso guardado (D1) desbloquea el mapa (C3).
   const handleSelectLevel = (levelId: string) => {
     console.log(`[App] Seleccionado nivel: ${levelId}`);
+    const selected = LOCAL_LEVELS[levelId];
+    if (selected !== undefined) {
+      setScene(selected);
+    }
     setScreen('PLAYING');
   };
 
