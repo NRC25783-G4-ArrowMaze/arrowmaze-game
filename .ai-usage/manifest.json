@@ -1851,10 +1851,46 @@
           "Test del caso 200-sin-token verifica que el Error genérico se re-envuelve como NetworkError"
         ],
         "notes": "Resolución de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
+      },
+      {
+        "id": "2026-07-08-002",
+        "date": "2026-07-08",
+        "title": "Fix del bug de ruta del login en PR #30 (/api/v1/auth/login) + corrección de su test",
+        "file": "2026-07-08-fix-ruta-login-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "review",
+        "feature": "login-service",
+        "linked_session": "2026-07-08-001",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 2,
+          "tests_added": 0
+        },
+        "areas": [
+          "pr-review",
+          "bugfix",
+          "infrastructure-adapter",
+          "api-client",
+          "auth"
+        ],
+        "validation": {
+          "tests": "passed — 35 suites / 324 tests (7/7 en el módulo login)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "diff_review": "passed — solo 2 archivos del fix (ruido de Git LFS en android/*.png excluido)"
+        },
+        "decisions": [
+          "Resguardar el trabajo local en backup/pr30-fix-local y resetear a origin antes de re-aplicar el fix, evitando divergencia y conflictos con el push paralelo de Santiago",
+          "Ruta verificada contra el backend real (arrowmaze-backend src/index.ts, app.use('/api/v1/auth'))",
+          "Corregir la aserción del test de Santiago (fijaba /api/auth/login) para que proteja de la regresión en vez de codificarla"
+        ],
+        "notes": "El follow-up de Santiago (2026-07-08-001) cerró 3 hallazgos menores pero omitió el bug de ruta (404) y su test aseguraba la URL incorrecta. Como revisor se re-aplicó el fix de ruta sobre su versión y se corrigió la aserción; suite en verde."
       }
     ],
     "statistics": {
-      "totalReports": 33,
+      "totalReports": 34,
       "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1886,8 +1922,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-08-001",
-      "summary": "Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF"
+      "id": "2026-07-08-002",
+      "summary": "Fix del bug de ruta del login en PR #30 (/api/v1/auth/login) + corrección de su test"
     }
   }
 }

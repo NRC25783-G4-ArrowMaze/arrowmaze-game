@@ -37,6 +37,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-03 | Auditoría del repo: reglas sincronizadas y tooling corregido | [`2026-07-03-analisis-repo-sync-reglas-tooling.md`](./2026-07-03-analisis-repo-sync-reglas-tooling.md) | Claude Fable 5 |
 | 2026-07-04 | Resolución de conflictos PR #16 + matriz de decisiones de merge | [`2026-07-04-resolucion-conflictos-pr16.md`](./2026-07-04-resolucion-conflictos-pr16.md) | Claude Fable 5 + Haiku 4.5 |
 | 2026-07-08 | Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF | [`2026-07-08-pr30-login-service-followup.md`](./2026-07-08-pr30-login-service-followup.md) | Claude Opus 4.6 (Thinking) |
+| 2026-07-08 | Fix del bug de ruta del login en PR #30 (`/api/v1/auth/login`) + corrección de su test | [`2026-07-08-fix-ruta-login-v1.md`](./2026-07-08-fix-ruta-login-v1.md) | Claude Opus 4.8 (1M context) |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -62,7 +63,7 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 33
+- **Total de reportes:** 34
 - **Última actualización:** 2026-07-08
 - **Suite de tests (actual):** 324/324 ✅ en 35 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
