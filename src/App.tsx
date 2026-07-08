@@ -135,6 +135,12 @@ const App: React.FC = () => {
   // por el mapa. Verifica el desbloqueo con el progreso fresco (el récord se
   // guardó al ganar): si el siguiente sigue bloqueado (p.ej. 'advanced' exige
   // ambos intermedios), cae al mapa para que el jugador elija.
+  //
+  // Si no se puede verificar el desbloqueo (sin módulo de persistencia o falla
+  // la consulta) el avance falla CERRADO: vuelve al mapa en vez de dejar
+  // avanzar a ciegas. Antes fallaba abierto, lo que ocultaba un fallo real de
+  // persistencia — el jugador seguía "avanzando" nivel a nivel sin que nada se
+  // guardara, y al volver al mapa todo el progreso aparecía perdido.
   const handleNextLevel = async () => {
     const nextScene = nextLevelId === undefined ? undefined : LOCAL_LEVELS[nextLevelId];
     if (nextScene === undefined) {
@@ -142,18 +148,24 @@ const App: React.FC = () => {
       return;
     }
 
-    if (progressModule !== null) {
-      try {
-        const progress = await progressModule.getLocalProgress.getAll();
-        setAllProgress(progress);
-        const nodes = LevelSelectionProjection.project(LEVEL_MAP, progress);
-        if (nodes.find((n) => n.levelId === nextLevelId)?.state === 'bloqueado') {
-          setScreen('SELECT');
-          return;
-        }
-      } catch (error: unknown) {
-        console.warn('[App] No se pudo verificar el desbloqueo del siguiente nivel:', error);
+    if (progressModule === null) {
+      console.warn('[App] Sin módulo de progreso: no se puede verificar el desbloqueo del siguiente nivel.');
+      handleBackToSelect();
+      return;
+    }
+
+    try {
+      const progress = await progressModule.getLocalProgress.getAll();
+      setAllProgress(progress);
+      const nodes = LevelSelectionProjection.project(LEVEL_MAP, progress);
+      if (nodes.find((n) => n.levelId === nextLevelId)?.state === 'bloqueado') {
+        setScreen('SELECT');
+        return;
       }
+    } catch (error: unknown) {
+      console.warn('[App] No se pudo verificar el desbloqueo del siguiente nivel:', error);
+      handleBackToSelect();
+      return;
     }
 
     console.log(`[App] Avanzando al siguiente nivel: ${nextLevelId}`);
