@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-07T00:00:00Z",
+    "lastUpdated": "2026-07-08T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1851,10 +1851,76 @@
           "Test del caso 200-sin-token verifica que el Error genérico se re-envuelve como NetworkError"
         ],
         "notes": "Resolución de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
+      },
+      {
+        "id": "2026-07-08-002",
+        "date": "2026-07-08",
+        "title": "Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2)",
+        "file": "2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-avance-siguiente-nivel-progreso-perdido",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 1,
+          "commits": 2
+        },
+        "areas": [
+          "bugfix",
+          "level-select",
+          "local-progress",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio"
+        },
+        "decisions": [
+          "handleNextLevel falla cerrado (vuelve al mapa) si no puede verificar el desbloqueo, en vez de avanzar a ciegas",
+          "Fix aplicado sobre una rama basada en dev (base real del flujo del equipo)",
+          "Causa raíz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
+        ],
+        "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo botón funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md."
+      },
+      {
+        "id": "2026-07-08-003",
+        "date": "2026-07-08",
+        "title": "Quitar el botón \"Volver\" redundante del header de partida",
+        "file": "2026-07-08-fix-boton-volver-header-redundante.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-boton-volver-header-redundante",
+        "linked_session": "2026-07-08-002",
+        "status": "completed",
+        "deliverables": {
+          "files_modified": 1,
+          "commits": 1
+        },
+        "areas": [
+          "bugfix",
+          "ui-cleanup",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio",
+          "lint": "passed — eslint sin hallazgos en el archivo modificado"
+        },
+        "decisions": [
+          "Quitar el botón Volver del header de GameView por quedar duplicado con Salir (PauseOverlay) y Volver al mapa (GameOverlay)",
+          "Conservar el botón de Pausa en el header, sin equivalente en otro lugar durante la partida en curso"
+        ],
+        "notes": "Continuación directa de la sesión 2026-07-08-002 (fix de avance de nivel)."
       }
     ],
     "statistics": {
-      "totalReports": 33,
+      "totalReports": 36,
       "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1874,13 +1940,14 @@
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)",
-        "Gemini (versión no especificada)"
+        "Gemini (versión no especificada)",
+        "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
-      "totalFilesCreated": 124,
+      "totalFilesCreated": 127,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 324,
-      "totalTestSuites": 35,
+      "totalTestsPassing": 330,
+      "totalTestSuites": 36,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
