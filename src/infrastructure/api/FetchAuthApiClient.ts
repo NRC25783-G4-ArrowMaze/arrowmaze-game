@@ -44,6 +44,7 @@ export class FetchAuthApiClient implements IAuthApiClient {
       if (error instanceof InvalidCredentialsError) {
         throw error; // Propagamos el error de credenciales hacia la UI
       }
+      if (error instanceof NetworkError) throw error;
       throw new NetworkError(error instanceof Error ? error.message : 'Error de red desconocido');
     }
   }
