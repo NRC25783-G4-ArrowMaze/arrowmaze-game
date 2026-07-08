@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Arrow Maze</string>
+    <string name="title_activity_main">Arrow Maze</string>
+    <string name="package_name">com.arrowmaze.app</string>
+    <string name="custom_url_scheme">com.arrowmaze.app</string>
+</resources>

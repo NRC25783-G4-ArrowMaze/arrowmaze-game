@@ -1,0 +1,691 @@
+@startuml
+class Port {
+    -index: number
+    +getIndex(): number
+}
+class TopologyError extends Error
+class BoardRegistryError extends Error
+class ConnectionError extends Error
+class LevelDataError extends Error
+class BoardMutationError extends Error
+class Cell {
+    -id: string
+    -portCount: number
+    -ports: readonly Port[]
+    -connections: Map<number, { neighborCell: Cell; neighborPortIndex: number; }>
+    -arrowSegment: { isHead: boolean; cellId: string; } | null
+    -occupied: boolean
+    +getId(): string
+    +getPortCount(): number
+    +getPortAtIndex(index: number): Port
+    +getNeighborAtPort(portIndex: number): Cell | null
+    +getConnection(portIndex: number): { neighbor: Cell; neighborPortIndex: number; } | null
+    +isExit(portIndex: number): boolean
+    +canConnect(portIndex: number): boolean
+    +_getNeighborPortIndex(portIndex: number): number | null
+    +_connectToNeighbor(portIndex: number, neighborCell: Cell, neighborPortIndex: number): void
+    +_disconnectFromNeighbor(portIndex: number): void
+    +hasArrowSegment(): boolean
+    +isOccupied(): boolean
+    +getArrowSegment(): { isHead: boolean; cellId: string; } | null
+    +placeArrowSegment(segment: { isHead: boolean; cellId: string; }): void
+    +removeArrowSegment(): void
+}
+class TopologyValidator {
+    +{static} validateEvenPortCount(portCount: number): void
+    +{static} validatePortIndex(portIndex: number, portCount: number): void
+    +{static} validateNoSelfConnect(cellA: Cell, cellB: Cell): void
+}
+class Board {
+    -id: string
+    -cells: Map<string, Cell>
+    +getId(): string
+    +getAllCells(): Cell[]
+    +getCell(id: string): Cell | undefined
+    +addCell(cell: Cell): void
+    +removeCell(cellId: string): void
+    +connectPorts(cellA: Cell, portIndexA: number, cellB: Cell, portIndexB: number): void
+    +disconnectPort(cell: Cell, portIndex: number): void
+}
+interface PlaceArrowInput {
+    +board: Board
+    +headCellId: string
+    +exitPort: number
+    +bodyCellIds?: string[] | undefined
+}
+interface ArrowSegmentDTO {
+    +cellId: string
+    +isHead: boolean
+    +exitPort: number | null
+    +entryPort: number | null
+}
+interface PlaceArrowResult {
+    +success: boolean
+    +arrowLength: number
+    +segments: ArrowSegmentDTO[]
+    +error?: string | undefined
+}
+interface CellDTO {
+    +id: string
+    +portCount: number
+    +isOccupied: boolean
+}
+interface ConnectionDTO {
+    +fromCellId: string
+    +fromPort: number
+    +toCellId: string
+    +toPort: number
+}
+interface LoadLevelResult {
+    +success: boolean
+    +levelId: string
+    +cells: CellDTO[]
+    +connections: ConnectionDTO[]
+    +error?: string | undefined
+}
+interface LevelCellDTO {
+    +id: string
+    +portCount: number
+}
+interface LevelConnectionDTO {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelArrowDTO {
+    +id: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface LevelDataDTO {
+    +id: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
+    +allowedMoves: number
+    +arrows: LevelArrowDTO[]
+    +cells: LevelCellDTO[]
+    +connections?: LevelConnectionDTO[] | undefined
+}
+interface LevelMapNodeDTO {
+    +levelId: string
+    +prerequisites: string[]
+    +pathHint?: { x: number; y: number; } | undefined
+    +starThresholds?: [number, number] | undefined
+}
+abstract class ArrowSegment {
+    +cell: Cell
+    +prev: ArrowSegment | null
+    +next: ArrowSegment | null
+    +{abstract} isHead: boolean
+    +getCellId(): string
+}
+class Head extends ArrowSegment {
+    +isHead: true
+    +exitPort: number
+}
+class Segment extends ArrowSegment {
+    +isHead: false
+    +entryPort: number
+}
+class ArrowPlacementError extends Error
+class ArrowCreationError extends Error
+class ArrowCinematicError extends Error
+interface AdvanceResult {
+    +outcome: AdvanceOutcome
+    +freedCellIds: readonly string[]
+    +occupiedCellIds: readonly string[]
+}
+class Arrow {
+    -_head: Head
+    -_inFlight: boolean
+    +head: Head
+    +length: number
+    +extend(nextCell: Cell): void
+    +destroy(): void
+    +advance(): AdvanceResult
+    -_collectChain(): ArrowSegment[]
+    -_calculateTargets(chain: ArrowSegment[]): { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]
+    -_commitAdvance(chain: ArrowSegment[], targets: { segment: ArrowSegment; exitDir: number; targetCell: Cell | null; }[]): AdvanceResult
+    -_getTail(): ArrowSegment
+    -_findConnectingPort(fromCell: Cell, toCell: Cell): number | null
+    -_cellBelongsToSelf(cell: Cell): boolean
+}
+interface AdvanceArrowInput {
+    +board: Board
+    +arrow: Arrow
+}
+interface AdvanceResultDTO {
+    +success: boolean
+    +outcome: AdvanceOutcome
+    +segments: ArrowSegmentDTO[]
+    +freedCellIds: string[]
+    +occupiedCellIds: string[]
+    +arrowLength: number
+    +error?: string | undefined
+}
+class NoMovesRemainingError extends Error
+class GameAlreadyFinishedError extends Error
+class ScoringTracker {
+    -_ticksUsed: number
+    -_totalFails: number
+    -_consecutiveFails: number
+    -_accumulatedPenalty: number
+    +ticksUsed: number
+    +totalFails: number
+    +consecutiveFails: number
+    +accumulatedPenalty: number
+    +recordTick(): void
+    +recordSuccess(): void
+    +recordFailure(): void
+}
+class Score {
+    +timeScore: number
+    +penaltyTotal: number
+    +flawlessVictory: boolean
+    +finalScore: number
+    +{static} compute(tracker: ScoringTracker): Score
+    +{static} createSimpleScore(value: number): Score
+}
+class GameSession {
+    -_movesRemaining: number
+    -_status: GameStatus
+    -_scoringTracker: ScoringTracker
+    -_score: Score | null
+    +movesRemaining: number
+    +status: GameStatus
+    +score: Score | null
+    +consumeMove(): void
+    +recordMoveOutcome(moveSucceeded: boolean): void
+    +evaluateStatus(board: Board): GameStatus
+}
+interface PlayMoveInput {
+    +session: GameSession
+    +board: Board
+    +arrow: Arrow
+}
+interface PlayMoveResult {
+    +success: boolean
+    +outcome?: "advanced" | "blocked" | "destroyed" | undefined
+    +movesRemaining: number
+    +gameStatus: GameStatus
+    +score?: number | undefined
+    +error?: string | undefined
+}
+interface SlideInput {
+    +session: GameSession
+    +board: Board
+    +arrow: Arrow
+}
+interface SlideResult {
+    +success: boolean
+    +trajectory: AdvanceOutcome[]
+    +finalOutcome?: AdvanceOutcome | undefined
+    +movesRemaining: number
+    +gameStatus: GameStatus
+    +score?: number | undefined
+    +error?: string | undefined
+}
+class InvalidFlowTransitionError extends Error
+interface IArrowBuilder {
+    +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
+}
+interface IAuthTokenProvider {
+    +getToken(): Promise<string | null>
+}
+interface IBoardBuilder {
+    +build(data: LevelDataDTO): Board
+}
+interface ILevelApiClient {
+    +fetchLevel(levelId: string): Promise<LevelDataDTO>
+}
+class InvalidLevelProgressError extends Error
+class LevelProgress {
+    -_levelId: string
+    -_score: Score
+    -_movesUsed: number
+    -_timeElapsedSeconds: number
+    -_achievedAt: Date
+    +levelId: string
+    +score: Score
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: Date
+    +isBeatenBy(newScore: Score, newMovesUsed: number, newTimeElapsedSeconds: number): boolean
+    +{static} create(levelId: string, score: Score, movesUsed: number, timeElapsedSeconds: number, achievedAt?: Date): LevelProgress
+}
+interface ILocalProgressRepository {
+    +initialize(): Promise<void>
+    +findByLevelId(levelId: string): Promise<LevelProgress | null>
+    +findAll(): Promise<LevelProgress[]>
+    +save(progress: LevelProgress): Promise<void>
+    +findPendingSync(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+interface IProgressApiClient {
+    +pushProgress(progress: LevelProgress): Promise<void>
+    +fetchUserProgress(): Promise<LevelProgress[]>
+}
+class GameFlowController {
+    -_session: GameSession
+    -_stack: GameFlowState[]
+    +session: GameSession
+    +current: GameFlowState
+    +stack: readonly GameFlowState[]
+    +pause(): void
+    +resume(): void
+    +openSettings(): void
+    +closeSettings(): void
+    +restart(newSession: GameSession): void
+}
+class LevelDataArrowBuilder implements IArrowBuilder {
+    +buildAll(board: Board, arrowDTOs: LevelArrowDTO[]): Arrow[]
+}
+class LevelDataBoardBuilder implements IBoardBuilder {
+    +build(data: LevelDataDTO): Board
+    -validateBaseStructure(data: LevelDataDTO): void
+    -validateCellData(cellData: LevelCellDTO): void
+    -processConnection(board: Board, conn: LevelConnectionDTO): void
+    -validateOppositePorts(fromCell: Cell, fromPort: number, toCell: Cell, toPort: number): void
+    -validateArrowIntegrity(board: Board, arrow: LevelArrowDTO): void
+}
+class AdvanceArrowUseCase {
+    +execute(input: AdvanceArrowInput): AdvanceResultDTO
+    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
+}
+class BuildBoardUseCase {
+    -builder: IBoardBuilder
+    +execute(levelData: LevelDataDTO): Board
+}
+class GetLocalProgress {
+    -_repository: ILocalProgressRepository
+    +getAll(): Promise<LevelProgress[]>
+    +getByLevel(levelId: string): Promise<LevelProgress | null>
+}
+interface LoadedLevel {
+    +board: Board
+    +arrows: Arrow[]
+}
+interface ILoadedLevelRepository {
+    +getLoadedLevel(levelId: string): Promise<LoadedLevel>
+}
+class LevelLoader {
+    -boardBuilder: IBoardBuilder
+    -arrowBuilder: IArrowBuilder
+    +load(data: LevelDataDTO): LoadedLevel
+}
+class PlaceArrowUseCase {
+    +execute(input: PlaceArrowInput): PlaceArrowResult
+    -_projectChain(head: ArrowSegment): ArrowSegmentDTO[]
+}
+class PlayMoveUseCase {
+    -advanceUseCase: AdvanceArrowUseCase
+    +execute(input: PlayMoveInput): PlayMoveResult
+}
+class TopologyQueryService {
+    +getNeighborCell(cell: Cell, portIndex: number): Cell | null
+    +isExit(cell: Cell, portIndex: number): boolean
+    +getAdjacentCells(cell: Cell): Cell[]
+}
+class PathChecker {
+    -{static} queryService: TopologyQueryService
+    +{static} canReachExit(startCell: Cell): boolean
+}
+class QueryTopologyUseCase {
+    -queryService: TopologyQueryService
+    +getAdjacentCells(board: Board, cellId: string): CellDTO[]
+    +isExitPort(board: Board, cellId: string, portIndex: number): boolean
+    +canReachExit(board: Board, cellId: string): boolean
+    -resolveCell(board: Board, cellId: string): Cell
+}
+class SaveLocalProgress {
+    -_repository: ILocalProgressRepository
+    +execute(levelId: string, finalScore: Score, movesUsed: number, timeElapsedSeconds: number): Promise<void>
+}
+class SlideArrowUseCase {
+    -advanceUseCase: AdvanceArrowUseCase
+    +execute(input: SlideInput): SlideResult
+}
+class SyncOfflineProgress {
+    -_repository: ILocalProgressRepository
+    +getPendingSyncRecords(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+class SessionExpiredError extends Error
+class NetworkError extends Error
+class SyncProgress {
+    -_localRepository: ILocalProgressRepository
+    -_apiClient: IProgressApiClient
+    +execute(): Promise<void>
+    -processUpstream(): Promise<void>
+    -processDownstream(): Promise<void>
+    -saveAsSynced(progress: LevelProgress): Promise<void>
+}
+interface DerivedNode {
+    +levelId: string
+    +state: "bloqueado" | "disponible" | "completado"
+    +isFocal: boolean
+    +bestScore?: number | undefined
+    +stars?: number | undefined
+    +prerequisites: string[]
+}
+class LevelSelectionProjection {
+    +{static} project(levelMap: LevelMapDTO, progress: LevelProgress[]): DerivedNode[]
+    -{static} computeStars(bestScore: number, __1: [number, number]): number
+}
+class FetchLevelApiClient implements ILevelApiClient {
+    -_baseUrl: string
+    -_timeoutMs: number
+    +fetchLevel(levelId: string): Promise<LevelDataDTO>
+}
+interface ApiProgressDTO {
+    +levelId: string
+    +score: number
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: string
+}
+class FetchProgressApiClient implements IProgressApiClient {
+    -_baseUrl: string
+    -_tokenProvider: IAuthTokenProvider
+    -getHeaders(): Promise<HeadersInit>
+    +pushProgress(progress: LevelProgress): Promise<void>
+    +fetchUserProgress(): Promise<LevelProgress[]>
+}
+interface LevelCellDTO {
+    +id: string
+    +portCount: number
+}
+interface LevelConnectionDTO {
+    +fromCell: string
+    +fromPort: number
+    +toCell: string
+    +toPort: number
+}
+interface LevelArrowDTO {
+    +id: string
+    +head: { cellId: string; exitPort: number; }
+    +body: string[]
+}
+interface LevelDataDTO {
+    +id: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
+    +allowedMoves: number
+    +cells: LevelCellDTO[]
+    +connections?: LevelConnectionDTO[] | undefined
+    +arrows: LevelArrowDTO[]
+}
+interface SceneCell extends LevelCellDTO {
+    +col: number
+    +row: number
+}
+interface SceneArrow extends LevelArrowDTO {
+    +color: string
+}
+interface Scene {
+    +id: string
+    +name?: string | undefined
+    +difficulty?: string | undefined
+    +allowedMoves: number
+    +cells: SceneCell[]
+    +connections: LevelConnectionDTO[]
+    +arrows: SceneArrow[]
+    +collisionBehavior?: CollisionBehavior | undefined
+}
+class ForgeApiClient {
+    +{static} login(email: string, password: string): Promise<string>
+    +{static} getLevel(id: string): Promise<LevelDataDTO>
+    +{static} createLevel(dto: LevelDataDTO, token: string): Promise<void>
+    +{static} updateLevel(id: string, dto: LevelDataDTO, token: string): Promise<void>
+}
+class CapacitorTokenProvider implements IAuthTokenProvider {
+    -TOKEN_KEY: "auth_session_token"
+    +getToken(): Promise<string | null>
+    +setToken(token: string): Promise<void>
+    +removeToken(): Promise<void>
+}
+interface LocalRecord {
+    +levelId: string
+    +score: number
+    +movesUsed: number
+    +timeElapsedSeconds: number
+    +achievedAt: string
+    +pendingSync: number
+}
+class LocalProgressMapper {
+    +{static} toDomain(record: LocalRecord): LevelProgress
+    +{static} toPersistence(domain: LevelProgress, isPendingSync: boolean): LocalRecord
+}
+interface IDatabaseDriver {
+    +executeSql(query: string, params?: (string | number)[] | undefined): Promise<T[]>
+}
+class SqliteProgressRepository implements ILocalProgressRepository {
+    -_db: IDatabaseDriver
+    +initialize(): Promise<void>
+    +findByLevelId(levelId: string): Promise<LevelProgress | null>
+    +findAll(): Promise<LevelProgress[]>
+    +save(progress: LevelProgress): Promise<void>
+    +findPendingSync(): Promise<LevelProgress[]>
+    +markAsSynced(levelId: string): Promise<void>
+}
+class CapacitorSqliteDriver implements IDatabaseDriver {
+    -_sqlite: SQLiteConnection
+    -_db: SQLiteDBConnection | null
+    +openDatabase(dbName?: string): Promise<void>
+    +executeSql(query: string, params?: (string | number)[]): Promise<T[]>
+}
+interface LocalProgressModule {
+    +saveLocalProgress: SaveLocalProgress
+    +getLocalProgress: GetLocalProgress
+    +syncOfflineProgress: SyncOfflineProgress
+    +syncProgress: SyncProgress
+}
+class LocalProgressModuleFactory {
+    +{static} create(apiBaseUrl: string, tokenProvider: IAuthTokenProvider): Promise<LocalProgressModule>
+}
+interface ILevelRepository {
+    +getLevel(levelId: string): Promise<LevelDataDTO>
+}
+class InMemoryLevelRepository implements ILevelRepository, ILoadedLevelRepository {
+    -fixtures: Map<string, LevelDataDTO>
+    -levelLoader: LevelLoader
+    +getLevel(levelId: string): Promise<LevelDataDTO>
+    +getLoadedLevel(levelId: string): Promise<LoadedLevel>
+    +addFixture(levelData: LevelDataDTO): void
+}
+interface Point {
+    +x: number
+    +y: number
+}
+interface GridDelta {
+    +dCol: number
+    +dRow: number
+}
+interface GridPosition {
+    +col: number
+    +row: number
+}
+interface BoardLayout {
+    +maxCol: number
+    +maxRow: number
+    +cellSize: number
+    +offset: Point
+}
+interface ArrowMotion {
+    +kind: ArrowMotionKind
+    +dx: number
+    +dy: number
+    +durationMs: number
+}
+interface UseForgeInputParams {
+    +width: number
+    +height: number
+    +layout: BoardLayout
+    +enabled: boolean
+    +onCellClick: (col: number, row: number) => void
+}
+interface PendingConnect {
+    +cellId: string
+    +port: number
+}
+interface ForgeState {
+    +scene: Scene
+    +gridCols: number
+    +gridRows: number
+    +tool: ToolMode
+    +selectedArrowId: string | null
+    +pendingConnect: PendingConnect | null
+    +history: { past: Scene[]; future: Scene[]; }
+    +session: { token: string | null; email: string | null; }
+    +setScene: (scene: Scene) => void
+    +setGridCols: (cols: number) => void
+    +setGridRows: (rows: number) => void
+    +setTool: (tool: ToolMode) => void
+    +selectArrow: (arrowId: string | null) => void
+    +setPendingConnect: (pending: PendingConnect | null) => void
+    +setSession: (token: string | null, email: string | null) => void
+    +addCell: (col: number, row: number) => void
+    +removeCell: (cellId: string) => void
+    +connectPorts: (cellIdA: string, portA: number, cellIdB: string, portB: number) => void
+    +disconnectPort: (cellId: string, port: number) => void
+    +placeHead: (cellId: string) => void
+    +rotateHead: (arrowId: string) => void
+    +extendArrow: (arrowId: string, cellId: string) => void
+    +retractArrow: (arrowId: string) => void
+    +deleteArrow: (arrowId: string) => void
+    +setLevelProps: (updates: Partial<Scene>) => void
+    +loadScene: (newScene: Scene) => void
+    +undo: () => void
+    +redo: () => void
+}
+interface ForgeIssue {
+    +severity: "error" | "warning"
+    +code: string
+    +message: string
+}
+interface CellView {
+    +id: string
+    +col: number
+    +row: number
+}
+interface ArrowView {
+    +id: string
+    +color: string
+    +cellIds: string[]
+    +exitDir: number
+}
+interface BoardViewModel {
+    +cells: CellView[]
+    +arrows: ArrowView[]
+}
+interface PlayMoveCommand {
+    +arrowId: string
+}
+interface ArrowSnapshot {
+    +cellIds: string[]
+    +exitPort: number
+}
+class GameController {
+    -board: Board
+    -session: GameSession
+    -slideUseCase: SlideArrowUseCase
+    -advanceUseCase: AdvanceArrowUseCase
+    -_collisionBehavior: CollisionBehavior
+    -arrowsById: Map<string, Arrow>
+    -colorById: Map<string, string>
+    -layoutByCellId: Map<string, { col: number; row: number; }>
+    -cellIdByPosition: Map<string, string>
+    +status: GameStatus
+    +gameSession: GameSession
+    +movesRemaining: number
+    +score: number | null
+    +collisionBehavior: CollisionBehavior
+    +viewModel(): BoardViewModel
+    +resolveArrowIdAt(col: number, row: number): string | null
+    +playMove(command: PlayMoveCommand): SlideResult | null
+    +advanceTick(arrowId: string): AdvanceOutcome | null
+    +commitSlide(finalOutcome: AdvanceOutcome): void
+    +snapshotArrow(arrowId: string): ArrowSnapshot | null
+    +restoreArrow(arrowId: string, snapshot: ArrowSnapshot): void
+    -visualExitDir(headExitPort: number, cellIds: string[]): number
+    -chainCellIds(arrow: Arrow): string[]
+}
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: Cell[]
+}
+interface ArrowShape {
+    +cellIds: string[]
+    +exitDir: number
+}
+interface ArrowRenderOverride extends ArrowShape {
+    +arrowId: string
+}
+interface CollisionSignal {
+    +arrowId: string
+    +nonce: number
+}
+interface VanishSignal {
+    +color: string
+    +cellIds: string[]
+    +nonce: number
+}
+interface HeadDisintegratingSignal {
+    +color: string
+    +cellId: string
+    +exitDir: number
+    +nonce: number
+}
+interface GameControllerState {
+    +controller: GameController
+    +viewModel: BoardViewModel
+    +status: GameStatus
+    +movesRemaining: number
+    +score: number | null
+    +inFlight: boolean
+    +collision: CollisionSignal | null
+    +vanishing: VanishSignal | null
+    +headDisintegrating: HeadDisintegratingSignal | null
+    +playMove: (command: PlayMoveCommand) => void
+    +flowState: GameFlowState
+    +pause: () => void
+    +resume: () => void
+    +openSettings: () => void
+    +closeSettings: () => void
+    +restart: () => void
+}
+interface RunTickParams {
+    +arrowId: string
+    +preArrow: ArrowView
+    +outcome: AdvanceOutcome
+    +cellSize: number
+}
+interface TickAnimationState {
+    +inFlight: boolean
+    +motions: ReadonlyMap<string, ArrowMotion>
+    +ghostArrow: ArrowView | null
+    +enabled: boolean
+    +setEnabled: (value: boolean) => void
+    +run: (params: RunTickParams) => void
+}
+interface I18nDict
+interface PointerGate {
+    +button: number
+    +isPrimary: boolean
+}
+interface UseBoardInputParams {
+    +width: number
+    +height: number
+    +layout: BoardLayout
+    +enabled: boolean
+    +resolveArrowIdAt: ArrowResolver
+    +onPlayMove: (command: PlayMoveCommand) => void
+}
+interface ArrowPath {
+    +id: string
+    +color: string
+    +cells: [number, number][]
+}
+@enduml
