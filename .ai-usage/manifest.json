@@ -1814,10 +1814,42 @@
           "Causa raíz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
         ],
         "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo botón funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md para el diagnóstico completo y los pasos de reproducción pendientes."
+      },
+      {
+        "id": "2026-07-08-002",
+        "date": "2026-07-08",
+        "title": "Quitar el botón \"Volver\" redundante del header de partida",
+        "file": "2026-07-08-fix-boton-volver-header-redundante.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-boton-volver-header-redundante",
+        "linked_session": "2026-07-08-001",
+        "status": "completed",
+        "deliverables": {
+          "files_modified": 1,
+          "commits": 1
+        },
+        "areas": [
+          "bugfix",
+          "ui-cleanup",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 34 suites / 323 tests en verde, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio",
+          "lint": "passed — eslint sin hallazgos en el archivo modificado"
+        },
+        "decisions": [
+          "Quitar el botón \"Volver\" del header de GameView por quedar duplicado con \"Salir\" (PauseOverlay) y \"Volver al mapa\" (GameOverlay)",
+          "Conservar el botón de Pausa en el header, sin equivalente en otro lugar durante la partida en curso"
+        ],
+        "notes": "Continuación directa de la sesión 2026-07-08-001 (fix de avance de nivel). Commit 86a8b129 en la rama fix/verificacion-avance-siguiente-nivel."
       }
     ],
     "statistics": {
-      "totalReports": 33,
+      "totalReports": 34,
       "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -1840,7 +1872,7 @@
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8440,
-      "totalFilesCreated": 125,
+      "totalFilesCreated": 126,
       "totalFilesDeleted": 16,
       "totalTestsPassing": 323,
       "totalTestSuites": 34,
