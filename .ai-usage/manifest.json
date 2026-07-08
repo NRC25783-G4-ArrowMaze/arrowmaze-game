@@ -1780,11 +1780,82 @@
           "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
         ],
         "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
+      },
+      {
+        "id": "2026-07-07-002",
+        "date": "2026-07-07",
+        "title": "Servicio de Inicio de Sesión (LoginUser) — Autenticación del Cliente Móvil",
+        "file": "2026-07-07-login-service.md",
+        "tool": "Gemini",
+        "model": "Gemini (versión no especificada)",
+        "author": "@SantiagoChirinos",
+        "phase": "implementation",
+        "feature": "login-service",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 1,
+          "tests_added": 3
+        },
+        "areas": [
+          "authentication",
+          "clean-architecture",
+          "application-layer",
+          "infrastructure-adapter",
+          "ports-and-adapters",
+          "testing"
+        ],
+        "validation": {
+          "tests": "passed — 3 tests nuevos en LoginUser.spec.ts (éxito, credenciales inválidas, error de red)",
+          "type_check": "passed — ajuste de IAuthTokenProvider tras error TS2551 (setToken/removeToken)"
+        },
+        "decisions": [
+          "Autenticación tratada como obtención de credenciales a nivel de infraestructura/aplicación; no se modela entidad de usuario en el cliente para esta etapa",
+          "LoginUser no captura errores de negocio ni de red: los propaga para que la capa de presentación (React) los maneje",
+          "DTO de respuesta simplificado a { token }, delegando la validación de éxito al código de estado HTTP"
+        ],
+        "notes": "Añade el caso de uso LoginUser, el adaptador FetchAuthApiClient y el contrato IAuthApiClient, extendiendo IAuthTokenProvider con setToken/removeToken. Aún no conectado a la UI (App.tsx conserva el TODO pendiente de redirección a Login)."
+      },
+      {
+        "id": "2026-07-08-001",
+        "date": "2026-07-08",
+        "title": "Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF",
+        "file": "2026-07-08-pr30-login-service-followup.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Claude Opus 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "login-service",
+        "linked_session": "2026-07-07-002",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 7,
+          "tests_added": 4
+        },
+        "areas": [
+          "bugfix",
+          "infrastructure-adapter",
+          "testing",
+          "code-style",
+          "documentation"
+        ],
+        "validation": {
+          "tests": "passed — 35 suites / 324 tests (4 nuevos de FetchAuthApiClient)",
+          "type_check": "passed — tsc --noEmit limpio",
+          "diff_review": "passed — solo archivos esperados modificados"
+        },
+        "decisions": [
+          "Guard de NetworkError replica patrón de FetchLevelApiClient para consistencia inter-adaptadores",
+          "Test del caso 200-sin-token verifica que el Error genérico se re-envuelve como NetworkError"
+        ],
+        "notes": "Resolución de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
       }
     ],
     "statistics": {
-      "totalReports": 31,
-      "lastUpdated": "2026-07-06T00:00:00Z",
+      "totalReports": 33,
+      "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1797,6 +1868,7 @@
       "modelsUsed": [
         "Claude Fable 5",
         "Claude Haiku 4.5",
+        "Claude Opus 4.6 (Thinking)",
         "Claude Opus 4.8",
         "Claude Sonnet 4.6 (Thinking)",
         "Claude Sonnet 4.6",
@@ -1804,18 +1876,18 @@
         "Gemini 3.5 Flash (Low)",
         "Gemini (versión no especificada)"
       ],
-      "totalLinesGenerated": 8440,
-      "totalFilesCreated": 123,
+      "totalLinesGenerated": 8530,
+      "totalFilesCreated": 124,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 249,
-      "totalTestSuites": 24,
+      "totalTestsPassing": 324,
+      "totalTestSuites": 35,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-06-001",
-      "summary": "Sincronización de especificaciones con arrowmaze-project-core como fuente única"
+      "id": "2026-07-08-001",
+      "summary": "Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF"
     }
   }
 }
