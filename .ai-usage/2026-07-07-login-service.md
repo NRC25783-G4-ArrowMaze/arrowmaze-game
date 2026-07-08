@@ -11,12 +11,12 @@
   * "vamos a realizar los tests"
 
 * **Salida tomada de la IA:**
-  * `src/domain/errors/AuthErrors.ts` \[NEW\] — Error de dominio `InvalidCredentialsError` para abstraer el código HTTP 401.
+  * `src/application/errors/AuthErrors.ts` \[NEW\] — Error de dominio `InvalidCredentialsError` para abstraer el código HTTP 401.
   * `src/application/ports/IAuthApiClient.ts` \[NEW\] — Contrato del cliente de red exclusivo para el inicio de sesión.
   * `src/application/ports/IAuthTokenProvider.ts` \[MODIFY\] — Actualización de la interfaz para incluir explícitamente las firmas de `setToken` y `removeToken`.
   * `src/application/services/LoginUser.ts` \[NEW\] — Orquestador del inicio de sesión (Aplicación) que delega la autenticación y la persistencia segura.
   * `src/infrastructure/api/FetchAuthApiClient.ts` \[NEW\] — Adaptador del cliente HTTP (fetch) con un DTO estricto (`LoginResponseDTO`).
-  * `tests/application/LoginUser.spec.ts` \[NEW\] — Pruebas unitarias para el caso de uso validando el flujo de éxito y de propagación de errores.
+  * `__tests__/application/LoginUser.spec.ts` \[NEW\] — Pruebas unitarias para el caso de uso validando el flujo de éxito y de propagación de errores.
 
 * **Modificaciones manuales del equipo:**
   * **Ajuste Estricto de Contratos:** Incorporación de las firmas `setToken` y `removeToken` en `IAuthTokenProvider` tras detectar una violación de interfaz (TS2551), protegiendo la Inversión de Dependencias.
