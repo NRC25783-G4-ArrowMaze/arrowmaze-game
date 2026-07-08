@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-07T00:00:00Z",
+    "lastUpdated": "2026-07-08T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1780,11 +1780,45 @@
           "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
         ],
         "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
+      },
+      {
+        "id": "2026-07-08-001",
+        "date": "2026-07-08",
+        "title": "Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2)",
+        "file": "2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-avance-siguiente-nivel-progreso-perdido",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 1,
+          "commits": 2
+        },
+        "areas": [
+          "bugfix",
+          "level-select",
+          "local-progress",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 34 suites / 323 tests en verde, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio"
+        },
+        "decisions": [
+          "handleNextLevel falla cerrado (vuelve al mapa) si no puede verificar el desbloqueo, en vez de avanzar a ciegas",
+          "Fix aplicado sobre una rama nueva desde main (donde vive el código de v0.1.2), no sobre la rama de trabajo activa que no lo incluía",
+          "Causa raíz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
+        ],
+        "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo botón funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md para el diagnóstico completo y los pasos de reproducción pendientes."
       }
     ],
     "statistics": {
-      "totalReports": 31,
-      "lastUpdated": "2026-07-06T00:00:00Z",
+      "totalReports": 33,
+      "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1802,13 +1836,14 @@
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)",
-        "Gemini (versión no especificada)"
+        "Gemini (versión no especificada)",
+        "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8440,
-      "totalFilesCreated": 123,
+      "totalFilesCreated": 125,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 249,
-      "totalTestSuites": 24,
+      "totalTestsPassing": 323,
+      "totalTestSuites": 34,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"

@@ -36,6 +36,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-03 | Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta | [`2026-07-03-pulido-visual-animaciones.md`](./2026-07-03-pulido-visual-animaciones.md) | Claude Fable 5 |
 | 2026-07-03 | Auditoría del repo: reglas sincronizadas y tooling corregido | [`2026-07-03-analisis-repo-sync-reglas-tooling.md`](./2026-07-03-analisis-repo-sync-reglas-tooling.md) | Claude Fable 5 |
 | 2026-07-04 | Resolución de conflictos PR #16 + matriz de decisiones de merge | [`2026-07-04-resolucion-conflictos-pr16.md`](./2026-07-04-resolucion-conflictos-pr16.md) | Claude Fable 5 + Haiku 4.5 |
+| 2026-07-08 | Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2) | [`2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md`](./2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md) | Claude Sonnet 5 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -61,9 +62,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 30
-- **Última actualización:** 2026-07-04
-- **Suite de tests (actual):** 249/249 ✅ en 24 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
+- **Total de reportes:** 33
+- **Última actualización:** 2026-07-08
+- **Suite de tests (actual):** 323/323 ✅ en 34 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
