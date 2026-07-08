@@ -91,9 +91,6 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
       <header className="app-header">
         <h1>Arrow Maze</h1>
         <div className="app-actions">
-          {onBack && (
-            <button onClick={onBack}>← Volver</button>
-          )}
           {game.status === 'IN_PROGRESS' && (
             <button onClick={game.pause} disabled={game.inFlight}>
               ⏸ Pausa

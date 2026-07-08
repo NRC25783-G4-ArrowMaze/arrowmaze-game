@@ -116,8 +116,8 @@ src/
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| [D1](./features/D1-persistencia-local.feature) | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ❌ Pendiente |
-| [D2](./features/D2-sincronizacion-local-remota.feature) | Sincronización del progreso local con el servidor remoto | D1, E2 | ❌ Pendiente |
+| [D1](./features/D1-persistencia-local.feature) | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ⚠️ Parcial — escritura implementada (`SqliteProgressRepository`, `SaveLocalProgress`, wired en `App.tsx`); lectura (`GetLocalProgress`) sin consumidor en UI, pendiente de C3 |
+| [D2](./features/D2-sincronizacion-local-remota.feature) | Sincronización del progreso local con el servidor remoto | D1, E2 | ⚠️ Parcial — upstream/downstream implementado y testeado (`SyncProgress`, wired en `App.tsx`/`GameView`); pendiente cerrar P21 (resolución formal de conflictos) |
 
 ### Grupo E — Identidad y sesión
 
