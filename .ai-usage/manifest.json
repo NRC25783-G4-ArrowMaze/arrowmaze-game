@@ -1780,11 +1780,47 @@
           "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
         ],
         "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
+      },
+      {
+        "id": "2026-07-07-002",
+        "date": "2026-07-07",
+        "title": "Servicio de Inicio de Sesión (LoginUser) — Autenticación del Cliente Móvil",
+        "file": "2026-07-07-login-service.md",
+        "tool": "Gemini",
+        "model": "Gemini (versión no especificada)",
+        "author": "@SantiagoChirinos",
+        "phase": "implementation",
+        "feature": "login-service",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 1,
+          "tests_added": 3
+        },
+        "areas": [
+          "authentication",
+          "clean-architecture",
+          "application-layer",
+          "infrastructure-adapter",
+          "ports-and-adapters",
+          "testing"
+        ],
+        "validation": {
+          "tests": "passed — 3 tests nuevos en LoginUser.spec.ts (éxito, credenciales inválidas, error de red)",
+          "type_check": "passed — ajuste de IAuthTokenProvider tras error TS2551 (setToken/removeToken)"
+        },
+        "decisions": [
+          "Autenticación tratada como obtención de credenciales a nivel de infraestructura/aplicación; no se modela entidad de usuario en el cliente para esta etapa",
+          "LoginUser no captura errores de negocio ni de red: los propaga para que la capa de presentación (React) los maneje",
+          "DTO de respuesta simplificado a { token }, delegando la validación de éxito al código de estado HTTP"
+        ],
+        "notes": "Añade el caso de uso LoginUser, el adaptador FetchAuthApiClient y el contrato IAuthApiClient, extendiendo IAuthTokenProvider con setToken/removeToken. Aún no conectado a la UI (App.tsx conserva el TODO pendiente de redirección a Login)."
       }
     ],
     "statistics": {
-      "totalReports": 31,
-      "lastUpdated": "2026-07-06T00:00:00Z",
+      "totalReports": 32,
+      "lastUpdated": "2026-07-07T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1814,8 +1850,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-06-001",
-      "summary": "Sincronización de especificaciones con arrowmaze-project-core como fuente única"
+      "id": "2026-07-07-002",
+      "summary": "Servicio de inicio de sesión (LoginUser) del cliente móvil"
     }
   }
 }
