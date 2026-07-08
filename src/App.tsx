@@ -12,6 +12,7 @@ import { LevelSelectionProjection } from './domain/services/LevelSelectionProjec
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
 import type { LevelProgress } from './domain/entities/LevelProgress';
+import { useTranslation } from './presentation/i18n/I18nContext';
 
 /** Siguiente nivel en el orden del LEVEL_MAP, o undefined si es el último. */
 const nextLevelIdOf = (levelId: string): string | undefined => {
@@ -19,12 +20,14 @@ const nextLevelIdOf = (levelId: string): string | undefined => {
   return index === -1 ? undefined : LEVEL_MAP[index + 1]?.levelId;
 };
 
+// `difficulty` guarda una CLAVE semántica (no un literal) que la UI traduce vía
+// catálogo i18n (G2); `name` es CONTENIDO del nivel y se muestra tal cual (P24).
 const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
-  'level-initial': { name: 'Nivel Inicial', difficulty: 'Fácil' },
-  'level-intermediate-a': { name: 'Desafío A', difficulty: 'Medio' },
-  'level-intermediate-b': { name: 'Desafío B', difficulty: 'Medio' },
-  'level-advanced': { name: 'Avanzado', difficulty: 'Difícil' },
-  'level-expert': { name: 'Experto', difficulty: 'Muy difícil' },
+  'level-initial': { name: 'Nivel Inicial', difficulty: 'easy' },
+  'level-intermediate-a': { name: 'Desafío A', difficulty: 'medium' },
+  'level-intermediate-b': { name: 'Desafío B', difficulty: 'medium' },
+  'level-advanced': { name: 'Avanzado', difficulty: 'hard' },
+  'level-expert': { name: 'Experto', difficulty: 'veryHard' },
 };
 
 /**
@@ -38,6 +41,7 @@ const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
  * otra.
  */
 const App: React.FC = () => {
+  const { t } = useTranslation();
   const [progressModule, setProgressModule] = useState<LocalProgressModule | null>(null);
   const [scene, setScene] = useState<Scene | null>(null);
   const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
@@ -175,9 +179,9 @@ const App: React.FC = () => {
   if (scene === null) {
     return (
       <div className="app">
-        <header className="app-header"><h1>Arrow Maze</h1></header>
+        <header className="app-header"><h1>{t('app.title')}</h1></header>
         <main className="app-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p>Cargando motor del juego...</p>
+          <p>{t('app.loading')}</p>
         </main>
       </div>
     );
@@ -186,7 +190,7 @@ const App: React.FC = () => {
   if (screen === 'SELECT') {
     return (
       <div className="app">
-        <header className="app-header"><h1>Arrow Maze</h1></header>
+        <header className="app-header"><h1>{t('app.title')}</h1></header>
         <main className="app-main">
           <LevelSelectScreen
             progress={allProgress}

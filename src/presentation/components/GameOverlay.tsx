@@ -1,5 +1,6 @@
 import React from 'react';
 import type { GameStatus } from '../../domain/entities/GameSession';
+import { useTranslation } from '../i18n/I18nContext';
 
 /** Props del overlay de fin de juego. */
 export interface GameOverlayProps {
@@ -31,6 +32,8 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
   onNextLevel,
   onBackToMap,
 }) => {
+  const { t } = useTranslation();
+
   if (status === 'IN_PROGRESS') {
     return null;
   }
@@ -41,7 +44,7 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
     <div
       data-testid="game-overlay"
       role="alertdialog"
-      aria-label={won ? 'Ganaste' : 'Perdiste'}
+      aria-label={won ? t('overlay.aria.won') : t('overlay.aria.lost')}
       style={{
         position: 'absolute',
         inset: 0,
@@ -62,11 +65,11 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
           color: won ? '#16a34a' : '#dc2626',
         }}
       >
-        {won ? '¡Ganaste!' : 'Perdiste'}
+        {won ? t('overlay.victory.title') : t('overlay.defeat.title')}
       </div>
       {won && score !== null && (
         <div style={{ fontSize: '1rem', color: '#374151' }}>
-          Puntaje: {score}
+          {t('common.score', { score })}
         </div>
       )}
       {won && onNextLevel !== undefined && (
@@ -75,12 +78,12 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
           onClick={onNextLevel}
           style={{ minWidth: '200px', marginTop: '8px' }}
         >
-          Siguiente nivel →
+          {t('overlay.victory.nextLevel')}
         </button>
       )}
       {onBackToMap !== undefined && (
         <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
-          Volver al mapa
+          {t('overlay.backToMap')}
         </button>
       )}
     </div>

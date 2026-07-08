@@ -9,6 +9,7 @@ import { useBoardInput } from '../input/useBoardInput';
 import type { Scene } from '../game/scene';
 import { type LocalProgressModule } from '../../infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from '../../domain/value-objects/Score';
+import { useTranslation } from '../i18n/I18nContext';
 
 const BOARD_SIZE = 560;
 
@@ -38,6 +39,7 @@ interface GameViewProps {
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
 export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel }) => {
+  const { t } = useTranslation();
   const game = useGameController(scene);
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
@@ -89,17 +91,17 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Arrow Maze</h1>
+        <h1>{t('app.title')}</h1>
         <div className="app-actions">
           {game.status === 'IN_PROGRESS' && (
             <button onClick={game.pause} disabled={game.inFlight}>
-              ⏸ Pausa
+              {t('game.pause')}
             </button>
           )}
         </div>
         <div className="app-stats">
-          <div className="stat-moves">
-            <span className="stat-label">Movimientos</span>
+          <div className="stat-moves" aria-label={t('game.movesLeft', { count: game.movesRemaining })}>
+            <span className="stat-label">{t('game.moves')}</span>
             <span className="stat-value">{game.movesRemaining}</span>
           </div>
           <div
@@ -112,10 +114,10 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             }
           >
             {game.status === 'IN_PROGRESS'
-              ? '▶ En juego'
+              ? t('game.status.inProgress')
               : game.status === 'WON'
-                ? '✓ Victoria'
-                : '✗ Derrota'}
+                ? t('game.status.won')
+                : t('game.status.lost')}
           </div>
         </div>
       </header>

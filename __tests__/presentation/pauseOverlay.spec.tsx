@@ -1,58 +1,58 @@
-import type { ReactElement } from 'react';
+// Criterio de tests i18n (G2): los componentes que consumen el contexto i18n
+// (useTranslation) se prueban con render() de @testing-library; la lógica pura
+// (catálogos, resolución, fallback, interpolación) se prueba como función pura.
+// El patrón puro del repo (invocar el componente como función) es incompatible
+// con hooks → render() solo donde hay contexto.
+import { render, screen, fireEvent } from '@testing-library/react';
+import { I18nProvider } from '../../src/presentation/i18n/I18nProvider';
 import { PauseOverlay } from '../../src/presentation/components/PauseOverlay';
+import { translate } from '../../src/presentation/i18n/i18n';
 
-// Sin @testing-library: se invoca el componente como función pura y se
-// inspecciona el elemento React devuelto (mismo patrón del repo: testear
-// lógica/props, no snapshots de DOM).
 const noop = (): void => undefined;
+const renderEs = (ui: React.ReactElement) =>
+  render(<I18nProvider initialLang="es">{ui}</I18nProvider>);
 
 describe('PauseOverlay — visibilidad', () => {
   it('visible=false: no renderiza (retorna null)', () => {
-    const element = PauseOverlay({
-      visible: false,
-      onResume: noop,
-      onRestart: noop,
-      onOpenSettings: noop,
-      onExit: noop,
-    });
-    expect(element).toBeNull();
+    renderEs(
+      <PauseOverlay visible={false} onResume={noop} onRestart={noop} onOpenSettings={noop} onExit={noop} />,
+    );
+    expect(screen.queryByTestId('pause-overlay')).toBeNull();
   });
 
   it('visible=true: renderiza el overlay de pausa', () => {
-    const element = PauseOverlay({
-      visible: true,
-      onResume: noop,
-      onRestart: noop,
-      onOpenSettings: noop,
-      onExit: noop,
-    });
-    expect(element).not.toBeNull();
-    expect(element?.props['data-testid']).toBe('pause-overlay');
+    renderEs(
+      <PauseOverlay visible onResume={noop} onRestart={noop} onOpenSettings={noop} onExit={noop} />,
+    );
+    expect(screen.getByTestId('pause-overlay')).toBeInTheDocument();
   });
 });
 
 describe('PauseOverlay — callbacks expuestos sin envolver', () => {
-  it('cada botón invoca exactamente el callback recibido por identidad', () => {
+  it('cada botón invoca exactamente el callback recibido', () => {
     const onResume = jest.fn();
     const onRestart = jest.fn();
     const onOpenSettings = jest.fn();
     const onExit = jest.fn();
 
-    const element = PauseOverlay({
-      visible: true,
-      onResume,
-      onRestart,
-      onOpenSettings,
-      onExit,
-    });
+    renderEs(
+      <PauseOverlay
+        visible
+        onResume={onResume}
+        onRestart={onRestart}
+        onOpenSettings={onOpenSettings}
+        onExit={onExit}
+      />,
+    );
 
-    const children = element?.props.children as ReactElement[];
-    const buttons = children.filter((child) => child?.type === 'button');
-    const clickHandlers = buttons.map((button) => button.props.onClick);
+    fireEvent.click(screen.getByText(translate('es', 'pause.resume')));
+    fireEvent.click(screen.getByText(translate('es', 'pause.restart')));
+    fireEvent.click(screen.getByText(translate('es', 'pause.settings')));
+    fireEvent.click(screen.getByText(translate('es', 'pause.exit')));
 
-    expect(clickHandlers).toContain(onResume);
-    expect(clickHandlers).toContain(onRestart);
-    expect(clickHandlers).toContain(onOpenSettings);
-    expect(clickHandlers).toContain(onExit);
+    expect(onResume).toHaveBeenCalledTimes(1);
+    expect(onRestart).toHaveBeenCalledTimes(1);
+    expect(onOpenSettings).toHaveBeenCalledTimes(1);
+    expect(onExit).toHaveBeenCalledTimes(1);
   });
 });
