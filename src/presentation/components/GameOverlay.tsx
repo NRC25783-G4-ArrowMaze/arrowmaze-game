@@ -7,17 +7,30 @@ export interface GameOverlayProps {
   status: GameStatus;
   /** Puntaje final (presente solo al ganar). */
   score: number | null;
+  /**
+   * Avanza directo al siguiente nivel del mapa (C3). Solo se ofrece al ganar
+   * y si el caller lo provee (tras el último nivel no hay siguiente).
+   */
+  onNextLevel?: () => void;
+  /** Vuelve al mapa de selección de niveles. */
+  onBackToMap?: () => void;
 }
 
 /**
  * GameOverlay — Capa simple de fin de juego (B4).
  *
  * Se superpone al tablero cuando la sesión es terminal (WON/LOST) con un mensaje
- * claro. No gestiona vidas/corazones, pantalla de inicio ni hints (grupo C, fuera
- * de alcance). El bloqueo de input en estado terminal lo hace la capa de input;
- * este componente es solo feedback visual.
+ * claro y las acciones de continuación: al ganar, avanzar al siguiente nivel sin
+ * pasar por el mapa (si existe) o volver al mapa. No gestiona vidas/corazones,
+ * pantalla de inicio ni hints (grupo C, fuera de alcance). El bloqueo de input
+ * en estado terminal lo hace la capa de input; la navegación la decide el caller.
  */
-export const GameOverlay: React.FC<GameOverlayProps> = ({ status, score }) => {
+export const GameOverlay: React.FC<GameOverlayProps> = ({
+  status,
+  score,
+  onNextLevel,
+  onBackToMap,
+}) => {
   if (status === 'IN_PROGRESS') {
     return null;
   }
@@ -55,6 +68,20 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({ status, score }) => {
         <div style={{ fontSize: '1rem', color: '#374151' }}>
           Puntaje: {score}
         </div>
+      )}
+      {won && onNextLevel !== undefined && (
+        <button
+          className="btn-primary"
+          onClick={onNextLevel}
+          style={{ minWidth: '200px', marginTop: '8px' }}
+        >
+          Siguiente nivel →
+        </button>
+      )}
+      {onBackToMap !== undefined && (
+        <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
+          Volver al mapa
+        </button>
       )}
     </div>
   );
