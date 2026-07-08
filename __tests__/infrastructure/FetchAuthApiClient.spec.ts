@@ -26,7 +26,7 @@ describe('FetchAuthApiClient', () => {
     const token = await client.login('user@example.com', 'password123');
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://localhost:3000/api/auth/login',
+      'http://localhost:3000/api/v1/auth/login',
       expect.objectContaining({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

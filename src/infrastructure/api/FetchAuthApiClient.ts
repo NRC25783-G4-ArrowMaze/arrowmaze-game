@@ -16,7 +16,7 @@ export class FetchAuthApiClient implements IAuthApiClient {
 
   async login(email: string, password: string): Promise<string> {
     try {
-      const response = await fetch(`${this._baseUrl}/api/auth/login`, {
+      const response = await fetch(`${this._baseUrl}/api/v1/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
