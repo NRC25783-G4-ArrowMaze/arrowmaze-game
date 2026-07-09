@@ -10,6 +10,8 @@ export const en: Catalog = {
     pause: '⏸ Pause',
     moves: 'Moves',
     movesLeft: 'Moves left: {count}',
+    time: 'Time',
+    timeElapsed: 'Elapsed time: {time}',
     status: {
       inProgress: '▶ In progress',
       won: '✓ Victory',
@@ -25,6 +27,7 @@ export const en: Catalog = {
       title: 'You lost',
     },
     backToMap: 'Back to map',
+    time: 'Time: {time}',
     aria: {
       won: 'You won',
       lost: 'You lost',
