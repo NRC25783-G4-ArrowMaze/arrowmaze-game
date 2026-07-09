@@ -1,19 +1,33 @@
+// Criterio de tests i18n (G2): los componentes que consumen el contexto i18n
+// (useTranslation) se prueban con render() de @testing-library; la lógica pura
+// (GameController + GameFlowController) se prueba directamente como función pura.
+// El patrón puro del repo (invocar el componente como función) es incompatible
+// con hooks → render() solo donde hay contexto.
+import { render, screen } from '@testing-library/react';
 import { GameController } from '../../src/presentation/game/GameController';
 import { SAMPLE_LEVEL } from '../../src/presentation/game/sampleLevel';
 import { GameFlowController } from '../../src/application/services/GameFlowController';
 import { InvalidFlowTransitionError } from '../../src/application/errors/GameFlowErrors';
 import { PauseOverlay } from '../../src/presentation/components/PauseOverlay';
 import { SettingsOverlay } from '../../src/presentation/components/SettingsOverlay';
+import { I18nProvider } from '../../src/presentation/i18n/I18nProvider';
 
 // Mapea los Rule del .feature C4 sobre GameController + GameFlowController
-// directamente (sin renderizar React ni el hook useGameController), replicando
-// las condiciones que GameView usa para decidir qué overlay mostrar y si el
-// tablero acepta input.
+// directamente (sin renderizar el hook useGameController), replicando las
+// condiciones que GameView usa para decidir qué overlay mostrar.
 const noop = (): void => undefined;
 
 /** Misma condición que GameView.onPointerDown (enabled). */
 function boardInputEnabled(controller: GameController, flow: GameFlowController, inFlight: boolean): boolean {
   return controller.status === 'IN_PROGRESS' && !inFlight && flow.current === 'ACTIVE';
+}
+
+/** Renderiza un overlay bajo el contexto i18n y devuelve si está presente por su testid. */
+function overlayPresent(ui: React.ReactElement, testId: string): boolean {
+  const { container, unmount } = render(<I18nProvider initialLang="es">{ui}</I18nProvider>);
+  const present = container.querySelector(`[data-testid="${testId}"]`) !== null;
+  unmount();
+  return present;
 }
 
 describe('Rule — Pausa congela el input del tablero sin perder el estado de la partida', () => {
@@ -41,27 +55,19 @@ describe('Rule — Pausa congela el input del tablero sin perder el estado de la
     const controller = new GameController(SAMPLE_LEVEL);
     const flow = new GameFlowController(controller.gameSession);
 
-    expect(
-      PauseOverlay({
-        visible: flow.current === 'PAUSED',
-        onResume: noop,
-        onRestart: noop,
-        onOpenSettings: noop,
-        onExit: noop,
-      }),
-    ).toBeNull();
+    const overlayFor = (): React.ReactElement => (
+      <PauseOverlay
+        visible={flow.current === 'PAUSED'}
+        onResume={noop}
+        onRestart={noop}
+        onOpenSettings={noop}
+        onExit={noop}
+      />
+    );
 
+    expect(overlayPresent(overlayFor(), 'pause-overlay')).toBe(false);
     flow.pause();
-
-    expect(
-      PauseOverlay({
-        visible: flow.current === 'PAUSED',
-        onResume: noop,
-        onRestart: noop,
-        onOpenSettings: noop,
-        onExit: noop,
-      }),
-    ).not.toBeNull();
+    expect(overlayPresent(overlayFor(), 'pause-overlay')).toBe(true);
   });
 });
 
@@ -127,17 +133,23 @@ describe('Rule — Ajustes es un contenedor accesible solo desde Pausa', () => {
     flow.pause();
     flow.openSettings();
 
-    const settings = SettingsOverlay({ visible: flow.current === 'SETTINGS', onClose: noop });
-    const pause = PauseOverlay({
-      visible: flow.current === 'PAUSED',
-      onResume: noop,
-      onRestart: noop,
-      onOpenSettings: noop,
-      onExit: noop,
-    });
+    const settingsPresent = overlayPresent(
+      <SettingsOverlay visible={flow.current === 'SETTINGS'} onClose={noop} />,
+      'settings-overlay',
+    );
+    const pausePresent = overlayPresent(
+      <PauseOverlay
+        visible={(flow.current as string) === 'PAUSED'}
+        onResume={noop}
+        onRestart={noop}
+        onOpenSettings={noop}
+        onExit={noop}
+      />,
+      'pause-overlay',
+    );
 
-    expect(settings).not.toBeNull();
-    expect(pause).toBeNull();
+    expect(settingsPresent).toBe(true);
+    expect(pausePresent).toBe(false);
   });
 });
 
@@ -149,18 +161,14 @@ describe('Rule — la navegación entre pantallas de soporte es reversible y sin
 
     const onResume = jest.fn();
     const onExit = jest.fn();
-    const overlay = PauseOverlay({
-      visible: true,
-      onResume,
-      onRestart: noop,
-      onOpenSettings: noop,
-      onExit,
-    });
+    render(
+      <I18nProvider initialLang="es">
+        <PauseOverlay visible onResume={onResume} onRestart={noop} onOpenSettings={noop} onExit={onExit} />
+      </I18nProvider>,
+    );
 
-    expect(overlay).not.toBeNull();
-    // No se pausa a mitad de un slide en vuelo (regla ya cubierta por
-    // useGameController.pause() como no-op); aquí solo se verifica que
-    // el overlay expone Reanudar y Salir como acciones de retorno.
+    // El overlay expone Reanudar y Salir como acciones de retorno, sin invocarlas solo por renderizar.
+    expect(screen.getByTestId('pause-overlay')).toBeInTheDocument();
     expect(onResume).not.toHaveBeenCalled();
     expect(onExit).not.toHaveBeenCalled();
   });
@@ -172,9 +180,13 @@ describe('Rule — la navegación entre pantallas de soporte es reversible y sin
     flow.openSettings();
 
     const onClose = jest.fn();
-    const overlay = SettingsOverlay({ visible: true, onClose });
+    render(
+      <I18nProvider initialLang="es">
+        <SettingsOverlay visible onClose={onClose} />
+      </I18nProvider>,
+    );
 
-    expect(overlay).not.toBeNull();
+    expect(screen.getByTestId('settings-overlay')).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
   });
 });

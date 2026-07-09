@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../i18n/I18nContext';
 
 /** Props del overlay de pausa (C4). */
 export interface PauseOverlayProps {
@@ -28,6 +29,8 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
   onOpenSettings,
   onExit,
 }) => {
+  const { t } = useTranslation();
+
   if (!visible) {
     return null;
   }
@@ -36,7 +39,7 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
     <div
       data-testid="pause-overlay"
       role="dialog"
-      aria-label="Pausa"
+      aria-label={t('pause.title')}
       style={{
         position: 'absolute',
         inset: 0,
@@ -49,18 +52,18 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
         borderRadius: '12px',
       }}
     >
-      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>Pausa</div>
+      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('pause.title')}</div>
       <button className="btn-primary" onClick={onResume} style={{ minWidth: '180px' }}>
-        Reanudar
+        {t('pause.resume')}
       </button>
       <button onClick={onRestart} style={{ minWidth: '180px' }}>
-        Reiniciar
+        {t('pause.restart')}
       </button>
       <button onClick={onOpenSettings} style={{ minWidth: '180px' }}>
-        Ajustes
+        {t('pause.settings')}
       </button>
       <button onClick={onExit} style={{ minWidth: '180px' }}>
-        Salir
+        {t('pause.exit')}
       </button>
     </div>
   );

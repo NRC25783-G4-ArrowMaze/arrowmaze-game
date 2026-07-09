@@ -1,6 +1,6 @@
 import React from 'react';
 import type { DerivedNode } from '../../domain/services/LevelSelectionProjection';
-import { t } from '../i18n/i18n';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface LevelNodeCardProps {
   node: DerivedNode;
@@ -13,12 +13,13 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
   metadata,
   onSelectLevel,
 }) => {
+  const { t } = useTranslation();
   const isBlocked = node.state === 'bloqueado';
   const isFocal = node.isFocal && !isBlocked;
 
   const handleClick = () => {
     if (isBlocked) {
-      alert(t('c3.locked.notice'));
+      alert(t('levelSelect.locked.notice'));
       return;
     }
     onSelectLevel();
@@ -69,14 +70,14 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
             </div>
           )}
           <div style={{ fontSize: '14px', color: '#666' }}>
-            Score: {node.bestScore}
+            {t('common.score', { score: node.bestScore ?? 0 })}
           </div>
         </>
       )}
 
       {node.state === 'disponible' && !isFocal && (
         <div style={{ fontSize: '12px', color: '#999' }}>
-          {t('c3.status.available')}
+          {t('levelSelect.status.available')}
         </div>
       )}
 
@@ -89,13 +90,13 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
             animation: 'pulse 1s infinite',
           }}
         >
-          Siguiente →
+          {t('levelSelect.card.next')}
         </div>
       )}
 
       {metadata?.difficulty && (
         <div style={{ fontSize: '12px', marginTop: '8px', color: '#888' }}>
-          {metadata.difficulty}
+          {t(`level.difficulty.${metadata.difficulty}`)}
         </div>
       )}
     </div>

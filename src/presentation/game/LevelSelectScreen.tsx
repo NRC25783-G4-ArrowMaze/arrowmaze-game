@@ -4,7 +4,7 @@ import type { DerivedNode } from '../../domain/services/LevelSelectionProjection
 import { LevelSelectionProjection } from '../../domain/services/LevelSelectionProjection';
 import { LEVEL_MAP } from './levelMap';
 import { LevelNodeCard } from './LevelNodeCard';
-import { t } from '../i18n/i18n';
+import { useTranslation } from '../i18n/I18nContext';
 
 interface LevelSelectScreenProps {
   progress: LevelProgress[];
@@ -17,6 +17,7 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
   onSelectLevel,
   levelMetadata,
 }) => {
+  const { t } = useTranslation();
   const [derived, setDerived] = useState<DerivedNode[]>([]);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
       <header style={{ marginBottom: '24px' }}>
         {/* Color explícito: sin él, el modo oscuro del sistema lo heredaba
             blanco sobre la pantalla clara y el título desaparecía. */}
-        <h1 style={{ color: '#1f2937', fontSize: '24px' }}>{t('c3.title')}</h1>
+        <h1 style={{ color: '#1f2937', fontSize: '24px' }}>{t('levelSelect.title')}</h1>
       </header>
 
       <main
