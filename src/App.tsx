@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import { GameView } from './presentation/components/GameView';
 import { SAMPLE_LEVEL_2 } from './presentation/game/sampleLevel2';
@@ -11,6 +11,11 @@ import { LEVEL_MAP } from './presentation/game/levelMap';
 import { LevelSelectionProjection } from './domain/services/LevelSelectionProjection';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
 import { CapacitorTokenProvider } from './infrastructure/auth/CapacitorTokenProvider';
+import { FetchAuthApiClient } from './infrastructure/api/FetchAuthApiClient';
+import { LoginUser } from './application/services/LoginUser';
+import { RegisterUser } from './application/services/RegisterUser';
+import { LogoutUser } from './application/services/LogoutUser';
+import { AccountOverlay } from './presentation/components/AccountOverlay';
 import type { LevelProgress } from './domain/entities/LevelProgress';
 import { useTranslation } from './presentation/i18n/I18nContext';
 
@@ -46,17 +51,49 @@ const App: React.FC = () => {
   const [scene, setScene] = useState<Scene | null>(null);
   const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
   const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
+  const [accountVisible, setAccountVisible] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Composition root de autenticación (E1/E2): una sola instancia de los casos
+  // de uso, reutilizando el mismo TokenProvider nativo que el bootstrap de
+  // persistencia. Sin estado nuevo persistido: la sesión es el token.
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  const tokenProvider = useMemo(() => new CapacitorTokenProvider(), []);
+  const authModule = useMemo(() => {
+    const apiClient = new FetchAuthApiClient(apiBaseUrl);
+    return {
+      loginUser: new LoginUser(apiClient, tokenProvider),
+      registerUser: new RegisterUser(apiClient),
+      logoutUser: new LogoutUser(apiClient, tokenProvider),
+    };
+  }, [apiBaseUrl, tokenProvider]);
+
+  // Estado de sesión inicial para el badge/overlay: token presente = logueado.
+  useEffect(() => {
+    let active = true;
+    tokenProvider.getToken()
+      .then((token) => { if (active) setIsAuthenticated(token !== null); })
+      .catch(() => { /* token ilegible: se asume deslogueado */ });
+    return () => { active = false; };
+  }, [tokenProvider]);
+
+  // Cambios de sesión desde el overlay: actualiza el badge y, al iniciar sesión,
+  // dispara una sincronización (D2) ahora que las peticiones llevan el token.
+  const handleAuthChanged = (authenticated: boolean): void => {
+    setIsAuthenticated(authenticated);
+    if (authenticated) {
+      progressModule?.syncProgress.execute()
+        .then(() => console.log('[App] Sincronización tras login completada.'))
+        .catch((error: unknown) => console.warn('[App] Sincronización tras login detenida:', error));
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
 
     const bootstrapGame = async () => {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
       // Modo offline (build de distribución): sin fetch remoto ni sync.
       const offlineMode = import.meta.env.VITE_OFFLINE_MODE === 'true';
-
-      // Inyectamos el proveedor nativo de Capacitor
-      const tokenProvider = new CapacitorTokenProvider();
 
       // La escena NO espera a la persistencia: si SQLite tarda o falla (p.ej.
       // wasm ausente en web), el juego debe abrir igual — sin guardado, pero
@@ -110,7 +147,7 @@ const App: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [apiBaseUrl, tokenProvider]);
 
   // Cada nodo del mapa juega su nivel del catálogo local: scene.id === levelId,
   // de modo que el progreso guardado (D1) desbloquea el mapa (C3).
@@ -189,8 +226,13 @@ const App: React.FC = () => {
 
   if (screen === 'SELECT') {
     return (
-      <div className="app">
-        <header className="app-header"><h1>{t('app.title')}</h1></header>
+      <div className="app" style={{ position: 'relative' }}>
+        <header className="app-header">
+          <h1>{t('app.title')}</h1>
+          <div className="app-actions">
+            <button onClick={() => setAccountVisible(true)}>{t('account.button')}</button>
+          </div>
+        </header>
         <main className="app-main">
           <LevelSelectScreen
             progress={allProgress}
@@ -198,6 +240,17 @@ const App: React.FC = () => {
             levelMetadata={LEVEL_METADATA}
           />
         </main>
+        {accountVisible && (
+          <AccountOverlay
+            visible
+            onClose={() => setAccountVisible(false)}
+            initialAuthenticated={isAuthenticated}
+            loginUser={authModule.loginUser}
+            registerUser={authModule.registerUser}
+            logoutUser={authModule.logoutUser}
+            onAuthChanged={handleAuthChanged}
+          />
+        )}
       </div>
     );
   }
