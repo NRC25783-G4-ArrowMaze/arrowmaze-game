@@ -52,6 +52,10 @@ export const en: Catalog = {
     },
     audio: {
       title: 'Audio',
+      mute: 'Mute all',
+      sfxVolume: 'SFX volume',
+      musicVolume: 'Music volume',
+      credits: 'Audio credits',
     },
     comingSoon: 'Coming soon',
     back: 'Back',

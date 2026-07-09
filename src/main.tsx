@@ -5,6 +5,7 @@ import App from './App'
 import { initSqliteWebStore } from './infrastructure/persistence/sqlite/initWebSqlite'
 import { I18nProvider } from './presentation/i18n/I18nProvider'
 import { CapacitorLanguagePreference } from './infrastructure/i18n/CapacitorLanguagePreference'
+import { AudioProvider } from './presentation/audio/AudioProvider'
 
 const languagePreference = new CapacitorLanguagePreference()
 
@@ -20,7 +21,9 @@ initSqliteWebStore()
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
         <I18nProvider preferenceProvider={languagePreference}>
-          <App />
+          <AudioProvider>
+            <App />
+          </AudioProvider>
         </I18nProvider>
       </StrictMode>,
     )

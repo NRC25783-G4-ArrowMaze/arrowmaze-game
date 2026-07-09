@@ -211,6 +211,7 @@ const App: React.FC = () => {
       progressModule={progressModule}
       onBack={handleBackToSelect}
       onNextLevel={nextLevelId === undefined ? undefined : handleNextLevel}
+      difficulty={LEVEL_METADATA[scene.id]?.difficulty}
     />
   );
 };

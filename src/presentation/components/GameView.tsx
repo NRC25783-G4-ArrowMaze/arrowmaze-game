@@ -12,6 +12,8 @@ import { Score } from '../../domain/value-objects/Score';
 import { useTranslation } from '../i18n/I18nContext';
 import { useLevelTimer } from '../game/useLevelTimer';
 import { LevelTimerDisplay } from './LevelTimerDisplay';
+import { useAudioContext } from '../audio/AudioContext';
+import { useGameAudio } from '../game/useGameAudio';
 
 const BOARD_SIZE = 560;
 
@@ -25,6 +27,8 @@ interface GameViewProps {
    * nivel del mapa sin pasar por la selección.
    */
   onNextLevel?: () => void;
+  /** Dificultad semántica del nivel (easy/medium/hard/veryHard) para la música (G1). */
+  difficulty?: string;
 }
 
 /**
@@ -40,7 +44,7 @@ interface GameViewProps {
  *      colisión o salida, reproyectando la forma real del dominio en cada paso.
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
-export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel }) => {
+export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel, difficulty }) => {
   const { t } = useTranslation();
   const game = useGameController(scene);
 
@@ -49,6 +53,19 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
   // controller. Proyección de presentación: no toca el dominio ni el score.
   const timerRunning = game.status === 'IN_PROGRESS' && game.flowState === 'ACTIVE';
   const timeSeconds = useLevelTimer(timerRunning, game.controller);
+
+  // Audio (G1): proyección de solo lectura del estado del juego → SFX por
+  // outcome, música en loop por dificultad, controles/mute desde Ajustes.
+  const { engine, unlocked, prefs } = useAudioContext();
+  useGameAudio({
+    status: game.status,
+    flowState: game.flowState,
+    difficulty,
+    tickOutcome: game.tickOutcome,
+    prefs,
+    unlocked,
+    engine,
+  });
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
   // (el motor no modela tiempo de partida).
