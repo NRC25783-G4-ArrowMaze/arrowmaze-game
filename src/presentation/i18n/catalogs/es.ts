@@ -10,6 +10,8 @@ export const es: Catalog = {
     pause: '⏸ Pausa',
     moves: 'Movimientos',
     movesLeft: 'Movimientos restantes: {count}',
+    time: 'Tiempo',
+    timeElapsed: 'Tiempo transcurrido: {time}',
     status: {
       inProgress: '▶ En juego',
       won: '✓ Victoria',
@@ -25,6 +27,7 @@ export const es: Catalog = {
       title: 'Perdiste',
     },
     backToMap: 'Volver al mapa',
+    time: 'Tiempo: {time}',
     aria: {
       won: 'Ganaste',
       lost: 'Perdiste',

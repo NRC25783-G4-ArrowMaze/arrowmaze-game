@@ -7,6 +7,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { I18nProvider } from '../../src/presentation/i18n/I18nProvider';
 import { GameOverlay } from '../../src/presentation/components/GameOverlay';
 import { translate } from '../../src/presentation/i18n/i18n';
+import { formatDuration } from '../../src/presentation/game/levelTimer';
 
 const noop = (): void => undefined;
 const renderEs = (ui: React.ReactElement) =>
@@ -56,5 +57,26 @@ describe('GameOverlay — acciones de continuación', () => {
   it('sin callbacks (uso legado): no renderiza botones', () => {
     renderEs(<GameOverlay status="WON" score={500} />);
     expect(screen.queryAllByRole('button')).toHaveLength(0);
+  });
+});
+
+describe('GameOverlay — tiempo final del nivel (G3)', () => {
+  it('al ganar muestra el tiempo (mm:ss) junto al score, vía catálogo', () => {
+    renderEs(<GameOverlay status="WON" score={1000} timeSeconds={130} onBackToMap={noop} />);
+    expect(screen.getByTestId('overlay-time')).toHaveTextContent(
+      translate('es', 'overlay.time', { time: formatDuration(130) }),
+    );
+  });
+
+  it('al perder también muestra el tiempo (el timer se detuvo)', () => {
+    renderEs(<GameOverlay status="LOST" score={null} timeSeconds={240} onBackToMap={noop} />);
+    expect(screen.getByTestId('overlay-time')).toHaveTextContent(
+      translate('es', 'overlay.time', { time: formatDuration(240) }),
+    );
+  });
+
+  it('sin timeSeconds no muestra bloque de tiempo (compatibilidad)', () => {
+    renderEs(<GameOverlay status="WON" score={1000} onBackToMap={noop} />);
+    expect(screen.queryByTestId('overlay-time')).toBeNull();
   });
 });

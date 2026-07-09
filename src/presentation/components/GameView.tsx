@@ -10,6 +10,8 @@ import type { Scene } from '../game/scene';
 import { type LocalProgressModule } from '../../infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from '../../domain/value-objects/Score';
 import { useTranslation } from '../i18n/I18nContext';
+import { useLevelTimer } from '../game/useLevelTimer';
+import { LevelTimerDisplay } from './LevelTimerDisplay';
 
 const BOARD_SIZE = 560;
 
@@ -41,6 +43,12 @@ interface GameViewProps {
 export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel }) => {
   const { t } = useTranslation();
   const game = useGameController(scene);
+
+  // Timer visual (G3): cuenta tiempo activo (IN_PROGRESS y flujo ACTIVE); se
+  // congela en PAUSED/WON/LOST y se reinicia cuando restart reemplaza el
+  // controller. Proyección de presentación: no toca el dominio ni el score.
+  const timerRunning = game.status === 'IN_PROGRESS' && game.flowState === 'ACTIVE';
+  const timeSeconds = useLevelTimer(timerRunning, game.controller);
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
   // (el motor no modela tiempo de partida).
@@ -104,6 +112,7 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             <span className="stat-label">{t('game.moves')}</span>
             <span className="stat-value">{game.movesRemaining}</span>
           </div>
+          <LevelTimerDisplay seconds={timeSeconds} />
           <div
             className={
               game.status === 'WON'
@@ -144,6 +153,7 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
           <GameOverlay
             status={game.status}
             score={game.score}
+            timeSeconds={timeSeconds}
             onNextLevel={onNextLevel}
             onBackToMap={onBack}
           />
