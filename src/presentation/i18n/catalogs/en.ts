@@ -82,4 +82,34 @@ export const en: Catalog = {
       veryHard: 'Very hard',
     },
   },
+  account: {
+    button: 'Account',
+    title: 'Account',
+    tab: {
+      login: 'Log in',
+      register: 'Sign up',
+    },
+    email: 'Email',
+    password: 'Password',
+    submit: {
+      login: 'Log in',
+      register: 'Sign up',
+    },
+    logout: 'Log out',
+    loading: 'Processing…',
+    status: {
+      loggedIn: 'Signed in',
+    },
+    register: {
+      success: 'Account created. Log in to continue.',
+    },
+    back: 'Back',
+    error: {
+      invalidCredentials: 'Invalid email or password',
+      emailInUse: 'That email is already registered',
+      invalidEmail: 'Invalid email format',
+      weakPassword: 'Password must have at least 8 characters, 1 number and 1 uppercase letter',
+      network: 'Connection error. Please try again.',
+    },
+  },
 };

@@ -82,4 +82,34 @@ export const es: Catalog = {
       veryHard: 'Muy difícil',
     },
   },
+  account: {
+    button: 'Cuenta',
+    title: 'Cuenta',
+    tab: {
+      login: 'Iniciar sesión',
+      register: 'Crear cuenta',
+    },
+    email: 'Correo electrónico',
+    password: 'Contraseña',
+    submit: {
+      login: 'Entrar',
+      register: 'Registrarme',
+    },
+    logout: 'Cerrar sesión',
+    loading: 'Procesando…',
+    status: {
+      loggedIn: 'Sesión activa',
+    },
+    register: {
+      success: 'Cuenta creada. Inicia sesión para continuar.',
+    },
+    back: 'Volver',
+    error: {
+      invalidCredentials: 'Correo o contraseña incorrectos',
+      emailInUse: 'Ese correo ya está registrado',
+      invalidEmail: 'Formato de correo inválido',
+      weakPassword: 'La contraseña debe tener mínimo 8 caracteres, 1 número y 1 mayúscula',
+      network: 'Error de conexión. Inténtalo de nuevo.',
+    },
+  },
 };
