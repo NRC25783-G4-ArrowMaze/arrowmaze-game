@@ -1,6 +1,7 @@
 import React from 'react';
 import type { GameStatus } from '../../domain/entities/GameSession';
 import { useTranslation } from '../i18n/I18nContext';
+import { formatDuration } from '../game/levelTimer';
 
 /** Props del overlay de fin de juego. */
 export interface GameOverlayProps {
@@ -8,6 +9,8 @@ export interface GameOverlayProps {
   status: GameStatus;
   /** Puntaje final (presente solo al ganar). */
   score: number | null;
+  /** Tiempo activo final del nivel en segundos (G3). Se muestra junto al score. */
+  timeSeconds?: number;
   /**
    * Avanza directo al siguiente nivel del mapa (C3). Solo se ofrece al ganar
    * y si el caller lo provee (tras el último nivel no hay siguiente).
@@ -29,6 +32,7 @@ export interface GameOverlayProps {
 export const GameOverlay: React.FC<GameOverlayProps> = ({
   status,
   score,
+  timeSeconds,
   onNextLevel,
   onBackToMap,
 }) => {
@@ -70,6 +74,11 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
       {won && score !== null && (
         <div style={{ fontSize: '1rem', color: '#374151' }}>
           {t('common.score', { score })}
+        </div>
+      )}
+      {timeSeconds !== undefined && (
+        <div data-testid="overlay-time" style={{ fontSize: '1rem', color: '#374151' }}>
+          {t('overlay.time', { time: formatDuration(timeSeconds) })}
         </div>
       )}
       {won && onNextLevel !== undefined && (
