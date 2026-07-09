@@ -44,6 +44,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-08 | G3: Temporizador de nivel (IClock inyectable, mm:ss, congela en pausa) | [`2026-07-08-g3-temporizador-nivel.md`](./2026-07-08-g3-temporizador-nivel.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-09 | G1: Audio (SFX por outcome + música por dificultad, mute/volúmenes, créditos) | [`2026-07-09-g1-audio-sfx-musica.md`](./2026-07-09-g1-audio-sfx-musica.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-09 | E: UI de Cuenta (login/registro/logout, validación E1, overlay + i18n) | [`2026-07-09-e-ui-cuenta.md`](./2026-07-09-e-ui-cuenta.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | Fix: ruta del adapter de progreso a `/api/v1/progress` (sync D2 daba 404) | [`2026-07-09-fix-ruta-progress-v1.md`](./2026-07-09-fix-ruta-progress-v1.md) | Claude Opus 4.8 (1M context) |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -69,9 +70,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 41
+- **Total de reportes:** 42
 - **Última actualización:** 2026-07-09
-- **Suite de tests (actual):** 438/438 ✅ en 51 suites
+- **Suite de tests (actual):** 442/442 ✅ en 52 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 

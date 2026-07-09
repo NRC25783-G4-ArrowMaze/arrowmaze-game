@@ -45,7 +45,7 @@ export class FetchProgressApiClient implements IProgressApiClient {
         achievedAt: progress.achievedAt.toISOString(),
       };
 
-      const response = await fetch(`${this._baseUrl}/api/progress`, {
+      const response = await fetch(`${this._baseUrl}/api/v1/progress`, {
         method: 'POST',
         headers,
         body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ export class FetchProgressApiClient implements IProgressApiClient {
     try {
       const headers = await this.getHeaders();
       
-      const response = await fetch(`${this._baseUrl}/api/progress`, {
+      const response = await fetch(`${this._baseUrl}/api/v1/progress`, {
         method: 'GET',
         headers,
       });
