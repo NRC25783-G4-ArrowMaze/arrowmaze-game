@@ -2168,10 +2168,82 @@
           "signal tickOutcome en useGameController = extensión solo de presentación; créditos desde LICENCIAS.txt (contenido, no i18n)"
         ],
         "notes": "Rama apilada sobre G3 (PR #36); el PR de G1 se abre tras mergear #36 con rebase --onto origin/dev. Base de assets '/audio' (Vite raíz + Capacitor); prefijar con BASE_URL si el build usa base no-raíz (follow-up menor). Assets nombrados corto (easy/medium/hard.mp3)."
+      },
+      {
+        "id": "2026-07-09-002",
+        "date": "2026-07-09",
+        "title": "E: UI de Cuenta (login/registro/logout) (SDD)",
+        "file": "2026-07-09-e-ui-cuenta.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "E-ui-cuenta",
+        "linked_session": "features/E1-register_and_login.feature + features/E2-active_session_management.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 8,
+          "files_modified": 8,
+          "tests_added": 42,
+          "assets_added": 0
+        },
+        "areas": [
+          "application-service",
+          "application-port",
+          "auth",
+          "infrastructure-adapter",
+          "presentation-layer",
+          "overlay",
+          "i18n",
+          "validation",
+          "spec-driven"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "created": [
+              "services/credentialPolicy.ts (puro)",
+              "services/RegisterUser.ts",
+              "services/LogoutUser.ts"
+            ],
+            "modified": [
+              "ports/IAuthApiClient.ts (+register, +logout)",
+              "errors/AuthErrors.ts (ValidationError, EmailAlreadyInUseError)"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": ["FetchAuthApiClient (+register /api/v1/auth/register, +logout /api/v1/auth/logout Bearer)"]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": ["components/AccountOverlay.tsx"],
+            "modified": [
+              "App.tsx (composition root auth + botón Cuenta + estado de sesión)",
+              "i18n/catalogs/es.ts (account.*)",
+              "i18n/catalogs/en.ts (account.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 51 suites / 438 tests (base G1 47/396 → +4 suites, +42 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos nuevos/modificados (deuda de lint preexistente fuera de alcance)",
+          "security": "el password nunca se persiste ni se loguea; la sesión es el token (sin datos personales nuevos)"
+        },
+        "decisions": [
+          "Validadores puros en application/services/credentialPolicy (política E1 literal), consumidos por RegisterUser y por el overlay; LoginUser intacto",
+          "Contrato F1 gana: register devuelve 201 sin token ⇒ sin auto-login; post-registro vuelve a login con mensaje de éxito",
+          "LogoutUser fail-open local: removeToken() en finally aunque la red falle (el JTI expira solo en 7 días)",
+          "Anti-enumeración E1: credenciales inválidas y usuario inexistente comparten un único mensaje i18n",
+          "Errores mapeados a i18n por TIPO (ValidationError.field, EmailAlreadyInUseError, InvalidCredentialsError, NetworkError); nunca el mensaje crudo",
+          "AccountOverlay indistinguible de PauseOverlay/SettingsOverlay (btn-primary, paleta del repo); botón Cuenta en App, LevelSelectScreen intacto"
+        ],
+        "notes": "Rama apilada sobre G1 (PR #37); el PR de E se abre tras mergear #37 con rebase --onto origin/dev feature/g1-audio-sfx-musica feature/e-ui-cuenta. Spec del adapter asserta URL+method+Bearer+status (red de seguridad #30). Pendiente acumulado el docs: de gen-uml + árbol de arquitectura."
       }
     ],
     "statistics": {
-      "totalReports": 40,
+      "totalReports": 41,
       "lastUpdated": "2026-07-09T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2195,17 +2267,17 @@
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
-      "totalFilesCreated": 165,
+      "totalFilesCreated": 173,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 396,
-      "totalTestSuites": 47,
+      "totalTestsPassing": 438,
+      "totalTestSuites": 51,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-09-001",
-      "summary": "G1: Audio (SFX por outcome + música por dificultad, mute/volúmenes, créditos)"
+      "id": "2026-07-09-002",
+      "summary": "E: UI de Cuenta (login/registro/logout, validación E1, overlay + i18n)"
     }
   }
 }
