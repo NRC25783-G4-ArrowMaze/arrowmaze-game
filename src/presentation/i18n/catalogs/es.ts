@@ -52,6 +52,10 @@ export const es: Catalog = {
     },
     audio: {
       title: 'Audio',
+      mute: 'Silenciar todo',
+      sfxVolume: 'Volumen de efectos',
+      musicVolume: 'Volumen de música',
+      credits: 'Créditos de audio',
     },
     comingSoon: 'Próximamente',
     back: 'Volver',

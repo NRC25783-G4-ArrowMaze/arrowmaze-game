@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type Lang } from '../i18n/i18n';
+import { useAudioContext } from '../audio/AudioContext';
+import { AUDIO_CREDITS } from '../audio/audioCredits';
 
 /** Props del overlay de ajustes (C4). */
 export interface SettingsOverlayProps {
@@ -18,11 +20,12 @@ const LANGUAGE_LABEL_KEY: Record<Lang, string> = {
 
 /**
  * SettingsOverlay — Contenedor de ajustes (C4). Aloja el selector de idioma
- * (G2): cambia el idioma en caliente (D3) y persiste la preferencia (D2) vía el
- * contexto i18n. El estado de audio (G1) sigue como placeholder.
+ * (G2, cambio en caliente + persistencia) y los controles de audio (G1: mute,
+ * volúmenes independientes y créditos), ambos vía sus contextos.
  */
 export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClose }) => {
   const { t, lang, setLang } = useTranslation();
+  const { prefs, setPrefs } = useAudioContext();
 
   if (!visible) {
     return null;
@@ -62,9 +65,59 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClo
           ))}
         </div>
       </section>
-      <section style={{ textAlign: 'center' }}>
+      <section style={{ textAlign: 'center' }} data-testid="audio-settings">
         <h3 style={{ margin: '4px 0' }}>{t('settings.audio.title')}</h3>
-        <p style={{ margin: 0, color: '#6b7280' }}>{t('settings.comingSoon')}</p>
+        <label style={{ display: 'block', margin: '4px 0' }}>
+          <input
+            type="checkbox"
+            checked={prefs.muted}
+            onChange={(e) => setPrefs({ ...prefs, muted: e.target.checked })}
+          />{' '}
+          {t('settings.audio.mute')}
+        </label>
+        <label style={{ display: 'block', margin: '4px 0' }}>
+          {t('settings.audio.sfxVolume')}{' '}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={prefs.sfxVolume}
+            aria-label={t('settings.audio.sfxVolume')}
+            onChange={(e) => setPrefs({ ...prefs, sfxVolume: Number(e.target.value) })}
+          />
+        </label>
+        <label style={{ display: 'block', margin: '4px 0' }}>
+          {t('settings.audio.musicVolume')}{' '}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={prefs.musicVolume}
+            aria-label={t('settings.audio.musicVolume')}
+            onChange={(e) => setPrefs({ ...prefs, musicVolume: Number(e.target.value) })}
+          />
+        </label>
+        <details data-testid="audio-credits" style={{ marginTop: '8px' }}>
+          <summary>{t('settings.audio.credits')}</summary>
+          <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: '#6b7280' }}>
+            {AUDIO_CREDITS.map((credit) => (
+              <li key={credit.file}>
+                {credit.title} — {credit.author}
+                {credit.source.startsWith('http') ? (
+                  <>
+                    {' ('}
+                    <a href={credit.source} target="_blank" rel="noopener noreferrer">
+                      {credit.source}
+                    </a>
+                    {')'}
+                  </>
+                ) : (
+                  ` (${credit.source})`
+                )}
+              </li>
+            ))}
+          </ul>
+        </details>
       </section>
       <button onClick={onClose} style={{ minWidth: '180px' }}>
         {t('settings.back')}
