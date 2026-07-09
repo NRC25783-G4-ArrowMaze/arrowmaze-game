@@ -2168,10 +2168,54 @@
           "signal tickOutcome en useGameController = extensión solo de presentación; créditos desde LICENCIAS.txt (contenido, no i18n)"
         ],
         "notes": "Rama apilada sobre G3 (PR #36); el PR de G1 se abre tras mergear #36 con rebase --onto origin/dev. Base de assets '/audio' (Vite raíz + Capacitor); prefijar con BASE_URL si el build usa base no-raíz (follow-up menor). Assets nombrados corto (easy/medium/hard.mp3)."
+      },
+      {
+        "id": "2026-07-09-003",
+        "date": "2026-07-09",
+        "title": "Fix: ruta del adapter de progreso a /api/v1/progress",
+        "file": "2026-07-09-fix-ruta-progress-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "bugfix",
+        "feature": "fix/ruta-progress-v1",
+        "linked_session": "bug de QA de la feature E; misma clase que el #33 (contrato HTTP)",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 1,
+          "tests_added": 4,
+          "assets_added": 0
+        },
+        "areas": [
+          "infrastructure-adapter",
+          "bugfix",
+          "http-contract",
+          "sync-d2"
+        ],
+        "layers": {
+          "infrastructure": {
+            "status": "fixed",
+            "modified": ["api/FetchProgressApiClient.ts (/api/progress → /api/v1/progress en pushProgress y fetchUserProgress)"],
+            "created": ["__tests__/infrastructure/FetchProgressApiClient.spec.ts (red de seguridad: URL+method+Bearer)"]
+          }
+        },
+        "validation": {
+          "tests": "passed — 48 suites / 400 tests (dev-base 47/396 → +1 suite, +4 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "sin cambios de estilo relevantes"
+        },
+        "decisions": [
+          "Ruta corregida en AMBOS métodos (upload POST + download GET); verificada contra el backend (ProgressRoutes monta POST / y GET / bajo /api/v1/progress)",
+          "Red de seguridad: spec de adapter que fija la URL exacta con /v1, el método y el header Bearer, con fetch mockeado (lección #33)",
+          "Alcance estricto: solo adapter + spec + ai-usage; sin tocar dominio/aplicación/presentación ni la rama E",
+          "Id 2026-07-09-003: se salta el -002 reservado por la rama E (sin mergear) para evitar colisión al integrar"
+        ],
+        "notes": "Rama fix/ruta-progress-v1 nace de dev; PR hacia dev (no abierto). El sync D2 daba 404 silencioso porque el adapter apuntaba a /api/progress."
       }
     ],
     "statistics": {
-      "totalReports": 40,
+      "totalReports": 41,
       "lastUpdated": "2026-07-09T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2195,17 +2239,17 @@
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
-      "totalFilesCreated": 165,
+      "totalFilesCreated": 166,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 396,
-      "totalTestSuites": 47,
+      "totalTestsPassing": 400,
+      "totalTestSuites": 48,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-09-001",
-      "summary": "G1: Audio (SFX por outcome + música por dificultad, mute/volúmenes, créditos)"
+      "id": "2026-07-09-003",
+      "summary": "Fix: ruta del adapter de progreso a /api/v1/progress (sync D2 daba 404)"
     }
   }
 }
