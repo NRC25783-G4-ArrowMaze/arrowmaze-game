@@ -1,5 +1,5 @@
 import { FetchAuthApiClient } from '../../src/infrastructure/api/FetchAuthApiClient';
-import { InvalidCredentialsError } from '../../src/application/errors/AuthErrors';
+import { InvalidCredentialsError, ValidationError, EmailAlreadyInUseError } from '../../src/application/errors/AuthErrors';
 import { NetworkError } from '../../src/domain/errors/SyncErrors';
 
 describe('FetchAuthApiClient', () => {
@@ -83,5 +83,68 @@ describe('FetchAuthApiClient', () => {
     });
     await expect(client.login('user@example.com', 'password123'))
       .rejects.toThrow(/token/i);
+  });
+
+  // ─────────────────────────────── REGISTER ───────────────────────────────
+
+  it('register: POST a /api/v1/auth/register con email+password y resuelve en 201', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 201, json: async () => ({ message: 'Account created successfully' }) });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.register('nuevo@usuario.com', 'Password123')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3000/api/v1/auth/register',
+      expect.objectContaining({
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'nuevo@usuario.com', password: 'Password123' }),
+      }),
+    );
+  });
+
+  it('register: 409 → EmailAlreadyInUseError', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 409, json: async () => ({ error: 'email is already in use' }) });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.register('admin@test.com', 'Password123')).rejects.toBeInstanceOf(EmailAlreadyInUseError);
+  });
+
+  it('register: 400 → ValidationError (política de password del backend)', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 400, json: async () => ({ error: 'password must contain at least 8 characters, 1 number, and 1 uppercase letter' }) });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.register('nuevo@usuario.com', 'weak')).rejects.toBeInstanceOf(ValidationError);
+  });
+
+  it('register: otro error HTTP → NetworkError', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 500 });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.register('nuevo@usuario.com', 'Password123')).rejects.toBeInstanceOf(NetworkError);
+  });
+
+  // ──────────────────────────────── LOGOUT ────────────────────────────────
+
+  it('logout: POST a /api/v1/auth/logout con header Authorization: Bearer y resuelve en 200', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ message: 'Logged out successfully' }) });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.logout('jwt.token.abc')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://localhost:3000/api/v1/auth/logout',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt.token.abc' }),
+      }),
+    );
+  });
+
+  it('logout: error HTTP → NetworkError (el caller decide fail-open)', async () => {
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 401, json: async () => ({ error: 'Unauthorized: missing token' }) });
+    const client = new FetchAuthApiClient('http://localhost:3000');
+
+    await expect(client.logout('jwt.token.abc')).rejects.toBeInstanceOf(NetworkError);
   });
 });
