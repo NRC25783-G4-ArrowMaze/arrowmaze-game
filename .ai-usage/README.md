@@ -41,6 +41,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-08 | Quitar el botón "Volver" redundante del header de partida | [`2026-07-08-fix-boton-volver-header-redundante.md`](./2026-07-08-fix-boton-volver-header-redundante.md) | Claude Sonnet 5 |
 | 2026-07-08 | Fix del bug de ruta del login en PR #30 (`/api/v1/auth/login`) + corrección de su test | [`2026-07-08-fix-ruta-login-v1.md`](./2026-07-08-fix-ruta-login-v1.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-08 | G2: Internacionalización ES/EN (catálogos, motor, cambio en caliente, selector) | [`2026-07-08-g2-internacionalizacion.md`](./2026-07-08-g2-internacionalizacion.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-08 | G3: Temporizador de nivel (IClock inyectable, mm:ss, congela en pausa) | [`2026-07-08-g3-temporizador-nivel.md`](./2026-07-08-g3-temporizador-nivel.md) | Claude Opus 4.8 (1M context) |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -66,9 +67,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 38
+- **Total de reportes:** 39
 - **Última actualización:** 2026-07-08
-- **Suite de tests (actual):** 351/351 ✅ en 40 suites
+- **Suite de tests (actual):** 370/370 ✅ en 43 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 

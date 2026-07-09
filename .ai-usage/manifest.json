@@ -2026,10 +2026,76 @@
           "Trade-off de tests: patrón puro incompatible con hooks → render() solo en los 4 specs con contexto i18n; lógica pura como función pura"
         ],
         "notes": "Implementación SDD de G2 con parada obligatoria en la tabla de inventario antes de tocar código. FORGE fuera de alcance (follow-up H1). Fuente: features/G2-internacionalizacion.feature (idéntico a project-core main, verificado por el autor)."
+      },
+      {
+        "id": "2026-07-08-006",
+        "date": "2026-07-08",
+        "title": "G3: Temporizador de nivel (SDD)",
+        "file": "2026-07-08-g3-temporizador-nivel.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "G3-temporizador-nivel",
+        "linked_session": "features/G3-temporizador-nivel.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 8,
+          "files_modified": 5,
+          "tests_added": 19
+        },
+        "areas": [
+          "presentation-layer",
+          "timer",
+          "clock-port",
+          "react-hooks",
+          "application-port",
+          "infrastructure-adapter",
+          "i18n",
+          "spec-driven",
+          "gherkin-bdd"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "ports": ["IClock"]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": ["SystemClock (Date.now)"]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "game/levelTimer.ts (LevelTimer + formatDuration)",
+              "game/useLevelTimer.ts",
+              "components/LevelTimerDisplay.tsx"
+            ],
+            "modified": [
+              "components/GameView.tsx (display en header)",
+              "components/GameOverlay.tsx (tiempo final junto al score)",
+              "i18n/catalogs/es.ts",
+              "i18n/catalogs/en.ts"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 43 suites / 370 tests (base dev 40/351 → +3 suites, +19 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos G3 (eslint-disable puntual react-hooks/set-state-in-effect en useLevelTimer, patrón del repo)"
+        },
+        "decisions": [
+          "Timer como proyección de presentación: cuenta hacia arriba mm:ss, nunca causa derrota, no toca dominio ni score (P23 fuera)",
+          "Puerto IClock inyectable (D3): SystemClock en infra, FakeClock en tests; el tiempo pausado NO se acumula (bug clásico cubierto)",
+          "Congela en PAUSED y detiene en WON/LOST conservando el valor; restart → 00:00; tiempo final visible en el overlay",
+          "El Date.now() preexistente de la marca de tiempo del score queda INTACTO (P23 fuera, persistencia bajo investigación); follow-up documentado",
+          "Trade-off de tests: lógica pura con FakeClock; render() para componentes con contexto i18n"
+        ],
+        "notes": "SDD con parada obligatoria en la tabla de diseño antes de tocar código. Claves i18n nuevas (game.time, game.timeElapsed, overlay.time) en ambos catálogos. Follow-ups: cerrar P23 (tiempo→score, enmienda A5) y migrar la marca de tiempo del score a IClock cuando termine la investigación de persistencia."
       }
     ],
     "statistics": {
-      "totalReports": 38,
+      "totalReports": 39,
       "lastUpdated": "2026-07-08T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2053,17 +2119,17 @@
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
-      "totalFilesCreated": 137,
+      "totalFilesCreated": 145,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 351,
-      "totalTestSuites": 40,
+      "totalTestsPassing": 370,
+      "totalTestSuites": 43,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-08-005",
-      "summary": "G2: Internacionalización ES/EN (catálogos, motor, cambio en caliente, selector)"
+      "id": "2026-07-08-006",
+      "summary": "G3: Temporizador de nivel (IClock inyectable, mm:ss, congela en pausa)"
     }
   }
 }
