@@ -4,6 +4,7 @@
 
 .app {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
@@ -96,7 +97,12 @@
 /* Board Container */
 /* ─────────────────────────────────────────────────────────────────── */
 
-.app-main > div {
+/* El lado del cuadrado lo fija width (aspect-ratio 1/1): 100% en móvil,
+   la altura visible menos el chrome (header + paddings) en landscape/desktop
+   bajo, y 760px de tope en pantallas grandes. */
+.board-frame {
+  width: min(100%, calc(100vh - 190px), 760px);
+  width: min(100%, calc(100dvh - 190px), 760px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   border-radius: 12px;
   overflow: hidden;
