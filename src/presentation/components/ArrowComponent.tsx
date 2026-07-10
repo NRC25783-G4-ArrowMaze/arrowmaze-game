@@ -106,6 +106,9 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // el target: el offset sigue desde su valor actual → cero reinicios, cero
   // fallback en cadena (los giros dejan de partirse en slides largos).
   const [arcOffset, setArcOffset] = useState(0);
+  // ¿La flecha se está moviendo (offset persiguiendo target)? Solo en movimiento
+  // el riel dirige la cabeza; en reposo la orientación la dicta el dominio.
+  const [moving, setMoving] = useState(false);
   // Espejo del riel para el RENDER (leer refs en render viola react-hooks/refs).
   // Los refs son la verdad síncrona dentro de los effects; este estado se
   // actualiza en cada cambio estructural del riel para que el render lo consuma.
@@ -134,6 +137,7 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
     }
     rafRef.current = 0;
     runningRef.current = false;
+    setMoving(false);
   };
   // Persigue `target` a velocidad constante (px/ms), en cualquier sentido. Sin
   // easing por tick: los ticks encadenan sin costura (resuelve la Fase B).
@@ -143,9 +147,11 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
     }
     if (typeof requestAnimationFrame !== 'function') {
       setOffset(targetRef.current); // entornos sin rAF (jsdom): snap.
+      setMoving(false); // snap ⇒ reposo inmediato.
       return;
     }
     runningRef.current = true;
+    setMoving(true);
     const speed = (GLIDE_SPEED * cellSize) / 1000; // celdas/s → px/ms.
     let last = performance.now();
     const frame = (now: number): void => {
@@ -164,6 +170,7 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
       } else {
         runningRef.current = false;
         rafRef.current = 0;
+        setMoving(false); // objetivo alcanzado ⇒ reposo.
       }
     };
     rafRef.current = requestAnimationFrame(frame);
@@ -325,10 +332,11 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // Factor de deformación por impacto (0 en reposo, máximo en pico del rebote).
   const deform = deformationFactor(recoilF);
 
-  // Con la forma sobre el riel (sin rebote activo) el cuerpo se traza sobre el
-  // riel —incluyendo los nodos-esquina— y la cabeza se orienta según el TRAMO
-  // bajo el vértice líder, de modo que la punta gira justo al doblar. En rebote
-  // o snap de reset se conserva el trazo por vértices.
+  // El riel traza el CUERPO y ubica la punta (correcto también en reposo). Pero
+  // la DIRECCIÓN de la cabeza solo la toma del riel EN MOVIMIENTO (`moving`): así
+  // la punta gira al doblar mientras se desliza, pero en REPOSO la orientación la
+  // dicta el dominio (exitDir) — tras un glide-back el último tramo del riel puede
+  // apuntar hacia atrás y la animación jamás decide hacia dónde mira una quieta.
   const useRailBody = recoilF === 0 && shape !== null;
   const bodyPath = buildBodyPath(useRailBody ? shape.body : drawCenters);
   // La punta visual va en la celda LÍDER (última en orden de ocupación), no en la
@@ -336,7 +344,8 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   const tipCenter = useRailBody
     ? shape.vertices[shape.vertices.length - 1]
     : drawCenters[drawCenters.length - 1];
-  const headDir = useRailBody ? shape.tipDir : tipDirection(drawCenters, exitDir);
+  const headDir =
+    moving && useRailBody ? shape.tipDir : tipDirection(drawCenters, exitDir);
   // Compresión de la punta durante el impacto (1 = sin comprimir).
   const headCompression = 1 - DEFORM_HEAD_RATIO * deform;
   const headPoints = buildHeadPoints(tipCenter, headDir, cellSize, headCompression);
