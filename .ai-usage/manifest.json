@@ -2411,6 +2411,72 @@
       {
         "id": "2026-07-10-001",
         "date": "2026-07-10",
+        "title": "Badge de usuario logueado en el header (alias del email, sobrevive F5)",
+        "file": "2026-07-10-badge-usuario.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/badge-usuario",
+        "linked_session": "base de la doble mision; feat/leaderboards-cliente se apila encima",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 7,
+          "tests_added": 19,
+          "assets_added": 0
+        },
+        "areas": [
+          "auth",
+          "presentation",
+          "session-identity",
+          "i18n"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "modified": [
+              "ports/IAuthTokenProvider.ts (+get/set/removeEmail)",
+              "services/LoginUser.ts (persiste email tras login)",
+              "services/LogoutUser.ts (borra email en finally, fail-open)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "modified": [
+              "auth/CapacitorTokenProvider.ts (clave auth_session_email, getEmail fail-safe)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "account/aliasFromEmail.ts (funcion pura)",
+              "components/AccountButton.tsx (badge)"
+            ],
+            "modified": [
+              "components/AccountOverlay.tsx (onAuthChanged con email)",
+              "App.tsx (userEmail, F5, 401 limpia email)",
+              "i18n/catalogs/es.ts + en.ts (+account.ariaLoggedIn)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 504 tests / 60 suites (base dev 485/57 -> +19 tests, +3 suites; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Extender IAuthTokenProvider (opcion a): email y token comparten ciclo de vida y store; cero cambios de constructor en LoginUser/LogoutUser",
+          "Email persistido SOLO tras login exitoso; jamas tecleando/registrando ni en logs; borrado siempre en logout incl. fail-open",
+          "aliasFromEmail puro: trim, parte local tal cual (sin lowercase), sin @ cadena completa, vacio -> (el boton decide el fallback)",
+          "Alias = contenido (no se traduce); aria-label con clave i18n en ambos catalogos",
+          "Migracion: token sin email guardado -> label generico sin crash (test)"
+        ],
+        "notes": "Rama feat/badge-usuario nace de dev; PR hacia dev de inmediato. feat/leaderboards-cliente se apila encima. Id 2026-07-10-001."
+      },
+      {
+        "id": "2026-07-10-002",
+        "date": "2026-07-10",
         "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
         "file": "2026-07-10-pr44-followups-42-lint-45.md",
         "tool": "Claude Code (claude.ai/code)",
@@ -2475,11 +2541,11 @@
           "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
           "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
         ],
-        "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-001."
+        "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
       }
     ],
     "statistics": {
-      "totalReports": 45,
+      "totalReports": 46,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2505,14 +2571,14 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 489,
-      "totalTestSuites": 57,
+      "totalTestsPassing": 508,
+      "totalTestSuites": 60,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-001",
+      "id": "2026-07-10-002",
       "date": "2026-07-10",
       "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
       "file": "2026-07-10-pr44-followups-42-lint-45.md",
@@ -2578,7 +2644,7 @@
         "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
         "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
       ],
-      "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-001."
+      "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
     }
   }
 }
