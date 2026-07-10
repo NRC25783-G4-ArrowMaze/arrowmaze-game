@@ -15,7 +15,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 16px 24px;
+  padding: clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 32px);
   background: white;
   border-bottom: 3px solid #e0e4e8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -23,7 +23,7 @@
 
 .app-header h1 {
   margin: 0 auto 0 0; /* empuja acciones y stats a la derecha */
-  font-size: 28px;
+  font-size: clamp(20px, 1.4rem + 0.8vw, 30px);
   font-weight: 700;
   color: #1a1a1a;
   letter-spacing: -0.5px;
@@ -38,7 +38,7 @@
 
 .app-stats {
   display: flex;
-  gap: 24px;
+  gap: clamp(12px, 2vw, 28px);
   align-items: center;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: clamp(10px, 0.55rem + 0.3vw, 12px);
   font-weight: 600;
   color: #666;
   text-transform: uppercase;
@@ -57,7 +57,7 @@
 }
 
 .stat-value {
-  font-size: 36px;
+  font-size: clamp(26px, 1.4rem + 1.2vw, 40px);
   font-weight: 800;
   color: #3b82f6;
   line-height: 1;
@@ -65,7 +65,7 @@
 }
 
 .stat-status {
-  font-size: 14px;
+  font-size: clamp(12px, 0.7rem + 0.2vw, 14px);
   font-weight: 500;
   color: #666;
   padding: 8px 12px;
@@ -90,7 +90,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px 20px;
+  padding: clamp(12px, 2.5vh, 32px) clamp(8px, 2.5vw, 24px);
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
@@ -154,40 +154,5 @@
   }
   50% {
     opacity: 0.55;
-  }
-}
-
-/* ─────────────────────────────────────────────────────────────────── */
-/* Responsive */
-/* ─────────────────────────────────────────────────────────────────── */
-
-@media (max-width: 768px) {
-  .app-header {
-    padding: 12px 12px;
-    gap: 8px;
-  }
-
-  .app-header h1 {
-    font-size: 20px;
-  }
-
-  .app-stats {
-    gap: 12px;
-  }
-
-  .stat-value {
-    font-size: 28px;
-  }
-
-  .stat-label {
-    font-size: 10px;
-  }
-
-  .stat-status {
-    font-size: 12px;
-  }
-
-  .app-main {
-    padding: 12px 8px;
   }
 }
