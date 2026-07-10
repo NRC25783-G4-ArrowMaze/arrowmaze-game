@@ -65,6 +65,25 @@ describe('BoardComponent — salida voladora (overlay)', () => {
       expect(count(container, 'arrow-exit')).toBe(0);
     });
 
+    // Follow-up #2 (PR #42): el clipPath usa un id único (useId), no uno global.
+    it('el clipPath de salida tiene id único y el grupo lo referencia; 2 boards no colisionan', () => {
+      const clipOf = (c: HTMLElement): { id: string; ref: string } => {
+        const clip = c.querySelector('clipPath')!;
+        const g = c.querySelector('[data-testid="pass-exits"]')!;
+        return { id: clip.getAttribute('id')!, ref: g.getAttribute('clip-path')! };
+      };
+      const b1 = render(<BoardComponent board={board([A_FULL])} width={W} height={H} />);
+      b1.rerender(<BoardComponent board={board([A_EXIT])} width={W} height={H} />);
+      const b2 = render(<BoardComponent board={board([A_FULL])} width={W} height={H} />);
+      b2.rerender(<BoardComponent board={board([A_EXIT])} width={W} height={H} />);
+
+      const c1 = clipOf(b1.container);
+      const c2 = clipOf(b2.container);
+      expect(c1.ref).toBe(`url(#${c1.id})`); // el grupo referencia su propio clip
+      expect(c2.ref).toBe(`url(#${c2.id})`);
+      expect(c1.id).not.toBe(c2.id); // ids distintos entre instancias
+    });
+
     it('en exit-mode se gatea el burst; sin salida el burst se muestra', () => {
       const vanishing = { color: '#f00', cellIds: ['c4'], nonce: 1 };
       // Control: sin salida, con vanishing → burst visible.

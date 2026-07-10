@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   computeBoardLayout,
   cellCenter,
@@ -136,6 +136,8 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   // overlay ArrowExit que la desliza fuera del tablero y la funde. La flecha
   // viva se oculta mientras su overlay vive (evita visión doble).
   const [exits, setExits] = useState<ExitOverlay[]>([]);
+  // Id único del clipPath de salida: evita colisiones si hay >1 BoardComponent.
+  const exitClipId = `board-exit-clip-${useId()}`;
   const prevArrowsRef = useRef<Map<string, ArrowShapeSnap>>(new Map());
   const exitingIdsRef = useRef<Set<string>>(new Set());
   const nonceRef = useRef(0);
@@ -287,7 +289,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
           sale del MUNDO y el borde se la va tragando mientras se funde). */}
       {exits.length > 0 && cellSize > 0 && (
         <>
-          <clipPath id="board-exit-clip">
+          <clipPath id={exitClipId}>
             <rect
               x={offset.x - cellSize / 2}
               y={offset.y - cellSize / 2}
@@ -295,7 +297,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
               height={(maxRow + 1) * cellSize}
             />
           </clipPath>
-          <g data-testid="pass-exits" clipPath="url(#board-exit-clip)">
+          <g data-testid="pass-exits" clipPath={`url(#${exitClipId})`}>
             {exits.map((e) => (
               <ArrowExit
                 key={e.key}
