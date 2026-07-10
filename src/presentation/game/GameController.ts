@@ -119,7 +119,9 @@ export class GameController {
       const cellIds = this.chainCellIds(arrow);
       return {
         id,
-        color: this.colorById.get(id) ?? '#000000',
+        // Fallback tematizado: var(--text) es visible sobre --board-bg en
+        // ambos temas (negro fijo desaparecería en el lienzo oscuro).
+        color: this.colorById.get(id) ?? 'var(--text)',
         cellIds,
         exitDir: this.visualExitDir(arrow.head.exitPort, cellIds),
       };

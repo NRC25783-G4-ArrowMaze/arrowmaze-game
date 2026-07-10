@@ -56,18 +56,18 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
           style={{
             fontSize: '2rem',
             fontWeight: 700,
-            color: won ? '#16a34a' : '#dc2626',
+            color: won ? 'var(--success)' : 'var(--danger)',
           }}
         >
           {won ? t('overlay.victory.title') : t('overlay.defeat.title')}
         </div>
         {won && score !== null && (
-          <div style={{ fontSize: '1rem', color: '#374151' }}>
+          <div style={{ fontSize: '1rem', color: 'var(--text)' }}>
             {t('common.score', { score })}
           </div>
         )}
         {timeSeconds !== undefined && (
-          <div data-testid="overlay-time" style={{ fontSize: '1rem', color: '#374151' }}>
+          <div data-testid="overlay-time" style={{ fontSize: '1rem', color: 'var(--text)' }}>
             {t('overlay.time', { time: formatDuration(timeSeconds) })}
           </div>
         )}
