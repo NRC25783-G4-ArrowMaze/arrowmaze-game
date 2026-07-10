@@ -43,6 +43,29 @@ function isExitShrink(prevIds: string[], currIds: string[]): boolean {
   return currIds.every((id, i) => id === prevIds[i + 1]);
 }
 
+/**
+ * ¿La celda-cabeza (`cellIds` termina en la punta) estaba en el borde apuntando
+ * FUERA del tablero? Es decir, ¿dar un paso en `exitDir` desde la cabeza cae
+ * fuera del bounding box? Sólo entonces una desaparición "sin shrink" es una
+ * salida real; una remoción a media pista (restart/clear) no lo cumple.
+ */
+function wasLeavingBoard(
+  headId: string,
+  exitDir: number,
+  cellPos: Map<string, { col: number; row: number }>,
+  maxCol: number,
+  maxRow: number,
+): boolean {
+  const head = cellPos.get(headId);
+  if (head === undefined) {
+    return false;
+  }
+  const { dCol, dRow } = portDelta(exitDir);
+  const col = head.col + dCol;
+  const row = head.row + dRow;
+  return col < 0 || col > maxCol || row < 0 || row > maxRow;
+}
+
 // Re-export por compatibilidad: los tipos del view-model viven en ../viewModel.
 export type { CellView, ArrowView, BoardViewModel } from '../viewModel';
 
@@ -126,6 +149,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
     const cById = new Map<string, Point>(
       cells.map((c) => [c.id, cellCenter(c.col, c.row, layout.cellSize, layout.offset)]),
     );
+    // Posiciones de grilla (col,row) para decidir si una cabeza estaba saliendo.
+    const cellPos = new Map<string, { col: number; row: number }>(
+      cells.map((c) => [c.id, { col: c.col, row: c.row }]),
+    );
     const currMap = new Map<string, ArrowShapeSnap>(
       arrows.map((a) => [
         a.id,
@@ -158,8 +185,17 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
       }
       const curr = currMap.get(id);
       if (curr === undefined) {
-        // Removida sin haber mostrado shrink (p.ej. flecha de 1 celda): salida directa.
-        spawn(id, prevSnap);
+        // Desapareció sin shrink previo. Sólo es una salida REAL si era de 1 celda
+        // (las de ≥2 celdas siempre muestran shrink antes → ya se lanzaron y se
+        // deduplican) y esa celda estaba en el borde apuntando fuera. Así un
+        // restart/clear a media pista no dispara salidas voladoras fantasma.
+        const head = prevSnap.cellIds[prevSnap.cellIds.length - 1];
+        if (
+          prevSnap.cellIds.length === 1 &&
+          wasLeavingBoard(head, prevSnap.exitDir, cellPos, layout.maxCol, layout.maxRow)
+        ) {
+          spawn(id, prevSnap);
+        }
       } else if (isExitShrink(prevSnap.cellIds, curr.cellIds)) {
         spawn(id, prevSnap);
       }

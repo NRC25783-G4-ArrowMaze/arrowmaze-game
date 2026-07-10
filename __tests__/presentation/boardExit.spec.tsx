@@ -48,6 +48,23 @@ describe('BoardComponent — salida voladora (overlay)', () => {
       expect(count(container, 'arrow')).toBe(1); // sigue viva (la maneja ArrowComponent)
     });
 
+    // Repro follow-up #1 (PR #42): un restart/clear elimina flechas a media pista
+    // en un solo tick, sin shrink. NO deben dispararse salidas voladoras fantasma.
+    it('restart/clear de una flecha MULTICELDA no dispara overlay fantasma', () => {
+      const { container, rerender } = render(<BoardComponent board={board([A_FULL])} width={W} height={H} />);
+      expect(count(container, 'arrow')).toBe(1);
+      rerender(<BoardComponent board={board([])} width={W} height={H} />); // clear directo, sin shrink
+      expect(count(container, 'arrow-exit')).toBe(0);
+    });
+
+    it('restart/clear de una flecha de 1 celda a media pista (no en el borde) no dispara overlay', () => {
+      // c2 (col 2) no está en el borde Este (maxCol 4); exitDir 1 no sale del tablero.
+      const midSingle: ArrowView = { id: 'm', color: '#0a0', cellIds: ['c2'], exitDir: 1 };
+      const { container, rerender } = render(<BoardComponent board={board([midSingle])} width={W} height={H} />);
+      rerender(<BoardComponent board={board([])} width={W} height={H} />);
+      expect(count(container, 'arrow-exit')).toBe(0);
+    });
+
     it('en exit-mode se gatea el burst; sin salida el burst se muestra', () => {
       const vanishing = { color: '#f00', cellIds: ['c4'], nonce: 1 };
       // Control: sin salida, con vanishing → burst visible.
