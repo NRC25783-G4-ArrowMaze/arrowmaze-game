@@ -20,6 +20,12 @@ const BOARD_SIZE = 560;
 interface GameViewProps {
   scene: Scene;
   progressModule: LocalProgressModule | null;
+  /**
+   * Pide una sincronización de progreso al composition root (scheduler con
+   * gate de sesión y single-flight). GameView no llama al sync directo: la
+   * política (¿hay sesión?, ¿hay uno en vuelo?) vive en App.
+   */
+  requestSync?: () => void;
   /** Si se provee, muestra un botón para volver al mapa de selección (C3). */
   onBack?: () => void;
   /**
@@ -44,7 +50,7 @@ interface GameViewProps {
  *      colisión o salida, reproyectando la forma real del dominio en cada paso.
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
-export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel, difficulty }) => {
+export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, requestSync, onBack, onNextLevel, difficulty }) => {
   const { t } = useTranslation();
   const game = useGameController(scene);
 
@@ -91,16 +97,17 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
         .execute(scene.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
           console.log(`[GameView] Progreso local guardado para el nivel ${scene.id}`);
-          // Intentamos subir el récord de inmediato tras ganar, si hay internet.
+          // Pide el sync al composition root: el scheduler decide (gate de
+          // sesión + single-flight). Sin sesión, es un no-op silencioso.
           if (!offlineMode) {
-            return progressModule.syncProgress.execute();
+            requestSync?.();
           }
         })
         .catch((error: unknown) => {
-          console.error('[GameView] Error guardando o sincronizando el récord:', error);
+          console.error('[GameView] Error guardando el récord:', error);
         });
     }
-  }, [game.status, game.score, game.movesRemaining, progressModule, scene]);
+  }, [game.status, game.score, game.movesRemaining, progressModule, requestSync, scene]);
 
   const onPointerDown = useBoardInput({
     width: BOARD_SIZE,

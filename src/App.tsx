@@ -22,6 +22,7 @@ import { LeaderboardOverlay } from './presentation/components/LeaderboardOverlay
 import { SettingsOverlay } from './presentation/components/SettingsOverlay';
 import { AccountButton } from './presentation/components/AccountButton';
 import { Toast } from './presentation/components/Toast';
+import { createSessionSyncControl } from './presentation/sync/createSyncScheduler';
 import { aliasFromEmail } from './presentation/account/aliasFromEmail';
 import type { LevelProgress } from './domain/entities/LevelProgress';
 import { useTranslation } from './presentation/i18n/I18nContext';
@@ -94,6 +95,13 @@ const App: React.FC = () => {
     [apiBaseUrl, tokenProvider],
   );
 
+  // Scheduler del sync (higiene): single-flight + coalescing con gate de
+  // sesión. Login y victoria disparan por AQUÍ (nunca dos pushes solapados;
+  // sin sesión el disparo es un no-op silencioso). El control encapsula la
+  // configuración mutable (sesión/módulo) detrás de métodos; los closures del
+  // scheduler la leen al EJECUTAR, así siempre ven el valor vigente.
+  const [sync] = useState(createSessionSyncControl);
+
   // Estado de sesión inicial para el badge/overlay: token presente = logueado; y
   // el email guardado alimenta el alias del botón (sobrevive al F5). Migración:
   // si hay token pero no email (sesión previa a este feature), userEmail queda
@@ -101,13 +109,18 @@ const App: React.FC = () => {
   useEffect(() => {
     let active = true;
     tokenProvider.getToken()
-      .then((token) => { if (active) setIsAuthenticated(token !== null); })
+      .then((token) => {
+        if (active) {
+          sync.setEnabled(token !== null);
+          setIsAuthenticated(token !== null);
+        }
+      })
       .catch(() => { /* token ilegible: se asume deslogueado */ });
     tokenProvider.getEmail()
       .then((email) => { if (active) setUserEmail(email); })
       .catch(() => { /* email ilegible: sin alias, el botón usa el label */ });
     return () => { active = false; };
-  }, [tokenProvider]);
+  }, [tokenProvider, sync]);
 
   // Cambios de sesión desde el overlay: actualiza el badge (identidad + estado),
   // CIERRA el overlay automáticamente en ambos sentidos (tras login no tiene
@@ -115,6 +128,7 @@ const App: React.FC = () => {
   // saluda/despide con un toast. Al iniciar sesión, además dispara una
   // sincronización (D2) ahora que las peticiones llevan el token.
   const handleAuthChanged = (authenticated: boolean, email?: string): void => {
+    sync.setEnabled(authenticated); // antes del request: el gate lo lee.
     setIsAuthenticated(authenticated);
     setUserEmail(authenticated ? (email ?? null) : null);
     setAccountVisible(false);
@@ -131,9 +145,8 @@ const App: React.FC = () => {
       );
     }
     if (authenticated) {
-      progressModule?.syncProgress.execute()
-        .then(() => console.log('[App] Sincronización tras login completada.'))
-        .catch((error: unknown) => console.warn('[App] Sincronización tras login detenida:', error));
+      // El sync del login pasa por el scheduler (single-flight + coalescing).
+      sync.scheduler.request();
     }
   };
 
@@ -167,6 +180,7 @@ const App: React.FC = () => {
       }
       if (!isMounted) return;
 
+      sync.setModule(module); // executor del scheduler lo lee.
       setProgressModule(module);
 
       // Progreso inicial para el mapa de selección (C3)
@@ -188,6 +202,7 @@ const App: React.FC = () => {
               // email persistido ⟺ token persistido).
               await tokenProvider.removeToken();
               await tokenProvider.removeEmail();
+              sync.setEnabled(false);
               if (isMounted) {
                 setIsAuthenticated(false);
                 setUserEmail(null);
@@ -203,7 +218,7 @@ const App: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [apiBaseUrl, tokenProvider]);
+  }, [apiBaseUrl, tokenProvider, sync]);
 
   // Cada nodo del mapa juega su nivel del catálogo local: scene.id === levelId,
   // de modo que el progreso guardado (D1) desbloquea el mapa (C3).
@@ -363,6 +378,7 @@ const App: React.FC = () => {
       key={scene.id}
       scene={scene}
       progressModule={progressModule}
+      requestSync={sync.scheduler.request}
       onBack={handleBackToSelect}
       onNextLevel={nextLevelId === undefined ? undefined : handleNextLevel}
       difficulty={LEVEL_METADATA[scene.id]?.difficulty}
