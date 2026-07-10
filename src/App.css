@@ -110,6 +110,39 @@
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
+/* Overlays modales */
+/* ─────────────────────────────────────────────────────────────────── */
+
+/* Escala de z-index: 100 overlays modales, 200 Toast (visible sobre modal).
+   OJO: position:fixed ancla al viewport solo mientras ningún ancestro cree
+   containing block (transform/filter/perspective/will-change/contain). */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
+  background: rgba(17, 24, 39, 0.45);
+}
+
+.overlay-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(440px, 100%);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  padding: clamp(20px, 4vw, 32px);
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
 /* Animaciones */
 /* ─────────────────────────────────────────────────────────────────── */
 

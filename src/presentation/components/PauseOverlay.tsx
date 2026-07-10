@@ -20,7 +20,7 @@ export interface PauseOverlayProps {
 
 /**
  * PauseOverlay — Overlay de pausa (C4). Mismo patrón visual que GameOverlay:
- * position:absolute;inset:0, estilos inline, sin librería de UI.
+ * modal a pantalla completa (.overlay-backdrop/.overlay-card), sin librería de UI.
  */
 export const PauseOverlay: React.FC<PauseOverlayProps> = ({
   visible,
@@ -40,31 +40,23 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
       data-testid="pause-overlay"
       role="dialog"
       aria-label={t('pause.title')}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        background: 'rgba(255, 255, 255, 0.9)',
-        borderRadius: '12px',
-      }}
+      className="overlay-backdrop"
     >
-      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('pause.title')}</div>
-      <button className="btn-primary" onClick={onResume} style={{ minWidth: '180px' }}>
-        {t('pause.resume')}
-      </button>
-      <button onClick={onRestart} style={{ minWidth: '180px' }}>
-        {t('pause.restart')}
-      </button>
-      <button onClick={onOpenSettings} style={{ minWidth: '180px' }}>
-        {t('pause.settings')}
-      </button>
-      <button onClick={onExit} style={{ minWidth: '180px' }}>
-        {t('pause.exit')}
-      </button>
+      <div className="overlay-card">
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('pause.title')}</div>
+        <button className="btn-primary" onClick={onResume} style={{ minWidth: '180px' }}>
+          {t('pause.resume')}
+        </button>
+        <button onClick={onRestart} style={{ minWidth: '180px' }}>
+          {t('pause.restart')}
+        </button>
+        <button onClick={onOpenSettings} style={{ minWidth: '180px' }}>
+          {t('pause.settings')}
+        </button>
+        <button onClick={onExit} style={{ minWidth: '180px' }}>
+          {t('pause.exit')}
+        </button>
+      </div>
     </div>
   );
 };
