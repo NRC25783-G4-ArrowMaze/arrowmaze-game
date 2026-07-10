@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import type { LevelProgress } from '../../domain/entities/LevelProgress';
-import type { DerivedNode } from '../../domain/services/LevelSelectionProjection';
 import { LevelSelectionProjection } from '../../domain/services/LevelSelectionProjection';
 import { LEVEL_MAP } from './levelMap';
 import { LevelNodeCard } from './LevelNodeCard';
@@ -18,12 +17,12 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
   levelMetadata,
 }) => {
   const { t } = useTranslation();
-  const [derived, setDerived] = useState<DerivedNode[]>([]);
-
-  useEffect(() => {
-    const nodes = LevelSelectionProjection.project(LEVEL_MAP, progress);
-    setDerived(nodes);
-  }, [progress]);
+  // Derivado puro del progreso: se computa en el render (useMemo), no en un
+  // effect con setState — evita el render inicial vacío y las cascadas.
+  const derived = useMemo(
+    () => LevelSelectionProjection.project(LEVEL_MAP, progress),
+    [progress],
+  );
 
   return (
     <div className="level-select-screen" style={{ padding: '20px' }}>
