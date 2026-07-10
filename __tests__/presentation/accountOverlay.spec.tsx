@@ -61,6 +61,11 @@ const fillForm = (email: string, password: string): void => {
   fireEvent.change(screen.getByLabelText(T('account.password')), { target: { value: password } });
 };
 
+/** Marca la casilla de términos (obligatoria para registrarse). */
+const acceptTerms = (): void => {
+  fireEvent.click(screen.getByLabelText(T('account.terms.accept')));
+};
+
 describe('AccountOverlay — visibilidad', () => {
   it('visible=false: no renderiza', () => {
     const h = makeHarness();
@@ -113,11 +118,25 @@ describe('AccountOverlay — registro', () => {
 
     fireEvent.click(screen.getByText(T('account.tab.register')));
     fillForm('nuevo@test.com', 'Secreta123');
+    acceptTerms();
     fireEvent.submit(screen.getByTestId('account-form'));
 
     await waitFor(() => expect(h.api.register).toHaveBeenCalledWith('nuevo@test.com', 'Secreta123'));
     expect(await screen.findByText(T('account.register.success'))).toBeInTheDocument();
     expect(h.tokens.setToken).not.toHaveBeenCalled();
+  });
+
+  it('sin aceptar términos: bloquea el registro y muestra el aviso', async () => {
+    const h = makeHarness();
+    renderOverlay(h);
+
+    fireEvent.click(screen.getByText(T('account.tab.register')));
+    fillForm('nuevo@test.com', 'Secreta123');
+    // Sin marcar la casilla: el submit no debe llegar a la red.
+    fireEvent.submit(screen.getByTestId('account-form'));
+
+    expect(await screen.findByText(T('account.error.termsRequired'))).toBeInTheDocument();
+    expect(h.api.register).not.toHaveBeenCalled();
   });
 
   it('password débil: validación inline bloquea la red y muestra el mensaje', async () => {
@@ -139,6 +158,7 @@ describe('AccountOverlay — registro', () => {
 
     fireEvent.click(screen.getByText(T('account.tab.register')));
     fillForm('admin@test.com', 'Secreta123');
+    acceptTerms();
     fireEvent.submit(screen.getByTestId('account-form'));
 
     expect(await screen.findByText(T('account.error.emailInUse'))).toBeInTheDocument();
