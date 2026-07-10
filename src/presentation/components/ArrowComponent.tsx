@@ -1,11 +1,15 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { portDelta, type Point } from '../rendering/boardLayout';
-import { BODY_STROKE_RATIO } from '../theme';
+import { ARROW_GLYPH } from '../theme';
 
-/** Geometría del triángulo de la cabeza, en fracciones de cellSize. */
-const HEAD_TIP_RATIO = 0.5; // distancia del centro al apex
-const HEAD_BACK_RATIO = 0.32; // distancia del centro al punto medio de la base
-const HEAD_HALF_BASE_RATIO = 0.36; // mitad del ancho de la base
+/**
+ * Geometría del triángulo de la cabeza, en fracciones de cellSize. Vienen ya
+ * escaladas por ARROW_SCALE desde theme (ARROW_GLYPH), punto único de verdad
+ * del tamaño; aquí no se aplica ningún factor adicional.
+ */
+const HEAD_TIP_RATIO = ARROW_GLYPH.headTipRatio; // distancia del centro al apex
+const HEAD_BACK_RATIO = ARROW_GLYPH.headBackRatio; // distancia del centro al punto medio de la base
+const HEAD_HALF_BASE_RATIO = ARROW_GLYPH.headHalfBaseRatio; // mitad del ancho de la base
 
 /**
  * Duración del glide entre ticks del slide (ms). Debe ser ≤ TICK_MS de
@@ -295,7 +299,8 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   );
 
   // Engrosamiento del cuerpo durante el impacto (simula compresión).
-  const bodyStrokeWidth = BODY_STROKE_RATIO * cellSize * (1 + DEFORM_STROKE_RATIO * deform);
+  const bodyStrokeWidth =
+    ARROW_GLYPH.bodyStrokeRatio * cellSize * (1 + DEFORM_STROKE_RATIO * deform);
 
   return (
     <g data-testid="arrow">
