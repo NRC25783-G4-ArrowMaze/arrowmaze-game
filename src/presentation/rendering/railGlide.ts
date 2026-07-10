@@ -73,8 +73,8 @@ function cumulativeArcs(rail: Point[]): number[] {
  * Punto sobre el riel a una longitud de arco dada (clampeada a [0, total]).
  * Recorre los tramos acumulando longitud hasta alojar `arc`.
  */
-export function sampleRailAtArc(rail: Point[], arc: number): Point {
-  const arcs = cumulativeArcs(rail);
+export function sampleRailAtArc(rail: Point[], arc: number, precomputedArcs?: number[]): Point {
+  const arcs = precomputedArcs ?? cumulativeArcs(rail);
   const total = arcs[arcs.length - 1];
   const target = Math.max(0, Math.min(arc, total));
   for (let i = 0; i < rail.length - 1; i++) {
@@ -99,13 +99,14 @@ export function sampleRailAtArc(rail: Point[], arc: number): Point {
 export function railDirectionAtArc(
   rail: Point[],
   arc: number,
+  precomputedArcs?: number[],
 ): { dir: { x: number; y: number }; segmentIndex: number } {
   // Riel degenerado (0/1 nodo): no hay tramo del que tomar dirección. Devuelve
   // una dirección nula sin lanzar; el caller decide el fallback (p.ej. exitDir).
   if (rail.length < 2) {
     return { dir: { x: 0, y: 0 }, segmentIndex: 0 };
   }
-  const arcs = cumulativeArcs(rail);
+  const arcs = precomputedArcs ?? cumulativeArcs(rail);
   const total = arcs[arcs.length - 1];
   const target = Math.max(0, Math.min(arc, total));
   let seg = 0;
@@ -205,14 +206,17 @@ export function sampleShapeOnRail(
   count: number,
   step: number,
 ): RailGlideResult {
+  // cumulativeArcs depende sólo del riel: se computa UNA vez y se reusa en cada
+  // muestreo de vértice y en la dirección de la punta → O(rail)+O(count) por
+  // frame en vez de O(count×rail).
+  const arcs = cumulativeArcs(rail);
   const vertexArc = (i: number): number => arcOffset + i * step;
   const vertices: Point[] = [];
   for (let i = 0; i < count; i++) {
-    vertices.push(sampleRailAtArc(rail, vertexArc(i)));
+    vertices.push(sampleRailAtArc(rail, vertexArc(i), arcs));
   }
 
   // Arco de la ventana [trasero, líder] y nodos-esquina interiores a incluir.
-  const arcs = cumulativeArcs(rail);
   const rearArc = vertexArc(0);
   const leadArc = vertexArc(count - 1);
   const interior: Point[] = [];
@@ -232,7 +236,7 @@ export function sampleShapeOnRail(
     }
   }
 
-  const tip = railDirectionAtArc(rail, leadArc);
+  const tip = railDirectionAtArc(rail, leadArc, arcs);
   return {
     body,
     vertices,
