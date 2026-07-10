@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { I18nProvider } from '../../src/presentation/i18n/I18nProvider';
-import { translate } from '../../src/presentation/i18n/i18n';
+import { translate, type TranslateParams } from '../../src/presentation/i18n/i18n';
 import { AccountButton } from '../../src/presentation/components/AccountButton';
 
-const T = (key: string): string => translate('es', key);
+const T = (key: string, params?: TranslateParams): string => translate('es', key, params);
 
 function renderButton(alias: string, onClick = (): void => undefined) {
   return render(
@@ -15,11 +15,14 @@ function renderButton(alias: string, onClick = (): void => undefined) {
 }
 
 describe('AccountButton — badge de usuario', () => {
-  it('logueado: muestra el alias (contenido) y un aria-label de sesión activa', () => {
+  it('logueado: muestra el alias (contenido) y un aria-label que anuncia esa identidad', () => {
     renderButton('juan');
     const btn = screen.getByRole('button');
     expect(btn).toHaveTextContent('juan');
-    expect(btn).toHaveAttribute('aria-label', T('account.ariaLoggedIn'));
+    // aria-label reemplaza al texto para lectores de pantalla: el alias debe
+    // interpolarse en la clave i18n para que el "quién" también se anuncie.
+    expect(btn).toHaveAttribute('aria-label', T('account.ariaLoggedIn', { alias: 'juan' }));
+    expect(btn.getAttribute('aria-label')).toContain('juan');
   });
 
   it('el alias es CONTENIDO, no una clave i18n (no se traduce)', () => {

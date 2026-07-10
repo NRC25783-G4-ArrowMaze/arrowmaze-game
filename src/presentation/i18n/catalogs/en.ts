@@ -100,7 +100,7 @@ export const en: Catalog = {
     status: {
       loggedIn: 'Signed in',
     },
-    ariaLoggedIn: 'Active session — manage your account',
+    ariaLoggedIn: 'Active session: {alias} — manage your account',
     register: {
       success: 'Account created. Log in to continue.',
     },

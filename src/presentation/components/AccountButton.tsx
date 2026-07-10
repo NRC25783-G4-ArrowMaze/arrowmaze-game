@@ -14,9 +14,11 @@ export interface AccountButtonProps {
 
 /**
  * AccountButton — Botón "Cuenta" del header. Logueado muestra el alias del
- * usuario (identidad de la sesión) con un aria-label que anuncia sesión activa;
- * deslogueado muestra el label traducido y sin aria extra (el texto ya nombra
- * la acción). El alias NO se traduce; es dato del usuario.
+ * usuario (identidad de la sesión) y anuncia esa identidad también por
+ * aria-label: como aria-label reemplaza al texto visible para los lectores de
+ * pantalla, el alias se interpola en la clave i18n para que el "quién" no se
+ * pierda. Deslogueado muestra el label traducido y sin aria extra (el texto ya
+ * nombra la acción). El alias NO se traduce; es dato del usuario.
  */
 export const AccountButton: React.FC<AccountButtonProps> = ({ alias, onClick }) => {
   const { t } = useTranslation();
@@ -25,7 +27,7 @@ export const AccountButton: React.FC<AccountButtonProps> = ({ alias, onClick }) 
   return (
     <button
       onClick={onClick}
-      aria-label={loggedIn ? t('account.ariaLoggedIn') : undefined}
+      aria-label={loggedIn ? t('account.ariaLoggedIn', { alias }) : undefined}
     >
       {loggedIn ? alias : t('account.button')}
     </button>
