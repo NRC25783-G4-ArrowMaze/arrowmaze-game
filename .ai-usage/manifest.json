@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-08T00:00:00Z",
+    "lastUpdated": "2026-07-09T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1985,11 +1985,15 @@
         "layers": {
           "application": {
             "status": "extended",
-            "ports": ["ILanguagePreferenceProvider"]
+            "ports": [
+              "ILanguagePreferenceProvider"
+            ]
           },
           "infrastructure": {
             "status": "extended",
-            "adapters": ["CapacitorLanguagePreference (@capacitor/preferences)"]
+            "adapters": [
+              "CapacitorLanguagePreference (@capacitor/preferences)"
+            ]
           },
           "presentation": {
             "status": "extended",
@@ -2058,11 +2062,15 @@
         "layers": {
           "application": {
             "status": "extended",
-            "ports": ["IClock"]
+            "ports": [
+              "IClock"
+            ]
           },
           "infrastructure": {
             "status": "extended",
-            "adapters": ["SystemClock (Date.now)"]
+            "adapters": [
+              "SystemClock (Date.now)"
+            ]
           },
           "presentation": {
             "status": "extended",
@@ -2126,11 +2134,15 @@
         "layers": {
           "application": {
             "status": "extended",
-            "ports": ["IAudioPreferences"]
+            "ports": [
+              "IAudioPreferences"
+            ]
           },
           "infrastructure": {
             "status": "extended",
-            "adapters": ["CapacitorAudioPreferences (@capacitor/preferences)"]
+            "adapters": [
+              "CapacitorAudioPreferences (@capacitor/preferences)"
+            ]
           },
           "presentation": {
             "status": "extended",
@@ -2213,11 +2225,15 @@
           },
           "infrastructure": {
             "status": "extended",
-            "adapters": ["FetchAuthApiClient (+register /api/v1/auth/register, +logout /api/v1/auth/logout Bearer)"]
+            "adapters": [
+              "FetchAuthApiClient (+register /api/v1/auth/register, +logout /api/v1/auth/logout Bearer)"
+            ]
           },
           "presentation": {
             "status": "extended",
-            "created": ["components/AccountOverlay.tsx"],
+            "created": [
+              "components/AccountOverlay.tsx"
+            ],
             "modified": [
               "App.tsx (composition root auth + botón Cuenta + estado de sesión)",
               "i18n/catalogs/es.ts (account.*)",
@@ -2268,8 +2284,12 @@
         "layers": {
           "infrastructure": {
             "status": "fixed",
-            "modified": ["api/FetchProgressApiClient.ts (/api/progress → /api/v1/progress en pushProgress y fetchUserProgress)"],
-            "created": ["__tests__/infrastructure/FetchProgressApiClient.spec.ts (red de seguridad: URL+method+Bearer)"]
+            "modified": [
+              "api/FetchProgressApiClient.ts (/api/progress → /api/v1/progress en pushProgress y fetchUserProgress)"
+            ],
+            "created": [
+              "__tests__/infrastructure/FetchProgressApiClient.spec.ts (red de seguridad: URL+method+Bearer)"
+            ]
           }
         },
         "validation": {
@@ -2284,10 +2304,58 @@
           "Id 2026-07-09-003: se salta el -002 reservado por la rama E (sin mergear) para evitar colisión al integrar"
         ],
         "notes": "Rama fix/ruta-progress-v1 nace de dev; PR hacia dev (no abierto). El sync D2 daba 404 silencioso porque el adapter apuntaba a /api/progress."
+      },
+      {
+        "id": "2026-07-09-004",
+        "date": "2026-07-09",
+        "title": "Reducir el glifo de las flechas al 55% con escala unificada (ARROW_SCALE + ARROW_GLYPH)",
+        "file": "2026-07-09-fix-tamano-flechas.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "style",
+        "feature": "fix/tamano-flechas",
+        "linked_session": "apila sobre la feature E; precede a fix/animacion-flechas",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 3,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "svg-glyph",
+          "visual-tuning",
+          "board"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "modified": [
+              "theme.ts (nueva ARROW_SCALE=0.55 + objeto ARROW_GLYPH con los 4 ratios finales)",
+              "components/ArrowComponent.tsx (consume ARROW_GLYPH; sin factores sueltos)",
+              "components/ArrowHeadDisintegrate.tsx (fractura de la punta usa ARROW_GLYPH; nace al 55%)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 442 tests / 52 suites, 0 regresiones",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "sin cambios de estilo relevantes"
+        },
+        "decisions": [
+          "Escala aplicada en la DEFINICION (theme): ARROW_GLYPH expone los 4 ratios ya multiplicados por ARROW_SCALE; los componentes no acumulan multiplicaciones",
+          "El hit-area NO se toca: el input resuelve por celda (screenToCell), independiente del glifo; encoger la flecha no reduce la zona tocable",
+          "ArrowHeadDisintegrate apunta a ARROW_GLYPH (tamaño, no timing) para que la desintegracion nazca al 55% y no suelte fragmentos al 100%",
+          "Valor final 0.55 calibrado visualmente en caliente (0.75 -> 0.6 -> 0.5 -> 0.55)",
+          "Alcance estricto a presentacion; dominio y aplicacion intactos"
+        ],
+        "notes": "Rama fix/tamano-flechas nace de dev; PR hacia dev (no abierto). Animaciones de choque se recalibran en la rama siguiente (fix/animacion-flechas)."
       }
     ],
     "statistics": {
-      "totalReports": 42,
+      "totalReports": 43,
       "lastUpdated": "2026-07-09T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2320,8 +2388,8 @@
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-09-003",
-      "summary": "Fix: ruta del adapter de progreso a /api/v1/progress (sync D2 daba 404)"
+      "id": "2026-07-09-004",
+      "summary": "Reducir el glifo de las flechas al 55% con escala unificada (ARROW_SCALE + ARROW_GLYPH)"
     }
   }
 }

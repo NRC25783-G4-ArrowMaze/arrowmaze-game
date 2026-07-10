@@ -1,5 +1,6 @@
 import React, { useLayoutEffect, useState } from 'react';
 import type { Point } from '../rendering/boardLayout';
+import { ARROW_GLYPH } from '../theme';
 
 /** Duración de la desintegración de la punta (ms). Aparece antes del burst. */
 const DISINTEGRATE_MS = 150;
@@ -46,19 +47,17 @@ function buildFragments(
   tipDir: { x: number; y: number },
   cellSize: number,
 ): Fragment[] {
-  // Parámetros del triángulo (espejo de ArrowComponent.buildHeadPoints).
-  const HEAD_TIP_RATIO = 0.5;
-  const HEAD_BACK_RATIO = 0.32;
-  const HEAD_HALF_BASE_RATIO = 0.36;
-
+  // Parámetros del triángulo: mismos ratios (ya escalados por ARROW_SCALE) que
+  // usa ArrowComponent para la punta, de modo que la fractura arranca del MISMO
+  // tamaño que la flecha viva. No se altera el timing/lógica de la animación.
   const dirX = tipDir.x;
   const dirY = tipDir.y;
   const perpX = -dirY;
   const perpY = dirX;
 
-  const tip = HEAD_TIP_RATIO * cellSize;
-  const back = HEAD_BACK_RATIO * cellSize;
-  const half = HEAD_HALF_BASE_RATIO * cellSize;
+  const tip = ARROW_GLYPH.headTipRatio * cellSize;
+  const back = ARROW_GLYPH.headBackRatio * cellSize;
+  const half = ARROW_GLYPH.headHalfBaseRatio * cellSize;
 
   const apex: Point = { x: center.x + dirX * tip, y: center.y + dirY * tip };
   const baseMid: Point = { x: center.x - dirX * back, y: center.y - dirY * back };
