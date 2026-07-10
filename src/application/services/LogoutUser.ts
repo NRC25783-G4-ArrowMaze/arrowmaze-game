@@ -30,7 +30,9 @@ export class LogoutUser {
       // Fail-open local: la revocación remota falló (p.ej. sin red), pero el
       // cierre de sesión local procede igual.
     } finally {
+      // El token y la identidad local mueren JUNTOS, incluso sin red.
       await this._tokenProvider.removeToken();
+      await this._tokenProvider.removeEmail();
     }
   }
 }

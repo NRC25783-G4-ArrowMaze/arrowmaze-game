@@ -30,6 +30,9 @@ function makeHarness(): Harness {
     getToken: jest.fn(),
     setToken: jest.fn(),
     removeToken: jest.fn(),
+    getEmail: jest.fn(),
+    setEmail: jest.fn(),
+    removeEmail: jest.fn(),
   };
   return {
     api,

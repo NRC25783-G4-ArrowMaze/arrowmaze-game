@@ -19,12 +19,15 @@ describe('LoginUser Use Case', () => {
       getToken: jest.fn(),
       setToken: jest.fn(),
       removeToken: jest.fn(),
+      getEmail: jest.fn(),
+      setEmail: jest.fn(),
+      removeEmail: jest.fn(),
     };
 
     useCase = new LoginUser(mockApiClient, mockTokenProvider);
   });
 
-  it('debe iniciar sesión exitosamente y guardar el token', async () => {
+  it('debe iniciar sesión exitosamente y guardar el token y el email', async () => {
     // Arrange
     const fakeToken = 'fake.jwt.token.123';
     mockApiClient.login.mockResolvedValue(fakeToken);
@@ -39,6 +42,14 @@ describe('LoginUser Use Case', () => {
     expect(mockApiClient.login).toHaveBeenCalledWith(email, password);
     // Verificamos que el orquestador guardó el token devuelto
     expect(mockTokenProvider.setToken).toHaveBeenCalledWith(fakeToken);
+    // …y persistió el email SOLO tras el login exitoso (identidad del badge).
+    expect(mockTokenProvider.setEmail).toHaveBeenCalledWith(email);
+  });
+
+  it('NO persiste el email si el login falla (credenciales inválidas)', async () => {
+    mockApiClient.login.mockRejectedValue(new InvalidCredentialsError());
+    await expect(useCase.execute('wrong@example.com', 'badpass')).rejects.toThrow();
+    expect(mockTokenProvider.setEmail).not.toHaveBeenCalled();
   });
 
   it('debe propagar InvalidCredentialsError y NO guardar el token si las credenciales son incorrectas', async () => {

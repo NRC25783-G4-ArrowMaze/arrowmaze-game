@@ -13,4 +13,22 @@ export interface IAuthTokenProvider {
    * Elimina el JWT almacenado (para cierre de sesión o revocación por 401).
    */
   removeToken(): Promise<void>;
+
+  /**
+   * Email de la sesión activa (identidad para el badge del header). Retorna null
+   * si no hay sesión o si es una sesión previa a este feature (migración). Solo
+   * se guarda el email que el propio usuario tecleó; nunca password ni token.
+   */
+  getEmail(): Promise<string | null>;
+
+  /**
+   * Almacena el email tras un login EXITOSO (misma vida que el token de sesión).
+   */
+  setEmail(email: string): Promise<void>;
+
+  /**
+   * Elimina el email almacenado (cierre de sesión o revocación por 401). Se
+   * limpia SIEMPRE junto con el token, incluido el camino fail-open del logout.
+   */
+  removeEmail(): Promise<void>;
 }
