@@ -287,6 +287,7 @@ const App: React.FC = () => {
           <h1>{t('app.title')}</h1>
           <div className="app-actions">
             <button
+              className="btn-icon"
               onClick={() => setSettingsVisible(true)}
               aria-label={t('settings.title')}
               title={t('settings.title')}

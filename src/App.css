@@ -36,6 +36,15 @@
   gap: 8px;
 }
 
+/* Botón compacto del header con icono (⚙️ ajustes, 👤 cuenta). El icono va en
+   un span aria-hidden; la semántica la dan el texto o el aria-label. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4em 0.8em;
+}
+
 .app-stats {
   display: flex;
   gap: clamp(12px, 2vw, 28px);

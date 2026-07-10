@@ -26,9 +26,11 @@ export const AccountButton: React.FC<AccountButtonProps> = ({ alias, onClick }) 
 
   return (
     <button
+      className="btn-icon"
       onClick={onClick}
       aria-label={loggedIn ? t('account.ariaLoggedIn', { alias }) : undefined}
     >
+      <span aria-hidden="true">👤</span>
       {loggedIn ? alias : t('account.button')}
     </button>
   );
