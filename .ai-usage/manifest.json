@@ -2813,10 +2813,60 @@
           "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
         ],
         "notes": "PR #48 abierto sin mergear, pendiente de revisión. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tomó el id -004 durante este merge con dev."
+      },
+      {
+        "id": "2026-07-10-008",
+        "date": "2026-07-10",
+        "title": "Higiene del sync: scheduler single-flight con gate de sesion",
+        "file": "2026-07-10-higiene-sync.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "fix",
+        "feature": "fix/higiene-sync",
+        "linked_session": "diagnostico QA multi-cuenta; paso 2 de la cola sync -> D1.5 -> modo oscuro",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 2,
+          "tests_added": 7,
+          "assets_added": 0
+        },
+        "areas": [
+          "sync",
+          "presentation",
+          "composition-root",
+          "offline-first"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "sync/createSyncScheduler.ts (single-flight + coalescing + gate; createSessionSyncControl)"
+            ],
+            "modified": [
+              "App.tsx (login y victoria via scheduler; requestSync a GameView; 401 apaga el gate)",
+              "components/GameView.tsx (prop requestSync; sin llamada directa a syncProgress)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 543 tests / 66 suites (base 536/65 -> +7; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Gate sin sesion = NO-OP silencioso (ni info ni warn)",
+          "Single-flight + coalescing: N pedidos durante un vuelo colapsan en UNA re-ejecucion; el gate se re-verifica antes del re-run",
+          "Fallos -> console.warn; el scheduler nunca se atasca",
+          "SyncProgress/adapter/dominio intactos; el sync del bootstrap queda fuera por alcance (residual anotado)",
+          "DEUDA DOCUMENTADA: progreso local = dispositivo, no cuenta (tabla sin usuario) — la resuelve D1.5 (paso 3)"
+        ],
+        "notes": "Correccion de hechos: el disparo tras ganar ya existia (GameView, D2); esta mision es higiene, no el fix del sintoma de QA. Id 2026-07-10-008 (renumerado de -005 al integrar #48/#49/#51 durante el rebase)."
       }
     ],
     "statistics": {
-      "totalReports": 51,
+      "totalReports": 52,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2842,15 +2892,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 536,
-      "totalTestSuites": 65,
+      "totalTestsPassing": 543,
+      "totalTestSuites": 66,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-004",
-      "summary": "Toast de sesion: bienvenida al login y cierre automatico del overlay (simetria en logout)"
+      "id": "2026-07-10-005",
+      "summary": "Higiene del sync: scheduler single-flight con gate de sesion"
     }
   }
 }
