@@ -94,7 +94,7 @@ const ForgeApp: React.FC = () => {
           <label>Herramienta:</label>
           <select
             value={tool}
-            onChange={(e) => setTool(e.target.value as any)}
+            onChange={(e) => setTool(e.target.value as ToolMode)}
             style={{ padding: '4px' }}
           >
             <option value="select">Select</option>
