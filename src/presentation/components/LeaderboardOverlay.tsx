@@ -27,7 +27,8 @@ type State =
 
 /**
  * LeaderboardOverlay — Clasificación de un nivel (mismo patrón visual que
- * AccountOverlay: dialog absoluto, backdrop blanco, estilos inline).
+ * AccountOverlay: modal a pantalla completa .overlay-backdrop/.overlay-card,
+ * estilos inline).
  *
  * Estados: no logueado (mensaje + CTA de login, SIN tocar la red) · cargando ·
  * error de red · vacío · datos (top + récord propio destacado). Un 401 en vuelo
@@ -114,85 +115,75 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
       data-testid="leaderboard-overlay"
       role="dialog"
       aria-label={t('leaderboard.title')}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        background:
-          'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), #ffffff',
-        borderRadius: '12px',
-        padding: '16px',
-      }}
+      className="overlay-backdrop"
     >
-      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
-        🏆 {t('leaderboard.title')}
-      </div>
+      <div className="overlay-card">
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
+          🏆 {t('leaderboard.title')}
+        </div>
 
-      {state.kind === 'loginRequired' && (
-        <>
-          <div style={{ color: '#6b7280' }}>{t('leaderboard.loginRequired')}</div>
-          <button
-            className="btn-primary"
-            onClick={onRequestLogin}
-            style={{ minWidth: '220px', maxWidth: '100%' }}
-          >
-            {t('leaderboard.loginButton')}
-          </button>
-        </>
-      )}
+        {state.kind === 'loginRequired' && (
+          <>
+            <div style={{ color: '#6b7280' }}>{t('leaderboard.loginRequired')}</div>
+            <button
+              className="btn-primary"
+              onClick={onRequestLogin}
+              style={{ minWidth: '220px', maxWidth: '100%' }}
+            >
+              {t('leaderboard.loginButton')}
+            </button>
+          </>
+        )}
 
-      {state.kind === 'loading' && (
-        <div style={{ color: '#6b7280' }}>{t('leaderboard.loading')}</div>
-      )}
+        {state.kind === 'loading' && (
+          <div style={{ color: '#6b7280' }}>{t('leaderboard.loading')}</div>
+        )}
 
-      {state.kind === 'error' && (
-        <div style={{ color: 'var(--danger, #b91c1c)' }}>{t('leaderboard.error')}</div>
-      )}
+        {state.kind === 'error' && (
+          <div style={{ color: 'var(--danger, #b91c1c)' }}>{t('leaderboard.error')}</div>
+        )}
 
-      {state.kind === 'data' &&
-        (state.response.topPlayers.length === 0 ? (
-          <div style={{ color: '#6b7280' }}>{t('leaderboard.empty')}</div>
-        ) : (
-          <div style={{ maxHeight: '60%', overflowY: 'auto', width: 'min(420px, 100%)' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
-              <thead>
-                <tr>
-                  <th style={headerCellStyle}>{t('leaderboard.col.rank')}</th>
-                  <th style={{ ...headerCellStyle, textAlign: 'left' }}>
-                    {t('leaderboard.col.player')}
-                  </th>
-                  <th style={headerCellStyle}>{t('leaderboard.col.score')}</th>
-                  <th style={headerCellStyle}>{t('leaderboard.col.moves')}</th>
-                  <th style={headerCellStyle}>{t('leaderboard.col.time')}</th>
-                </tr>
-              </thead>
-              <tbody>{state.response.topPlayers.map((e) => renderRow(e, false))}</tbody>
-            </table>
+        {state.kind === 'data' &&
+          (state.response.topPlayers.length === 0 ? (
+            <div style={{ color: '#6b7280' }}>{t('leaderboard.empty')}</div>
+          ) : (
+            <div style={{ maxHeight: 'min(50dvh, 420px)', overflowY: 'auto', width: 'min(420px, 100%)' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                <thead>
+                  <tr>
+                    <th style={headerCellStyle}>{t('leaderboard.col.rank')}</th>
+                    <th style={{ ...headerCellStyle, textAlign: 'left' }}>
+                      {t('leaderboard.col.player')}
+                    </th>
+                    <th style={headerCellStyle}>{t('leaderboard.col.score')}</th>
+                    <th style={headerCellStyle}>{t('leaderboard.col.moves')}</th>
+                    <th style={headerCellStyle}>{t('leaderboard.col.time')}</th>
+                  </tr>
+                </thead>
+                <tbody>{state.response.topPlayers.map((e) => renderRow(e, false))}</tbody>
+              </table>
 
-            {state.response.currentRecord !== null ? (
-              <div style={{ marginTop: '12px' }}>
-                <div style={{ fontWeight: 700, color: '#374151', padding: '0 10px' }}>
-                  {t('leaderboard.yourRecord')}
+              {state.response.currentRecord !== null ? (
+                <div style={{ marginTop: '12px' }}>
+                  <div style={{ fontWeight: 700, color: '#374151', padding: '0 10px' }}>
+                    {t('leaderboard.yourRecord')}
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
+                    <tbody>{renderRow(state.response.currentRecord, true)}</tbody>
+                  </table>
                 </div>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
-                  <tbody>{renderRow(state.response.currentRecord, true)}</tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ marginTop: '12px', color: '#6b7280', padding: '0 10px' }}>
-                {t('leaderboard.noRecord')}
-              </div>
-            )}
-          </div>
-        ))}
+              ) : (
+                <div style={{ marginTop: '12px', color: '#6b7280', padding: '0 10px' }}>
+                  {t('leaderboard.noRecord')}
+                </div>
+              )}
+            </div>
+          ))}
 
-      <button onClick={onClose} style={{ minWidth: '220px', maxWidth: '100%' }}>
-        {t('leaderboard.back')}
-      </button>
+        <button onClick={onClose} style={{ minWidth: '220px', maxWidth: '100%' }}>
+          {t('leaderboard.back')}
+        </button>
+      </div>
     </div>
   );
 };
