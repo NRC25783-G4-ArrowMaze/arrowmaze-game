@@ -13,8 +13,11 @@ export class LoginUser {
   async execute(email: string, password: string): Promise<void> {
     // 1. Obtenemos el token de la API
     const token = await this._apiClient.login(email, password);
-    
-    // 2. Lo guardamos en las preferencias del dispositivo
+
+    // 2. Persistimos la sesión SOLO tras el login exitoso: el token y, como
+    //    identidad del badge, el email tecleado (jamás la contraseña). Si el
+    //    login lanzó arriba, nada de esto se ejecuta.
     await this._tokenProvider.setToken(token);
+    await this._tokenProvider.setEmail(email);
   }
 }

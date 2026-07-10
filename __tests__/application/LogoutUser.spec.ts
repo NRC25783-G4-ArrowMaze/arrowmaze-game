@@ -18,11 +18,14 @@ describe('LogoutUser Use Case', () => {
       getToken: jest.fn(),
       setToken: jest.fn(),
       removeToken: jest.fn(),
+      getEmail: jest.fn(),
+      setEmail: jest.fn(),
+      removeEmail: jest.fn(),
     };
     useCase = new LogoutUser(mockApiClient, mockTokenProvider);
   });
 
-  it('revoca el token en el servidor y luego lo elimina localmente', async () => {
+  it('revoca el token en el servidor y luego elimina token y email localmente', async () => {
     mockTokenProvider.getToken.mockResolvedValue('token-A');
     mockApiClient.logout.mockResolvedValue(undefined);
 
@@ -30,9 +33,10 @@ describe('LogoutUser Use Case', () => {
 
     expect(mockApiClient.logout).toHaveBeenCalledWith('token-A');
     expect(mockTokenProvider.removeToken).toHaveBeenCalledTimes(1);
+    expect(mockTokenProvider.removeEmail).toHaveBeenCalledTimes(1);
   });
 
-  it('FAIL-OPEN LOCAL: si la red falla, elimina el token igual y NO propaga el error', async () => {
+  it('FAIL-OPEN LOCAL: si la red falla, elimina token Y email igual y NO propaga el error', async () => {
     mockTokenProvider.getToken.mockResolvedValue('token-A');
     mockApiClient.logout.mockRejectedValue(new NetworkError('sin conexión'));
 
@@ -40,6 +44,8 @@ describe('LogoutUser Use Case', () => {
 
     expect(mockApiClient.logout).toHaveBeenCalledWith('token-A');
     expect(mockTokenProvider.removeToken).toHaveBeenCalledTimes(1);
+    // La identidad local muere junto con el token aunque la red esté caída.
+    expect(mockTokenProvider.removeEmail).toHaveBeenCalledTimes(1);
   });
 
   it('sin token local: no llama a la API pero garantiza el estado deslogueado', async () => {

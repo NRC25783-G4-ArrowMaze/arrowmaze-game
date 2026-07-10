@@ -30,6 +30,9 @@ function makeHarness(): Harness {
     getToken: jest.fn(),
     setToken: jest.fn(),
     removeToken: jest.fn(),
+    getEmail: jest.fn(),
+    setEmail: jest.fn(),
+    removeEmail: jest.fn(),
   };
   return {
     api,
@@ -86,7 +89,8 @@ describe('AccountOverlay — login', () => {
 
     await waitFor(() => expect(h.api.login).toHaveBeenCalledWith('user@test.com', 'Secreta123'));
     expect(await screen.findByText(T('account.status.loggedIn'))).toBeInTheDocument();
-    expect(onAuthChanged).toHaveBeenCalledWith(true);
+    // Contrato extendido: en login pasa el email para el badge inmediato.
+    expect(onAuthChanged).toHaveBeenCalledWith(true, 'user@test.com');
   });
 
   it('credenciales inválidas: muestra el mensaje i18n mapeado por tipo (no el crudo)', async () => {
