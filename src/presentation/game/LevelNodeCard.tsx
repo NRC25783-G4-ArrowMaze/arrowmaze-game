@@ -40,11 +40,9 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
         transform: isFocal ? 'scale(1.1)' : isBlocked ? 'scale(0.9)' : 'scale(1)',
         transition: 'all 0.2s ease',
         padding: '16px',
-        margin: '8px',
         border: isFocal ? '2px solid #4CAF50' : '1px solid #d1d5db',
         borderRadius: '8px',
         backgroundColor: isBlocked ? '#f3f4f6' : '#fff',
-        minWidth: '140px',
         textAlign: 'center',
         position: 'relative',
       }}
