@@ -1,25 +1,17 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { portDelta, type Point } from '../rendering/boardLayout';
+import { sampleShapeOnRail } from '../rendering/railGlide';
+import { GLIDE_SPEED } from '../rendering/glideConfig';
+import { buildBodyPath, tipDirection, buildHeadPoints } from '../rendering/arrowGlyphPath';
 import { ARROW_GLYPH } from '../theme';
 
 /**
- * Geometría del triángulo de la cabeza, en fracciones de cellSize. Vienen ya
- * escaladas por ARROW_SCALE desde theme (ARROW_GLYPH), punto único de verdad
- * del tamaño; aquí no se aplica ningún factor adicional.
+ * Coreografía del rebote de colisión (amago de avance + deformación siguiendo la
+ * forma). Recalibrada al glifo reducido (ARROW_SCALE=0.55): con la flecha más
+ * pequeña, la deformación agresiva del glifo 1.0 se sentía exagerada; estos
+ * valores dan un impacto más contenido y proporcionado.
  */
-const HEAD_TIP_RATIO = ARROW_GLYPH.headTipRatio; // distancia del centro al apex
-const HEAD_BACK_RATIO = ARROW_GLYPH.headBackRatio; // distancia del centro al punto medio de la base
-const HEAD_HALF_BASE_RATIO = ARROW_GLYPH.headHalfBaseRatio; // mitad del ancho de la base
-
-/**
- * Duración del glide entre ticks del slide (ms). Debe ser ≤ TICK_MS de
- * useGameController (90 ms) para que la interpolación de un tick termine antes
- * de que llegue el siguiente y el movimiento se lea continuo, no a saltos.
- */
-const SLIDE_MS = 85;
-
-/** Coreografía del rebote de colisión (amago de avance + deformación siguiendo la forma). */
-const RECOIL_MS = 200;
+const RECOIL_MS = 160;
 /**
  * Fracción de celda que la flecha amaga avanzar antes de regresar. El amago NO es
  * un translate de toda la figura: cada vértice se mueve hacia su PROPIA dirección
@@ -27,11 +19,11 @@ const RECOIL_MS = 200;
  * —el tramo horizontal avanza horizontal, el vertical avanza vertical— en vez de
  * levantarse entero hacia la punta.
  */
-const RECOIL_FRACTION = 0.16;
+const RECOIL_FRACTION = 0.1;
 /** Máximo engrosamiento del cuerpo durante la deformación por impacto (como fracción del stroke). */
-const DEFORM_STROKE_RATIO = 0.5; // 50% más grueso en el pico
+const DEFORM_STROKE_RATIO = 0.2; // 20% más grueso en el pico
 /** Máxima compresión de la punta durante la deformación (la punta se vuelve más pequeña). */
-const DEFORM_HEAD_RATIO = 0.4; // 40% más pequeño en el pico
+const DEFORM_HEAD_RATIO = 0.15; // 15% más pequeño en el pico
 
 /** Props de ArrowComponent: view-model de presentación de UNA flecha. */
 export interface ArrowComponentProps {
@@ -51,78 +43,6 @@ export interface ArrowComponentProps {
    * slide. Al cambiar, dispara el rebote (recoil). `undefined` = sin colisión.
    */
   collideNonce?: number;
-}
-
-/**
- * Construye el atributo `d` del cuerpo uniendo centros en orden con segmentos rectos.
- *
- * Caso de una sola celda: se emite `M x,y L x,y` (línea de longitud cero) para que
- * `stroke-linecap: round` produzca un punto/cap redondo visible (spec B1).
- */
-function buildBodyPath(centers: Point[]): string {
-  if (centers.length === 0) {
-    return '';
-  }
-  const [first, ...rest] = centers;
-  if (rest.length === 0) {
-    // Flecha de una sola celda: punto con cap redondo.
-    return `M ${first.x},${first.y} L ${first.x},${first.y}`;
-  }
-  const move = `M ${first.x},${first.y}`;
-  const lines = rest.map((p) => `L ${p.x},${p.y}`).join(' ');
-  return `${move} ${lines}`;
-}
-
-/**
- * Dirección unitaria (en pantalla) hacia la que apunta la punta de la flecha.
- *
- * En este motor la cabeza (Head) ocupa la celda TRASERA y el cuerpo se extiende
- * hacia adelante (en dirección del exitPort), así que la "punta" visual va en la
- * celda LÍDER. Su orientación se toma del último tramo del shaft (de la penúltima
- * a la última celda); para una flecha de una sola celda se usa portDelta(exitDir).
- */
-function tipDirection(centers: Point[], exitDir: number): { x: number; y: number } {
-  if (centers.length >= 2) {
-    const prev = centers[centers.length - 2];
-    const last = centers[centers.length - 1];
-    const dx = last.x - prev.x;
-    const dy = last.y - prev.y;
-    const len = Math.hypot(dx, dy) || 1;
-    return { x: dx / len, y: dy / len };
-  }
-  const { dCol, dRow } = portDelta(exitDir);
-  return { x: dCol, y: dRow };
-}
-
-/**
- * Construye los puntos del polígono triangular de la punta, centrado en `center`
- * (la celda líder) y orientado según el vector unitario `dir`.
- * Opcionalmente aplica deformación por impacto (la punta se comprime).
- */
-function buildHeadPoints(
-  center: Point,
-  dir: { x: number; y: number },
-  cellSize: number,
-  deformFactor: number = 0,
-): string {
-  const dirX = dir.x;
-  const dirY = dir.y;
-  // Perpendicular unitaria para abrir la base.
-  const perpX = -dirY;
-  const perpY = dirX;
-
-  // Aplica compresión: cuanto mayor sea deformFactor, más pequeño es el triángulo.
-  const compressionRatio = 1 - DEFORM_HEAD_RATIO * deformFactor;
-  const tip = HEAD_TIP_RATIO * cellSize * compressionRatio;
-  const back = HEAD_BACK_RATIO * cellSize * compressionRatio;
-  const half = HEAD_HALF_BASE_RATIO * cellSize * compressionRatio;
-
-  const apex: Point = { x: center.x + dirX * tip, y: center.y + dirY * tip };
-  const baseMid: Point = { x: center.x - dirX * back, y: center.y - dirY * back };
-  const left: Point = { x: baseMid.x + perpX * half, y: baseMid.y + perpY * half };
-  const right: Point = { x: baseMid.x - perpX * half, y: baseMid.y - perpY * half };
-
-  return `${apex.x},${apex.y} ${left.x},${left.y} ${right.x},${right.y}`;
 }
 
 /**
@@ -181,47 +101,175 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // Fracción de amago actual (0 = reposo). Animada por rAF durante la colisión.
   const [recoilF, setRecoilF] = useState(0);
 
-  // Glide entre ticks: al cambiar `centers` (mismo nº de celdas), la forma se
-  // interpola desde la última posición DIBUJADA hacia la nueva en SLIDE_MS, en
-  // vez de saltar. `from` es el snapshot de origen; `t` el progreso 0 → 1.
-  const [glide, setGlide] = useState<{ from: Point[]; t: number } | null>(null);
-  // Última forma efectivamente dibujada (incluye posiciones intermedias del glide).
-  const drawnRef = useRef<Point[] | null>(null);
+  // ── Riel persistente + offset continuo ──────────────────────────────────
+  // El riel acumula los centros de celda que el dominio proyecta durante el
+  // slide. La forma dibujada es una VENTANA sobre el riel a `arcOffset` (arco
+  // del vértice trasero); un rAF persigue ese offset hacia `target` a velocidad
+  // constante (GLIDE_SPEED). Cada avance de un paso APPENDEA la celda líder y
+  // suma un paso al target; el retroceso (glide-back de colisión) recorre los
+  // MISMOS nodos ya presentes restando un paso. Un retarget en vuelo solo mueve
+  // el target: el offset sigue desde su valor actual → cero reinicios, cero
+  // fallback en cadena (los giros dejan de partirse en slides largos).
+  const [arcOffset, setArcOffset] = useState(0);
+  // ¿La flecha se está moviendo (offset persiguiendo target)? Solo en movimiento
+  // el riel dirige la cabeza; en reposo la orientación la dicta el dominio.
+  const [moving, setMoving] = useState(false);
+  // Espejo del riel para el RENDER (leer refs en render viola react-hooks/refs).
+  // Los refs son la verdad síncrona dentro de los effects; este estado se
+  // actualiza en cada cambio estructural del riel para que el render lo consuma.
+  const [railState, setRailState] = useState<{ rail: Point[]; count: number } | null>(
+    null,
+  );
+  const railRef = useRef<Point[] | null>(null);
+  const railCountRef = useRef(0);
+  const prevCentersRef = useRef<Point[] | null>(null);
+  const targetRef = useRef(0);
+  const offsetRef = useRef(0);
+  const cellSizeRef = useRef(cellSize);
+  const rafRef = useRef(0);
+  const runningRef = useRef(false);
+
   const centersKey = centers.map((p) => `${p.x},${p.y}`).join(';');
 
-  useLayoutEffect(() => {
-    const prev = drawnRef.current;
-    if (
-      prev === null ||
-      prev.length !== centers.length ||
-      typeof requestAnimationFrame !== 'function'
-    ) {
-      // Primer render, cambio de nº de celdas o entorno sin rAF: snap directo.
-      setGlide(null);
+  const clonePts = (pts: Point[]): Point[] => pts.map((p) => ({ x: p.x, y: p.y }));
+  const setOffset = (v: number): void => {
+    offsetRef.current = v;
+    setArcOffset(v);
+  };
+  const stopLoop = (): void => {
+    if (rafRef.current !== 0) {
+      cancelAnimationFrame(rafRef.current);
+    }
+    rafRef.current = 0;
+    runningRef.current = false;
+    setMoving(false);
+  };
+  // Persigue `target` a velocidad constante (px/ms), en cualquier sentido. Sin
+  // easing por tick: los ticks encadenan sin costura (resuelve la Fase B).
+  const startLoop = (): void => {
+    if (runningRef.current) {
+      return; // ya animando: el nuevo target se persigue sin reiniciar.
+    }
+    if (typeof requestAnimationFrame !== 'function') {
+      setOffset(targetRef.current); // entornos sin rAF (jsdom): snap.
+      setMoving(false); // snap ⇒ reposo inmediato.
       return;
     }
-    const moved = prev.some((p, i) => p.x !== centers[i].x || p.y !== centers[i].y);
+    runningRef.current = true;
+    setMoving(true);
+    const speed = (GLIDE_SPEED * cellSize) / 1000; // celdas/s → px/ms.
+    let last = performance.now();
+    const frame = (now: number): void => {
+      const dt = now - last;
+      last = now;
+      const target = targetRef.current;
+      let off = offsetRef.current;
+      if (off < target) {
+        off = Math.min(off + speed * dt, target);
+      } else if (off > target) {
+        off = Math.max(off - speed * dt, target);
+      }
+      setOffset(off);
+      if (Math.abs(off - targetRef.current) > 1e-6) {
+        rafRef.current = requestAnimationFrame(frame);
+      } else {
+        runningRef.current = false;
+        rafRef.current = 0;
+        setMoving(false); // objetivo alcanzado ⇒ reposo.
+      }
+    };
+    rafRef.current = requestAnimationFrame(frame);
+  };
+
+  useLayoutEffect(() => stopLoop, []);
+
+  /* eslint-disable react-hooks/set-state-in-effect --
+     Reconciliación prop→animación: este effect sincroniza el riel persistente
+     (railState) y el offset con el sistema externo de animación (rAF). Es el
+     caso legítimo que la propia regla contempla (sincronizar React con un
+     sistema externo); el setState arranca la animación, que a partir de ahí se
+     autoconduce por callbacks de rAF. */
+  useLayoutEffect(() => {
+    const curr = centers;
+    const prev = prevCentersRef.current;
+    prevCentersRef.current = clonePts(curr);
+    const n = curr.length;
+
+    // Reset + snap: primer render, cambio de nº de celdas/cellSize, o movimiento
+    // que no es avance/retroceso de un paso (teleport/restart).
+    const reset = (): void => {
+      stopLoop();
+      railRef.current = clonePts(curr);
+      railCountRef.current = n;
+      targetRef.current = 0;
+      cellSizeRef.current = cellSize;
+      setRailState({ rail: railRef.current, count: n });
+      setOffset(0);
+    };
+
+    if (n === 0) {
+      stopLoop();
+      railRef.current = null;
+      setRailState(null);
+      return;
+    }
+    if (
+      prev === null ||
+      prev.length !== n ||
+      cellSize !== cellSizeRef.current ||
+      railRef.current === null
+    ) {
+      reset();
+      return;
+    }
+    const moved = prev.some((p, i) => p.x !== curr[i].x || p.y !== curr[i].y);
     if (!moved) {
       return;
     }
-    const from = prev.map((p) => ({ x: p.x, y: p.y }));
-    // Arranque síncrono (antes del paint): evita un frame pintado en el destino.
-    setGlide({ from, t: 0 });
-    let raf = 0;
-    const start = performance.now();
-    const frame = (now: number): void => {
-      const p = Math.min((now - start) / SLIDE_MS, 1);
-      if (p < 1) {
-        setGlide({ from, t: p });
-        raf = requestAnimationFrame(frame);
-      } else {
-        setGlide(null);
+    // ¿Avance de un paso? curr[i] === prev[i+1] (la forma se corre una celda).
+    let forward = true;
+    for (let i = 0; i < n - 1; i++) {
+      if (prev[i + 1].x !== curr[i].x || prev[i + 1].y !== curr[i].y) {
+        forward = false;
+        break;
       }
-    };
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    }
+    // ¿Retroceso de un paso? curr[i] === prev[i-1] (glide-back de colisión).
+    let backward = true;
+    for (let i = 1; i < n; i++) {
+      if (prev[i - 1].x !== curr[i].x || prev[i - 1].y !== curr[i].y) {
+        backward = false;
+        break;
+      }
+    }
+
+    if (forward) {
+      // Arranque desde reposo: compacta el riel a la ventana actual (acota la
+      // memoria) sin salto visual (offset 0 ⇒ ventana == forma en reposo).
+      if (!runningRef.current) {
+        railRef.current = clonePts(prev);
+        railCountRef.current = n;
+        targetRef.current = 0;
+        offsetRef.current = 0;
+      }
+      railRef.current = [...railRef.current!, { x: curr[n - 1].x, y: curr[n - 1].y }];
+      railCountRef.current = n;
+      targetRef.current += cellSize;
+      setRailState({ rail: railRef.current, count: n });
+      setOffset(offsetRef.current);
+      startLoop();
+      return;
+    }
+    if (backward && targetRef.current - cellSize >= -1e-6) {
+      // Los nodos del retroceso ya están en el riel: solo mueve el target atrás.
+      targetRef.current -= cellSize;
+      startLoop();
+      return;
+    }
+    reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [centersKey]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useLayoutEffect(() => {
     if (collideNonce === undefined || centers.length === 0) {
@@ -251,31 +299,33 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collideNonce]);
 
-  // Base del dibujo: durante el glide, cada vértice se interpola (con salida
-  // suave) desde su última posición dibujada hacia la nueva; en reposo son los
-  // centros tal cual. La interpolación es solo estética: el dominio ya está en
-  // la celda destino.
-  const glideEase = glide === null ? 1 : 1 - (1 - glide.t) * (1 - glide.t);
-  const baseCenters =
-    glide === null || glide.from.length !== centers.length
-      ? centers
-      : centers.map((c, i) => ({
-          x: glide.from[i].x + (c.x - glide.from[i].x) * glideEase,
-          y: glide.from[i].y + (c.y - glide.from[i].y) * glideEase,
-        }));
-  // Registra la forma que se va a pintar en ESTE commit; corre después del
-  // effect del glide (orden de declaración), así aquel siempre lee la posición
-  // dibujada del commit anterior al arrancar una nueva interpolación.
-  useLayoutEffect(() => {
-    drawnRef.current = centers.length > 0 ? baseCenters : null;
-  });
-
   if (centers.length === 0) {
     return null;
   }
 
-  // Durante el amago, cada vértice se desplaza recoilF hacia su dirección de avance
-  // (siguiendo la forma). En reposo (recoilF === 0) se usan los centros tal cual.
+  // Forma dibujada: ventana del riel persistente en `arcOffset`, leída del ESTADO
+  // espejo (railState), no de refs. Guard estructural: el riel debe existir, casar
+  // en nº de celdas y tener ≥2 nodos (dirección de tramo válida). Ante CUALQUIER
+  // estado inconsistente o excepción → shape=null y se cae a snap sobre `centers`.
+  // La animación es cosmética: nunca puede lanzar y tumbar el árbol de React.
+  const shape: ReturnType<typeof sampleShapeOnRail> | null = (() => {
+    if (
+      railState === null ||
+      railState.count !== centers.length ||
+      railState.rail.length < 2
+    ) {
+      return null;
+    }
+    try {
+      return sampleShapeOnRail(railState.rail, arcOffset, centers.length, cellSize);
+    } catch {
+      return null; // snap silencioso; la próxima reconciliación reconstruye el riel.
+    }
+  })();
+  const baseCenters = shape !== null ? shape.vertices : centers;
+
+  // Durante el amago de colisión, cada vértice se desplaza recoilF hacia su
+  // dirección de avance (siguiendo la forma). En reposo se usa la forma tal cual.
   const drawCenters =
     recoilF === 0
       ? baseCenters
@@ -287,16 +337,23 @@ export const ArrowComponent: React.FC<ArrowComponentProps> = ({
   // Factor de deformación por impacto (0 en reposo, máximo en pico del rebote).
   const deform = deformationFactor(recoilF);
 
-  const bodyPath = buildBodyPath(drawCenters);
+  // El riel traza el CUERPO y ubica la punta (correcto también en reposo). Pero
+  // la DIRECCIÓN de la cabeza solo la toma del riel EN MOVIMIENTO (`moving`): así
+  // la punta gira al doblar mientras se desliza, pero en REPOSO la orientación la
+  // dicta el dominio (exitDir) — tras un glide-back el último tramo del riel puede
+  // apuntar hacia atrás y la animación jamás decide hacia dónde mira una quieta.
+  const useRailBody = recoilF === 0 && shape !== null;
+  const bodyPath = buildBodyPath(useRailBody ? shape.body : drawCenters);
   // La punta visual va en la celda LÍDER (última en orden de ocupación), no en la
   // celda-cabeza del dominio, que en este motor ocupa el extremo trasero.
-  const tipCenter = drawCenters[drawCenters.length - 1];
-  const headPoints = buildHeadPoints(
-    tipCenter,
-    tipDirection(drawCenters, exitDir),
-    cellSize,
-    deform, // aplica compresión de la punta
-  );
+  const tipCenter = useRailBody
+    ? shape.vertices[shape.vertices.length - 1]
+    : drawCenters[drawCenters.length - 1];
+  const headDir =
+    moving && useRailBody ? shape.tipDir : tipDirection(drawCenters, exitDir);
+  // Compresión de la punta durante el impacto (1 = sin comprimir).
+  const headCompression = 1 - DEFORM_HEAD_RATIO * deform;
+  const headPoints = buildHeadPoints(tipCenter, headDir, cellSize, headCompression);
 
   // Engrosamiento del cuerpo durante el impacto (simula compresión).
   const bodyStrokeWidth =

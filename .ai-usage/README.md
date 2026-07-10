@@ -46,6 +46,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-09 | E: UI de Cuenta (login/registro/logout, validación E1, overlay + i18n) | [`2026-07-09-e-ui-cuenta.md`](./2026-07-09-e-ui-cuenta.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-09 | Fix: ruta del adapter de progreso a `/api/v1/progress` (sync D2 daba 404) | [`2026-07-09-fix-ruta-progress-v1.md`](./2026-07-09-fix-ruta-progress-v1.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-09 | Reducir el glifo de las flechas al 55% con escala unificada (`ARROW_SCALE` + `ARROW_GLYPH`) | [`2026-07-09-fix-tamano-flechas.md`](./2026-07-09-fix-tamano-flechas.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | Animación de flechas: glide sobre riel persistente, orientación en reposo, salida voladora, recalibración del choque | [`2026-07-09-animacion-flechas.md`](./2026-07-09-animacion-flechas.md) | Claude Opus 4.8 (1M context) |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -71,9 +72,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 43
+- **Total de reportes:** 44
 - **Última actualización:** 2026-07-09
-- **Suite de tests (actual):** 442/442 ✅ en 52 suites
+- **Suite de tests (actual):** 485/485 ✅ en 57 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
