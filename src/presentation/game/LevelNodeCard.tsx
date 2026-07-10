@@ -6,12 +6,16 @@ interface LevelNodeCardProps {
   node: DerivedNode;
   metadata?: { name: string; difficulty: string };
   onSelectLevel: () => void;
+  /** Abre la clasificación de ESTE nivel (🏆). Disponible en TODAS las cards,
+   * incluidas las bloqueadas: ver récords ajenos motiva a desbloquear. */
+  onOpenLeaderboard?: () => void;
 }
 
 export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
   node,
   metadata,
   onSelectLevel,
+  onOpenLeaderboard,
 }) => {
   const { t } = useTranslation();
   const isBlocked = node.state === 'bloqueado';
@@ -42,8 +46,33 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
         backgroundColor: isBlocked ? '#f3f4f6' : '#fff',
         minWidth: '140px',
         textAlign: 'center',
+        position: 'relative',
       }}
     >
+      {/* 🏆 en TODAS las cards (también bloqueadas). stopPropagation: abrir la
+          clasificación no debe disparar jugar ni el alert de bloqueado. */}
+      {onOpenLeaderboard !== undefined && (
+        <button
+          aria-label={t('leaderboard.open')}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenLeaderboard();
+          }}
+          style={{
+            position: 'absolute',
+            top: '4px',
+            right: '4px',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            fontSize: '16px',
+            padding: '4px',
+            lineHeight: 1,
+          }}
+        >
+          🏆
+        </button>
+      )}
       {/* Color SIEMPRE explícito: heredarlo del sistema (modo oscuro) lo
           volvía blanco sobre la card clara — título invisible. */}
       <div

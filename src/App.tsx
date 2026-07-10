@@ -15,7 +15,10 @@ import { FetchAuthApiClient } from './infrastructure/api/FetchAuthApiClient';
 import { LoginUser } from './application/services/LoginUser';
 import { RegisterUser } from './application/services/RegisterUser';
 import { LogoutUser } from './application/services/LogoutUser';
+import { GetLevelLeaderboard } from './application/services/GetLevelLeaderboard';
+import { FetchLeaderboardApiClient } from './infrastructure/api/FetchLeaderboardApiClient';
 import { AccountOverlay } from './presentation/components/AccountOverlay';
+import { LeaderboardOverlay } from './presentation/components/LeaderboardOverlay';
 import { AccountButton } from './presentation/components/AccountButton';
 import { aliasFromEmail } from './presentation/account/aliasFromEmail';
 import type { LevelProgress } from './domain/entities/LevelProgress';
@@ -58,6 +61,8 @@ const App: React.FC = () => {
   // Email de la sesión activa para el badge del header (null = deslogueado o
   // sesión previa a este feature sin email guardado → el botón cae al label).
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  // Nivel cuya clasificación está abierta (🏆 de la card); null = cerrada.
+  const [leaderboardLevelId, setLeaderboardLevelId] = useState<string | null>(null);
 
   // Composition root de autenticación (E1/E2): una sola instancia de los casos
   // de uso, reutilizando el mismo TokenProvider nativo que el bootstrap de
@@ -72,6 +77,12 @@ const App: React.FC = () => {
       logoutUser: new LogoutUser(apiClient, tokenProvider),
     };
   }, [apiBaseUrl, tokenProvider]);
+
+  // Caso de uso del leaderboard (misma composición que auth: adapter + Bearer).
+  const getLevelLeaderboard = useMemo(
+    () => new GetLevelLeaderboard(new FetchLeaderboardApiClient(apiBaseUrl, tokenProvider)),
+    [apiBaseUrl, tokenProvider],
+  );
 
   // Estado de sesión inicial para el badge/overlay: token presente = logueado; y
   // el email guardado alimenta el alias del botón (sobrevive al F5). Migración:
@@ -261,6 +272,7 @@ const App: React.FC = () => {
             progress={allProgress}
             onSelectLevel={handleSelectLevel}
             levelMetadata={LEVEL_METADATA}
+            onOpenLeaderboard={(levelId) => setLeaderboardLevelId(levelId)}
           />
         </main>
         {accountVisible && (
@@ -272,6 +284,24 @@ const App: React.FC = () => {
             registerUser={authModule.registerUser}
             logoutUser={authModule.logoutUser}
             onAuthChanged={handleAuthChanged}
+          />
+        )}
+        {leaderboardLevelId !== null && !accountVisible && (
+          <LeaderboardOverlay
+            // key: remonta por nivel — el estado (loading/data) nace limpio en
+            // cada apertura, sin resets síncronos dentro de effects.
+            key={leaderboardLevelId}
+            visible
+            levelId={leaderboardLevelId}
+            isAuthenticated={isAuthenticated}
+            getLevelLeaderboard={getLevelLeaderboard}
+            // Sinergia con la cuenta: el leaderboard es EL motivo para loguearse.
+            // Cierra esta vista y abre el AccountOverlay.
+            onRequestLogin={() => {
+              setLeaderboardLevelId(null);
+              setAccountVisible(true);
+            }}
+            onClose={() => setLeaderboardLevelId(null)}
           />
         )}
       </div>

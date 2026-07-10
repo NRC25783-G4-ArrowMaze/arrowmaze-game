@@ -9,12 +9,15 @@ interface LevelSelectScreenProps {
   progress: LevelProgress[];
   onSelectLevel: (levelId: string) => void;
   levelMetadata: Record<string, { name: string; difficulty: string }>;
+  /** Abre la clasificación del nivel (🏆 de cada card). */
+  onOpenLeaderboard?: (levelId: string) => void;
 }
 
 export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
   progress,
   onSelectLevel,
   levelMetadata,
+  onOpenLeaderboard,
 }) => {
   const { t } = useTranslation();
   // Derivado puro del progreso: se computa en el render (useMemo), no en un
@@ -46,6 +49,11 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
             node={node}
             metadata={levelMetadata[node.levelId]}
             onSelectLevel={() => onSelectLevel(node.levelId)}
+            onOpenLeaderboard={
+              onOpenLeaderboard === undefined
+                ? undefined
+                : () => onOpenLeaderboard(node.levelId)
+            }
           />
         ))}
       </main>
