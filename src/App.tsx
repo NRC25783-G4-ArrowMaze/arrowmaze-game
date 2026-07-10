@@ -20,6 +20,7 @@ import { FetchLeaderboardApiClient } from './infrastructure/api/FetchLeaderboard
 import { AccountOverlay } from './presentation/components/AccountOverlay';
 import { LeaderboardOverlay } from './presentation/components/LeaderboardOverlay';
 import { AccountButton } from './presentation/components/AccountButton';
+import { Toast } from './presentation/components/Toast';
 import { aliasFromEmail } from './presentation/account/aliasFromEmail';
 import type { LevelProgress } from './domain/entities/LevelProgress';
 import { useTranslation } from './presentation/i18n/I18nContext';
@@ -63,6 +64,11 @@ const App: React.FC = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   // Nivel cuya clasificación está abierta (🏆 de la card); null = cerrada.
   const [leaderboardLevelId, setLeaderboardLevelId] = useState<string | null>(null);
+  // Toast de sesión (bienvenida / sesión cerrada). UN toast a la vez: el nonce
+  // remonta el componente, así el nuevo reemplaza al viejo sin colas.
+  const [toast, setToast] = useState<
+    { kind: 'welcome'; alias: string; nonce: number } | { kind: 'loggedOut'; nonce: number } | null
+  >(null);
 
   // Composition root de autenticación (E1/E2): una sola instancia de los casos
   // de uso, reutilizando el mismo TokenProvider nativo que el bootstrap de
@@ -99,12 +105,27 @@ const App: React.FC = () => {
     return () => { active = false; };
   }, [tokenProvider]);
 
-  // Cambios de sesión desde el overlay: actualiza el badge (identidad + estado) y,
-  // al iniciar sesión, dispara una sincronización (D2) ahora que las peticiones
-  // llevan el token.
+  // Cambios de sesión desde el overlay: actualiza el badge (identidad + estado),
+  // CIERRA el overlay automáticamente en ambos sentidos (tras login no tiene
+  // sentido mirar "Sesión activa"; tras logout, tampoco los formularios) y
+  // saluda/despide con un toast. Al iniciar sesión, además dispara una
+  // sincronización (D2) ahora que las peticiones llevan el token.
   const handleAuthChanged = (authenticated: boolean, email?: string): void => {
     setIsAuthenticated(authenticated);
     setUserEmail(authenticated ? (email ?? null) : null);
+    setAccountVisible(false);
+    const alias = authenticated ? aliasFromEmail(email ?? '') : '';
+    if (authenticated && alias === '') {
+      // Sin identidad utilizable (no debería pasar: el overlay siempre pasa el
+      // email en el login) → sin toast; el resto del flujo sigue igual.
+      setToast(null);
+    } else {
+      setToast(
+        authenticated
+          ? { kind: 'welcome', alias, nonce: Date.now() }
+          : { kind: 'loggedOut', nonce: Date.now() },
+      );
+    }
     if (authenticated) {
       progressModule?.syncProgress.execute()
         .then(() => console.log('[App] Sincronización tras login completada.'))
@@ -284,6 +305,18 @@ const App: React.FC = () => {
             registerUser={authModule.registerUser}
             logoutUser={authModule.logoutUser}
             onAuthChanged={handleAuthChanged}
+          />
+        )}
+        {toast !== null && (
+          <Toast
+            // key: remonta al reemplazar (un toast a la vez, sin colas).
+            key={toast.nonce}
+            message={
+              toast.kind === 'welcome'
+                ? t('account.welcome', { alias: toast.alias })
+                : t('account.loggedOut')
+            }
+            onDone={() => setToast(null)}
           />
         )}
         {leaderboardLevelId !== null && !accountVisible && (

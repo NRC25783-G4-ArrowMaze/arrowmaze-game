@@ -101,6 +101,8 @@ export const es: Catalog = {
       loggedIn: 'Sesión activa',
     },
     ariaLoggedIn: 'Sesión activa: {alias} — gestiona tu cuenta',
+    welcome: '¡Bienvenido, {alias}!',
+    loggedOut: 'Sesión cerrada',
     register: {
       success: 'Cuenta creada. Inicia sesión para continuar.',
     },
