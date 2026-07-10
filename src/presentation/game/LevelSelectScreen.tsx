@@ -8,7 +8,7 @@ import { useTranslation } from '../i18n/I18nContext';
 interface LevelSelectScreenProps {
   progress: LevelProgress[];
   onSelectLevel: (levelId: string) => void;
-  levelMetadata: Record<string, { name: string; difficulty: string }>;
+  levelMetadata: Record<string, { difficulty: string }>;
   /** Abre la clasificación del nivel (🏆 de cada card). */
   onOpenLeaderboard?: (levelId: string) => void;
 }

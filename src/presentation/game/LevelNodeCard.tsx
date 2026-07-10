@@ -4,7 +4,7 @@ import { useTranslation } from '../i18n/I18nContext';
 
 interface LevelNodeCardProps {
   node: DerivedNode;
-  metadata?: { name: string; difficulty: string };
+  metadata?: { difficulty: string };
   onSelectLevel: () => void;
   /** Abre la clasificación de ESTE nivel (🏆). Disponible en TODAS las cards,
    * incluidas las bloqueadas: ver récords ajenos motiva a desbloquear. */
@@ -94,7 +94,7 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
           color: isBlocked ? '#9ca3af' : '#1f2937',
         }}
       >
-        {metadata?.name || node.levelId}
+        {t(`level.name.${node.levelId}`)}
       </div>
 
       {isBlocked && (

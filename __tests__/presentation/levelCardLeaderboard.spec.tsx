@@ -22,7 +22,7 @@ function renderCard(node: DerivedNode, handlers: Partial<{ onSelectLevel: () => 
     <I18nProvider initialLang="es">
       <LevelNodeCard
         node={node}
-        metadata={{ name: 'Nivel Inicial', difficulty: 'easy' }}
+        metadata={{ difficulty: 'easy' }}
         onSelectLevel={handlers.onSelectLevel ?? noop}
         onOpenLeaderboard={handlers.onOpenLeaderboard ?? noop}
       />
@@ -71,7 +71,7 @@ describe('LevelNodeCard — acceso al leaderboard (🏆)', () => {
     const onSelectLevel = jest.fn();
     renderCard(makeNode(), { onSelectLevel });
 
-    fireEvent.click(screen.getByText('Nivel Inicial'));
+    fireEvent.click(screen.getByText(T('level.name.level-initial')));
 
     expect(onSelectLevel).toHaveBeenCalledTimes(1);
   });
