@@ -2663,10 +2663,160 @@
           "Cherry-pick de f823061 descartado con evidencia (git reporto cero cambios: el contenido ya vive en dev via squash del #43); se declara en la descripcion del PR"
         ],
         "notes": "Rama nace del tip post-rebase de leaderboards (e253871); tras el merge del #46 (squash 061577a) se rebasa --onto dev y su PR sale de inmediato. Id 2026-07-10-004."
+      },
+      {
+        "id": "2026-07-10-005",
+        "date": "2026-07-10",
+        "title": "Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md)",
+        "file": "2026-07-10-verification-checklist-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-leaderboards-cliente",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 3,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "verification",
+          "auditing"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "doc/VERIFICATION_CHECKLIST.md (12 categorías, roadmap priorizado)"
+            ],
+            "modified": [
+              "README.md (tabla de features grupos C-G)",
+              "arrowmaze-project-core/docs/FEATURES.md (repo externo)",
+              "arrowmaze-project-core/docs/BORRADOR-features-pendientes.md (repo externo, marcado cerrado)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites (evidencia citada dentro de la checklist)",
+          "type_check": "no aplica (cambios solo de documentación)",
+          "lint": "no aplica",
+          "e2e": "verificación cruzada en código (grep de wiring real en App.tsx, SyncProgress.ts, GameFlowController.ts, GetLevelLeaderboard.ts) antes de marcar cada feature como implementada, en vez de confiar en la documentación previa"
+        },
+        "decisions": [
+          "Fase 1 acotada por el usuario a solo generar la checklist, sin CI/LICENSE/CHANGELOG todavía",
+          "Rama nueva docs/verification-checklist-v1 desde dev (no dev directo, no release/)",
+          "Priorizar corregir la documentación desfasada (README + FEATURES.md) antes de seguir con infraestructura de release, a pedido explícito del usuario",
+          "C1/C3/D1/D2/F4/G1/G2 confirmados como implementados con evidencia de código; P20 y P21 marcados como resueltos",
+          "BORRADOR-features-pendientes.md no reescrito por completo — marcado 🔒 CERRADO y preservado como contexto histórico"
+        ],
+        "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
+      },
+      {
+        "id": "2026-07-10-006",
+        "date": "2026-07-10",
+        "title": "LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README",
+        "file": "2026-07-10-release-scaffolding-gof-solid.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 4,
+          "tests_added": 0,
+          "assets_added": 1
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "design-patterns",
+          "solid",
+          "diagrams"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "LICENSE (MIT)",
+              "CHANGELOG.md (Keep a Changelog, v0.1.0 -> v1.0.0)",
+              "doc/classes.svg (exportado localmente con plantuml.jar vendorizado)"
+            ],
+            "modified": [
+              "package.json (version -> 1.0.0)",
+              "android/app/build.gradle (versionName/versionCode -> 1.0.0/4)",
+              "README.md (secciones GoF, SOLID, Diagrama de clases, Licencia)",
+              "doc/VERIFICATION_CHECKLIST.md (secciones 6/10/12 y roadmap actualizados)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites con arrowmaze-game@1.0.0",
+          "type_check": "no aplica (cambios de documentación/config)",
+          "lint": "no aplica",
+          "e2e": "verificacion del SVG generado (120 clases/interfaces renderizadas, sin errores de sintaxis PlantUML); CHANGELOG.md contrastado contra git log --oneline por rango de tags"
+        },
+        "decisions": [
+          "MIT confirmado explícitamente por el usuario antes de crear LICENSE",
+          "CHANGELOG.md generado tras explicar su propósito (Keep a Changelog) porque el usuario no tenía claro para qué servía",
+          "Segunda fuente de versión descubierta en el camino (android/app/build.gradle) y corregida junto con package.json, siguiendo el patrón del backend (swagger.ts)",
+          "Diagrama exportado con el plantuml.jar ya vendorizado por node-plantuml, sin depender de internet"
+        ],
+        "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
+      },
+      {
+        "id": "2026-07-10-007",
+        "date": "2026-07-10",
+        "title": "Push y apertura del PR #48 (checklist + scaffolding de release)",
+        "file": "2026-07-10-pr48-checklist-release-scaffolding.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1, 2026-07-10-release-scaffolding-gof-solid",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 0,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "git-workflow"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              ".ai-usage/2026-07-10-pr48-checklist-release-scaffolding.md"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "no aplica (solo git push + gh pr create)",
+          "type_check": "no aplica",
+          "lint": "no aplica",
+          "e2e": "git log --oneline dev..docs/verification-checklist-v1 confirmado antes de abrir el PR; URL de PR #48 devuelta por gh como confirmación"
+        },
+        "decisions": [
+          "PR #48 abierto contra dev (no main), confirmado explícitamente por el usuario",
+          "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
+        ],
+        "notes": "PR #48 abierto sin mergear, pendiente de revisión. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tomó el id -004 durante este merge con dev."
       }
     ],
     "statistics": {
-      "totalReports": 48,
+      "totalReports": 51,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
