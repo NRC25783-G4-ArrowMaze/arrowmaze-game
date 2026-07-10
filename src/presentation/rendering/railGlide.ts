@@ -1,4 +1,4 @@
-import type { Point } from './boardLayout';
+import { portDelta, type Point } from './boardLayout';
 
 /**
  * railGlide — Interpolación del deslizamiento (glide) SOBRE EL RIEL de celdas.
@@ -122,6 +122,43 @@ export function railDirectionAtArc(
   const b = rail[seg + 1];
   const len = dist(a, b) || 1;
   return { dir: { x: (b.x - a.x) / len, y: (b.y - a.y) / len }, segmentIndex: seg };
+}
+
+/**
+ * Extiende un riel con nodos VIRTUALES fuera del tablero para la salida voladora.
+ *
+ * Toma la forma completa (centros de celda de la flecha, cola→punta) y añade
+ * nodos que continúan en la dirección de salida: el último tramo real si la
+ * flecha tiene ≥2 celdas (así una que venía de un codo sigue recto tras doblar),
+ * o portDelta(exitDir) para una flecha de una sola celda. La longitud virtual es
+ * generosa (cubre el largo de la flecha + margen + holgura) para que el muestreo
+ * nunca se quede corto durante todo el vuelo.
+ */
+export function extendRailForExit(
+  centers: Point[],
+  exitDir: number,
+  marginCells: number,
+  cellSize: number,
+): Point[] {
+  if (centers.length === 0) {
+    return [];
+  }
+  const last = centers[centers.length - 1];
+  let dir: { x: number; y: number };
+  if (centers.length >= 2) {
+    const prev = centers[centers.length - 2];
+    const len = dist(prev, last) || 1;
+    dir = { x: (last.x - prev.x) / len, y: (last.y - prev.y) / len };
+  } else {
+    const { dCol, dRow } = portDelta(exitDir);
+    dir = { x: dCol, y: dRow };
+  }
+  const rail = centers.map((p) => ({ x: p.x, y: p.y }));
+  const virtualNodes = centers.length * 2 + Math.ceil(Math.max(0, marginCells)) + 2;
+  for (let k = 1; k <= virtualNodes; k++) {
+    rail.push({ x: last.x + dir.x * cellSize * k, y: last.y + dir.y * cellSize * k });
+  }
+  return rail;
 }
 
 /** Longitud total de arco de un riel. */

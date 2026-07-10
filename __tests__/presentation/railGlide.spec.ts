@@ -4,7 +4,9 @@ import {
   railDirectionAtArc,
   glideAlongRail,
   sampleShapeOnRail,
+  extendRailForExit,
 } from '../../src/presentation/rendering/railGlide';
+import { exitOpacity, EXIT_FADE_START } from '../../src/presentation/rendering/glideConfig';
 import type { Point } from '../../src/presentation/rendering/boardLayout';
 
 // ── Utilidades de test (geometría, sin DOM) ──────────────────────────────────
@@ -327,5 +329,91 @@ describe('sampleShapeOnRail', () => {
     // Líder (arcOffset+10). arcOffset=0 → líder en arco 10 (esquina) → tramo saliente sur.
     const g = sampleShapeOnRail(lRail, 0, 2, STEP);
     expect(pointClose(g.tipDir, { x: 0, y: 1 })).toBe(true);
+  });
+});
+
+// ── extendRailForExit + salida voladora ──────────────────────────────────────
+
+describe('extendRailForExit', () => {
+  const CELL = 10;
+
+  it('añade nodos virtuales en la dirección del último tramo (flecha recta al Este)', () => {
+    const centers: Point[] = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 20, y: 0 },
+    ];
+    const rail = extendRailForExit(centers, 1, 2, CELL);
+    // Conserva los nodos reales al inicio.
+    centers.forEach((c, i) => expect(pointClose(rail[i], c)).toBe(true));
+    // Los nodos virtuales continúan al Este (x creciente, y constante).
+    for (let i = centers.length; i < rail.length; i++) {
+      expect(rail[i].y).toBe(0);
+      expect(rail[i].x).toBeGreaterThan(rail[i - 1].x);
+    }
+    // Longitud suficiente para el vuelo (largo + margen + holgura).
+    expect(rail.length).toBeGreaterThan(centers.length + 2);
+  });
+
+  it('flecha de UNA celda usa portDelta(exitDir) para la dirección (Sur)', () => {
+    const rail = extendRailForExit([{ x: 5, y: 5 }], 2 /* Sur */, 2, CELL);
+    expect(rail.length).toBeGreaterThan(1);
+    // Sur → y creciente, x constante.
+    for (let i = 1; i < rail.length; i++) {
+      expect(rail[i].x).toBe(5);
+      expect(rail[i].y).toBeGreaterThan(rail[i - 1].y);
+    }
+  });
+
+  it('venir de un codo: el vuelo continúa en la dirección del último tramo (Sur)', () => {
+    const centers: Point[] = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 10, y: 10 }, // dobló al Sur justo antes de salir
+    ];
+    const rail = extendRailForExit(centers, 2, 1, CELL);
+    for (let i = centers.length; i < rail.length; i++) {
+      expect(rail[i].x).toBe(10);
+      expect(rail[i].y).toBeGreaterThan(rail[i - 1].y);
+    }
+  });
+
+  it('⭐ INVARIANTE: la forma completa vive en el riel extendido durante todo el vuelo', () => {
+    const centers: Point[] = [
+      { x: 0, y: 0 },
+      { x: 10, y: 0 },
+      { x: 20, y: 0 },
+    ];
+    const rail = extendRailForExit(centers, 1, 2, CELL);
+    const count = centers.length;
+    const flyTarget = (count + 2) * CELL; // largo + margen
+    for (let off = 0; off <= flyTarget; off += 1) {
+      const g = sampleShapeOnRail(rail, off, count, CELL);
+      for (const p of g.body) expect(distToRail(p, rail)).toBeLessThan(1e-9);
+      for (const v of g.vertices) expect(distToRail(v, rail)).toBeLessThan(1e-9);
+    }
+  });
+
+  it('centros vacíos → riel vacío (sin lanzar)', () => {
+    expect(extendRailForExit([], 1, 2, CELL)).toEqual([]);
+  });
+});
+
+describe('exitOpacity (fade de salida)', () => {
+  it('opacidad plena hasta EXIT_FADE_START y monótona no creciente', () => {
+    expect(exitOpacity(0)).toBe(1);
+    expect(exitOpacity(EXIT_FADE_START)).toBe(1);
+    let prev = 1;
+    for (let p = 0; p <= 1.0001; p += 0.05) {
+      const o = exitOpacity(p);
+      expect(o).toBeLessThanOrEqual(prev + 1e-9);
+      expect(o).toBeGreaterThanOrEqual(0);
+      prev = o;
+    }
+  });
+
+  it('el fade llega a 0 al final del vuelo (p = 1)', () => {
+    expect(exitOpacity(1)).toBeCloseTo(0, 10);
+    expect(exitOpacity(1.5)).toBe(0); // clamp por encima de 1
   });
 });
