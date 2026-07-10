@@ -113,4 +113,23 @@ export const es: Catalog = {
       network: 'Error de conexión. Inténtalo de nuevo.',
     },
   },
+  leaderboard: {
+    title: 'Clasificación',
+    open: 'Ver la clasificación del nivel',
+    loading: 'Cargando clasificación…',
+    error: 'No se pudo cargar la clasificación. Inténtalo de nuevo.',
+    empty: 'Aún no hay récords — sé el primero',
+    loginRequired: 'Inicia sesión para ver la clasificación',
+    loginButton: 'Iniciar sesión',
+    yourRecord: 'Tu récord',
+    noRecord: 'Aún no tienes récord en este nivel',
+    back: 'Volver',
+    col: {
+      rank: '#',
+      player: 'Jugador',
+      score: 'Puntaje',
+      moves: 'Movidas',
+      time: 'Tiempo',
+    },
+  },
 };

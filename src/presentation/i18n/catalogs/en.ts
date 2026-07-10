@@ -113,4 +113,23 @@ export const en: Catalog = {
       network: 'Connection error. Please try again.',
     },
   },
+  leaderboard: {
+    title: 'Leaderboard',
+    open: 'View level leaderboard',
+    loading: 'Loading leaderboard…',
+    error: 'Could not load the leaderboard. Please try again.',
+    empty: 'No records yet — be the first',
+    loginRequired: 'Log in to view the leaderboard',
+    loginButton: 'Log in',
+    yourRecord: 'Your record',
+    noRecord: "You don't have a record on this level yet",
+    back: 'Back',
+    col: {
+      rank: '#',
+      player: 'Player',
+      score: 'Score',
+      moves: 'Moves',
+      time: 'Time',
+    },
+  },
 };

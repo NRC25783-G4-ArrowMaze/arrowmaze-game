@@ -49,6 +49,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-09 | Animación de flechas: glide sobre riel persistente, orientación en reposo, salida voladora, recalibración del choque | [`2026-07-09-animacion-flechas.md`](./2026-07-09-animacion-flechas.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | Badge de usuario logueado en el header (alias del email, sobrevive F5) | [`2026-07-10-badge-usuario.md`](./2026-07-10-badge-usuario.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | Follow-ups de #42 (salida fantasma, `useId`, `onDone`, perf del riel) + saneo de lint de `dev` (#45) en el PR #44 | [`2026-07-10-pr44-followups-42-lint-45.md`](./2026-07-10-pr44-followups-42-lint-45.md) | Claude Opus 4.8 |
+| 2026-07-10 | Leaderboards en el cliente: clasificación por nivel (🏆 en cards, overlay 5 estados) | [`2026-07-10-leaderboards-cliente.md`](./2026-07-10-leaderboards-cliente.md) | Claude Opus 4.8 (1M context) + Fable 5 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -74,9 +75,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 46
+- **Total de reportes:** 47
 - **Última actualización:** 2026-07-10
-- **Suite de tests (actual):** 508/508 ✅ en 60 suites
+- **Suite de tests (actual):** 531/531 ✅ en 64 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
