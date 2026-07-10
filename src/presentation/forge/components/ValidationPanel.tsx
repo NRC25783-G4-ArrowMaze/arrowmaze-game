@@ -7,9 +7,11 @@ interface ValidationPanelProps {
 }
 
 export const ValidationPanel: React.FC<ValidationPanelProps> = ({ scene }) => {
-  const issues = React.useMemo(() => {
-    return validateScene(scene)
-  }, [scene.id, scene.allowedMoves, scene.cells.length, scene.arrows.length, scene.connections.length])
+  // El store reemplaza `scene` de forma inmutable en cada edición, así que su
+  // identidad basta como dependencia: recomputa por CONTENIDO. Las deps
+  // granulares por `.length` anteriores dejaban stale la validación ante
+  // cambios de contenido que no alteran longitudes (p.ej. el portCount de una celda).
+  const issues = React.useMemo(() => validateScene(scene), [scene])
 
   const errorCount = issues.filter((i) => i.severity === 'error').length
   const warningCount = issues.filter((i) => i.severity === 'warning').length
