@@ -14,6 +14,7 @@ import { useLevelTimer } from '../game/useLevelTimer';
 import { LevelTimerDisplay } from './LevelTimerDisplay';
 import { useAudioContext } from '../audio/AudioContext';
 import { useGameAudio } from '../game/useGameAudio';
+import { useTutorial } from '../game/useTutorial';
 
 const BOARD_SIZE = 560;
 
@@ -109,15 +110,25 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
     }
   }, [game.status, game.score, game.movesRemaining, progressModule, requestSync, scene]);
 
+  // Tutorial guiado del primer nivel (solo la primera vez): la manito señala la
+  // flecha del paso actual mientras el tablero acepta toques.
+  const boardInteractive =
+    game.status === 'IN_PROGRESS' && !game.inFlight && game.flowState === 'ACTIVE';
+  const { hintCell, notifyMove } = useTutorial(scene, boardInteractive);
+
   const onPointerDown = useBoardInput({
     width: BOARD_SIZE,
     height: BOARD_SIZE,
     layout,
     // Bloqueo: input deshabilitado en estado terminal, con un slide en vuelo,
     // o cuando el tope de la pila de flujo no es ACTIVE (C1: PAUSED/SETTINGS).
-    enabled: game.status === 'IN_PROGRESS' && !game.inFlight && game.flowState === 'ACTIVE',
+    enabled: boardInteractive,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => game.playMove(command),
+    onPlayMove: (command) => {
+      // Avanza el tutorial cuando se juega la flecha guiada (no-op fuera del nivel-tutorial).
+      notifyMove(command.arrowId);
+      game.playMove(command);
+    },
   });
 
   return (
@@ -172,6 +183,7 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
             collision={game.collision ?? undefined}
             vanishing={game.vanishing ?? undefined}
             headDisintegrating={game.headDisintegrating ?? undefined}
+            hintCell={hintCell ?? undefined}
           />
           <GameOverlay
             status={game.status}
