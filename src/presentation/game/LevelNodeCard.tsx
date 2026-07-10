@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { DerivedNode } from '../../domain/services/LevelSelectionProjection';
 import { useTranslation } from '../i18n/I18nContext';
 
@@ -21,6 +21,18 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
   const isBlocked = node.state === 'bloqueado';
   const isFocal = node.isFocal && !isBlocked;
 
+  // Auto-scroll a la card "Siguiente →" al montar la pantalla: con el mapa a
+  // 50+ niveles el jugador aterriza directo en su próximo nivel. Solo al
+  // montar (SELECT se remonta al volver de una partida), no en cada cambio de
+  // progreso. Optional call: jsdom no implementa scrollIntoView.
+  const cardRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (isFocal) {
+      cardRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleClick = () => {
     if (isBlocked) {
       alert(t('levelSelect.locked.notice'));
@@ -33,6 +45,7 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
 
   return (
     <div
+      ref={cardRef}
       onClick={handleClick}
       className={`level-node-card ${node.state} ${isFocal ? 'focal' : ''}`}
       style={{
@@ -40,11 +53,9 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
         transform: isFocal ? 'scale(1.1)' : isBlocked ? 'scale(0.9)' : 'scale(1)',
         transition: 'all 0.2s ease',
         padding: '16px',
-        margin: '8px',
         border: isFocal ? '2px solid #4CAF50' : '1px solid #d1d5db',
         borderRadius: '8px',
         backgroundColor: isBlocked ? '#f3f4f6' : '#fff',
-        minWidth: '140px',
         textAlign: 'center',
         position: 'relative',
       }}

@@ -43,8 +43,9 @@ function errorKeyOf(error: unknown): string {
 
 /**
  * AccountOverlay — UI de cuenta (E1/E2). Mismo patrón visual que PauseOverlay /
- * SettingsOverlay: position:absolute;inset:0, role="dialog", estilos inline y
- * clases existentes (btn-primary para la acción principal), sin librería de UI.
+ * SettingsOverlay: modal a pantalla completa (.overlay-backdrop/.overlay-card),
+ * role="dialog", estilos inline y clases existentes (btn-primary para la acción
+ * principal), sin librería de UI.
  *
  * Estados: deslogueado (formulario login/registro) · cargando · error · logueado.
  * El password vive solo en memoria y se limpia tras cada operación; nunca se
@@ -153,108 +154,155 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
       data-testid="account-overlay"
       role="dialog"
       aria-label={t('account.title')}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '12px',
-        // Mismo backdrop que PauseOverlay/SettingsOverlay: rgba(255,255,255,0.9).
-        // Aquellos heredan una superficie blanca de `.app-main > div`; este modal
-        // cubre la pantalla SELECT sobre el degradado de `.app`, así que aporta su
-        // propia base blanca bajo el tinte idéntico para no transparentar el mapa.
-        background: 'linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), #ffffff',
-        borderRadius: '12px',
-        padding: '16px',
-      }}
+      className="overlay-backdrop"
     >
-      <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('account.title')}</div>
+      <div className="overlay-card">
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
+          <span aria-hidden="true">👤</span> {t('account.title')}
+        </div>
 
-      {authenticated ? (
-        <>
-          <div style={{ color: '#6b7280' }}>{t('account.status.loggedIn')}</div>
-          <button
-            className="btn-primary"
-            onClick={() => void handleLogout()}
-            disabled={submitting}
-            style={{ minWidth: '220px', maxWidth: '100%' }}
-          >
-            {submitting ? t('account.loading') : t('account.logout')}
-          </button>
-        </>
-      ) : (
-        <>
-          <div data-testid="account-tabs" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+        {authenticated ? (
+          <>
+            <div style={{ color: '#6b7280' }}>{t('account.status.loggedIn')}</div>
             <button
-              onClick={() => switchMode('login')}
-              aria-pressed={mode === 'login'}
-              className={mode === 'login' ? 'btn-primary' : undefined}
-              style={{ minWidth: '120px' }}
-            >
-              {t('account.tab.login')}
-            </button>
-            <button
-              onClick={() => switchMode('register')}
-              aria-pressed={mode === 'register'}
-              className={mode === 'register' ? 'btn-primary' : undefined}
-              style={{ minWidth: '120px' }}
-            >
-              {t('account.tab.register')}
-            </button>
-          </div>
-
-          <form
-            data-testid="account-form"
-            onSubmit={(e) => void handleSubmit(e)}
-            style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '260px', maxWidth: '100%' }}
-          >
-            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#374151' }}>
-              {t('account.email')}
-              <input
-                type="email"
-                autoComplete="email"
-                aria-label={t('account.email')}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={inputStyle}
-              />
-            </label>
-            <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#374151' }}>
-              {t('account.password')}
-              <input
-                type="password"
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                aria-label={t('account.password')}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={inputStyle}
-              />
-            </label>
-
-            {errorKey !== null && <div style={dangerText}>{t(errorKey)}</div>}
-            {successKey !== null && <div style={successText}>{t(successKey)}</div>}
-
-            <button
-              type="submit"
               className="btn-primary"
+              onClick={() => void handleLogout()}
               disabled={submitting}
-              style={{ minWidth: '220px', maxWidth: '100%' }}
+              style={{ width: 'min(300px, 100%)' }}
             >
-              {submitting
-                ? t('account.loading')
-                : mode === 'login'
-                  ? t('account.submit.login')
-                  : t('account.submit.register')}
+              {submitting ? t('account.loading') : t('account.logout')}
             </button>
-          </form>
-        </>
-      )}
+          </>
+        ) : (
+          <>
+            {/* Control segmentado: la pestaña activa mantiene btn-primary; la
+                inactiva se funde con la pista (sin borde) para leerse como
+                selector, no como dos botones sueltos. */}
+            <div
+              data-testid="account-tabs"
+              style={{
+                display: 'flex',
+                width: 'min(300px, 100%)',
+                background: '#f0f4f8',
+                borderRadius: '999px',
+                padding: '4px',
+              }}
+            >
+              <button
+                onClick={() => switchMode('login')}
+                aria-pressed={mode === 'login'}
+                className={mode === 'login' ? 'btn-primary' : undefined}
+                style={{
+                  flex: 1,
+                  minHeight: '38px',
+                  padding: '0.3em 0.6em',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontSize: '0.95rem',
+                  ...(mode === 'login' ? {} : { background: 'transparent', color: '#6b7280' }),
+                }}
+              >
+                {t('account.tab.login')}
+              </button>
+              <button
+                onClick={() => switchMode('register')}
+                aria-pressed={mode === 'register'}
+                className={mode === 'register' ? 'btn-primary' : undefined}
+                style={{
+                  flex: 1,
+                  minHeight: '38px',
+                  padding: '0.3em 0.6em',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontSize: '0.95rem',
+                  ...(mode === 'register' ? {} : { background: 'transparent', color: '#6b7280' }),
+                }}
+              >
+                {t('account.tab.register')}
+              </button>
+            </div>
 
-      <button onClick={onClose} style={{ minWidth: '220px', maxWidth: '100%' }}>
-        {t('account.back')}
-      </button>
+            <form
+              data-testid="account-form"
+              onSubmit={(e) => void handleSubmit(e)}
+              style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: 'min(300px, 100%)' }}
+            >
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  color: '#374151',
+                  textAlign: 'left',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                }}
+              >
+                {t('account.email')}
+                <input
+                  type="email"
+                  autoComplete="email"
+                  aria-label={t('account.email')}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  style={inputStyle}
+                />
+              </label>
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  color: '#374151',
+                  textAlign: 'left',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                }}
+              >
+                {t('account.password')}
+                <input
+                  type="password"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  aria-label={t('account.password')}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  style={inputStyle}
+                />
+              </label>
+
+              {errorKey !== null && <div style={dangerText}>{t(errorKey)}</div>}
+              {successKey !== null && <div style={successText}>{t(successKey)}</div>}
+
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={submitting}
+                style={{ width: '100%', marginTop: '4px' }}
+              >
+                {submitting
+                  ? t('account.loading')
+                  : mode === 'login'
+                    ? t('account.submit.login')
+                    : t('account.submit.register')}
+              </button>
+            </form>
+          </>
+        )}
+
+        {/* Acción secundaria: sin borde ni fondo para no competir con el submit. */}
+        <button
+          onClick={onClose}
+          style={{
+            width: 'min(300px, 100%)',
+            border: 'none',
+            background: 'transparent',
+            color: '#6b7280',
+            fontWeight: 500,
+          }}
+        >
+          {t('account.back')}
+        </button>
+      </div>
     </div>
   );
 };

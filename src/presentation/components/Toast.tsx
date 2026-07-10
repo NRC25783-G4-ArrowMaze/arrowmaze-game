@@ -18,7 +18,7 @@ type Phase = 'enter' | 'visible' | 'leaving';
 
 /**
  * Toast — Aviso efímero flotante (bienvenida / sesión cerrada), bottom-center
- * sobre el tablero sin tapar el header. Accesible (role=status +
+ * del viewport sin tapar el header. Accesible (role=status +
  * aria-live=polite), auto-dismiss por dial, click lo cierra antes, entrada y
  * salida con una transición CSS sutil (sin rAF). UN toast a la vez: el caller
  * remonta por nonce (key), el nuevo reemplaza al viejo sin colas.
@@ -64,8 +64,10 @@ export const Toast: React.FC<ToastProps> = ({
       aria-live="polite"
       onClick={dismiss}
       style={{
-        position: 'absolute',
-        bottom: '24px',
+        position: 'fixed',
+        // safe-area: en Capacitor (viewport-fit=cover) el toast no debe quedar
+        // bajo la barra de gestos.
+        bottom: 'calc(24px + env(safe-area-inset-bottom))',
         left: '50%',
         // La transición anima opacidad y un leve desplazamiento vertical.
         transform: `translate(-50%, ${hidden ? '12px' : '0'})`,
@@ -77,7 +79,8 @@ export const Toast: React.FC<ToastProps> = ({
         borderRadius: '999px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
         cursor: 'pointer',
-        zIndex: 10,
+        // Escala de z-index (App.css): 100 overlays modales, 200 Toast.
+        zIndex: 200,
         maxWidth: '90%',
         whiteSpace: 'nowrap',
         overflow: 'hidden',

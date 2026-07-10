@@ -19,6 +19,7 @@ import { GetLevelLeaderboard } from './application/services/GetLevelLeaderboard'
 import { FetchLeaderboardApiClient } from './infrastructure/api/FetchLeaderboardApiClient';
 import { AccountOverlay } from './presentation/components/AccountOverlay';
 import { LeaderboardOverlay } from './presentation/components/LeaderboardOverlay';
+import { SettingsOverlay } from './presentation/components/SettingsOverlay';
 import { AccountButton } from './presentation/components/AccountButton';
 import { Toast } from './presentation/components/Toast';
 import { aliasFromEmail } from './presentation/account/aliasFromEmail';
@@ -58,6 +59,9 @@ const App: React.FC = () => {
   const [screen, setScreen] = useState<'SELECT' | 'PLAYING'>('SELECT');
   const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
   const [accountVisible, setAccountVisible] = useState(false);
+  // Ajustes (idioma/audio) desde el mapa: antes solo eran alcanzables en
+  // partida vía pausa (C1); aquí es estado local de presentación, sin FSM.
+  const [settingsVisible, setSettingsVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   // Email de la sesión activa para el badge del header (null = deslogueado o
   // sesión previa a este feature sin email guardado → el botón cae al label).
@@ -282,6 +286,14 @@ const App: React.FC = () => {
         <header className="app-header">
           <h1>{t('app.title')}</h1>
           <div className="app-actions">
+            <button
+              className="btn-icon"
+              onClick={() => setSettingsVisible(true)}
+              aria-label={t('settings.title')}
+              title={t('settings.title')}
+            >
+              <span aria-hidden="true">⚙️</span>
+            </button>
             <AccountButton
               alias={userEmail !== null ? aliasFromEmail(userEmail) : ''}
               onClick={() => setAccountVisible(true)}
@@ -296,6 +308,9 @@ const App: React.FC = () => {
             onOpenLeaderboard={(levelId) => setLeaderboardLevelId(levelId)}
           />
         </main>
+        {settingsVisible && (
+          <SettingsOverlay visible onClose={() => setSettingsVisible(false)} />
+        )}
         {accountVisible && (
           <AccountOverlay
             visible

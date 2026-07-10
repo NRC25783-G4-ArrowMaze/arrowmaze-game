@@ -49,52 +49,43 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
       data-testid="game-overlay"
       role="alertdialog"
       aria-label={won ? t('overlay.aria.won') : t('overlay.aria.lost')}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        background: 'rgba(255, 255, 255, 0.82)',
-        borderRadius: '12px',
-        textAlign: 'center',
-      }}
+      className="overlay-backdrop"
     >
-      <div
-        style={{
-          fontSize: '2rem',
-          fontWeight: 700,
-          color: won ? '#16a34a' : '#dc2626',
-        }}
-      >
-        {won ? t('overlay.victory.title') : t('overlay.defeat.title')}
-      </div>
-      {won && score !== null && (
-        <div style={{ fontSize: '1rem', color: '#374151' }}>
-          {t('common.score', { score })}
-        </div>
-      )}
-      {timeSeconds !== undefined && (
-        <div data-testid="overlay-time" style={{ fontSize: '1rem', color: '#374151' }}>
-          {t('overlay.time', { time: formatDuration(timeSeconds) })}
-        </div>
-      )}
-      {won && onNextLevel !== undefined && (
-        <button
-          className="btn-primary"
-          onClick={onNextLevel}
-          style={{ minWidth: '200px', marginTop: '8px' }}
+      <div className="overlay-card">
+        <div
+          style={{
+            fontSize: '2rem',
+            fontWeight: 700,
+            color: won ? '#16a34a' : '#dc2626',
+          }}
         >
-          {t('overlay.victory.nextLevel')}
-        </button>
-      )}
-      {onBackToMap !== undefined && (
-        <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
-          {t('overlay.backToMap')}
-        </button>
-      )}
+          {won ? t('overlay.victory.title') : t('overlay.defeat.title')}
+        </div>
+        {won && score !== null && (
+          <div style={{ fontSize: '1rem', color: '#374151' }}>
+            {t('common.score', { score })}
+          </div>
+        )}
+        {timeSeconds !== undefined && (
+          <div data-testid="overlay-time" style={{ fontSize: '1rem', color: '#374151' }}>
+            {t('overlay.time', { time: formatDuration(timeSeconds) })}
+          </div>
+        )}
+        {won && onNextLevel !== undefined && (
+          <button
+            className="btn-primary"
+            onClick={onNextLevel}
+            style={{ minWidth: '200px', marginTop: '8px' }}
+          >
+            {t('overlay.victory.nextLevel')}
+          </button>
+        )}
+        {onBackToMap !== undefined && (
+          <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
+            {t('overlay.backToMap')}
+          </button>
+        )}
+      </div>
     </div>
   );
 };
