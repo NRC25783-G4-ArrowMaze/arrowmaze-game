@@ -101,6 +101,8 @@ export const en: Catalog = {
       loggedIn: 'Signed in',
     },
     ariaLoggedIn: 'Active session: {alias} — manage your account',
+    welcome: 'Welcome, {alias}!',
+    loggedOut: 'Signed out',
     register: {
       success: 'Account created. Log in to continue.',
     },

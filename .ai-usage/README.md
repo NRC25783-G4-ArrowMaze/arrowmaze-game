@@ -50,6 +50,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-10 | Badge de usuario logueado en el header (alias del email, sobrevive F5) | [`2026-07-10-badge-usuario.md`](./2026-07-10-badge-usuario.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | Follow-ups de #42 (salida fantasma, `useId`, `onDone`, perf del riel) + saneo de lint de `dev` (#45) en el PR #44 | [`2026-07-10-pr44-followups-42-lint-45.md`](./2026-07-10-pr44-followups-42-lint-45.md) | Claude Opus 4.8 |
 | 2026-07-10 | Leaderboards en el cliente: clasificación por nivel (🏆 en cards, overlay 5 estados) | [`2026-07-10-leaderboards-cliente.md`](./2026-07-10-leaderboards-cliente.md) | Claude Opus 4.8 (1M context) + Fable 5 |
+| 2026-07-10 | Toast de sesión: bienvenida al login y cierre automático del overlay (simetría en logout) | [`2026-07-10-login-bienvenida.md`](./2026-07-10-login-bienvenida.md) | Claude Fable 5 |
 | 2026-07-10 | Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md) | [`2026-07-10-verification-checklist-v1.md`](./2026-07-10-verification-checklist-v1.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README | [`2026-07-10-release-scaffolding-gof-solid.md`](./2026-07-10-release-scaffolding-gof-solid.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | Push y apertura del PR #48 (checklist + scaffolding de release) | [`2026-07-10-pr48-checklist-release-scaffolding.md`](./2026-07-10-pr48-checklist-release-scaffolding.md) | Claude Opus 4.8 (1M context) |
@@ -78,9 +79,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 50
+- **Total de reportes:** 51
 - **Última actualización:** 2026-07-10
-- **Suite de tests (actual):** 531/531 ✅ en 64 suites
+- **Suite de tests (actual):** 536/536 ✅ en 65 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 

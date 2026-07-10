@@ -2616,6 +2616,57 @@
       {
         "id": "2026-07-10-004",
         "date": "2026-07-10",
+        "title": "Toast de sesion: bienvenida al login y cierre automatico del overlay (simetria en logout)",
+        "file": "2026-07-10-login-bienvenida.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/login-bienvenida",
+        "linked_session": "cadena badge -> leaderboards -> bienvenida; usa aliasFromEmail y onAuthChanged(true, email) de la mision 1",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 3,
+          "tests_added": 5,
+          "assets_added": 0
+        },
+        "areas": [
+          "auth-ux",
+          "presentation",
+          "toast",
+          "i18n",
+          "a11y"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "components/Toast.tsx (bottom-center, aria-live, diales TOAST_DURATION_MS/TOAST_EXIT_MS, click-para-cerrar)"
+            ],
+            "modified": [
+              "App.tsx (handleAuthChanged cierra el overlay en ambos sentidos + un toast a la vez)",
+              "i18n/catalogs es+en (account.welcome, account.loggedOut)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 536 tests / 65 suites (base 531/64 -> +5; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados",
+          "qa": "visual aprobado: cierre automatico login/logout, alias en el toast, click-para-cerrar, reemplazo sin colas"
+        },
+        "decisions": [
+          "AccountOverlay intacto: el contrato onAuthChanged(true, email) de la mision 1 basto; cierre + toast viven en el composition root",
+          "Simetria en logout: overlay se cierra solo + toast Sesion cerrada",
+          "UN toast a la vez (remount por nonce), bottom-center, aria-live polite, timers con cleanup",
+          "Cherry-pick de f823061 descartado con evidencia (git reporto cero cambios: el contenido ya vive en dev via squash del #43); se declara en la descripcion del PR"
+        ],
+        "notes": "Rama nace del tip post-rebase de leaderboards (e253871); tras el merge del #46 (squash 061577a) se rebasa --onto dev y su PR sale de inmediato. Id 2026-07-10-004."
+      },
+      {
+        "id": "2026-07-10-005",
+        "date": "2026-07-10",
         "title": "Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md)",
         "file": "2026-07-10-verification-checklist-v1.md",
         "tool": "Claude Code (claude.ai/code)",
@@ -2666,7 +2717,7 @@
         "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
       },
       {
-        "id": "2026-07-10-005",
+        "id": "2026-07-10-006",
         "date": "2026-07-10",
         "title": "LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README",
         "file": "2026-07-10-release-scaffolding-gof-solid.md",
@@ -2721,7 +2772,7 @@
         "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
       },
       {
-        "id": "2026-07-10-006",
+        "id": "2026-07-10-007",
         "date": "2026-07-10",
         "title": "Push y apertura del PR #48 (checklist + scaffolding de release)",
         "file": "2026-07-10-pr48-checklist-release-scaffolding.md",
@@ -2761,11 +2812,11 @@
           "PR #48 abierto contra dev (no main), confirmado explícitamente por el usuario",
           "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
         ],
-        "notes": "PR #48 abierto sin mergear, pendiente de revisión."
+        "notes": "PR #48 abierto sin mergear, pendiente de revisión. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tomó el id -004 durante este merge con dev."
       }
     ],
     "statistics": {
-      "totalReports": 50,
+      "totalReports": 51,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2791,15 +2842,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 531,
-      "totalTestSuites": 64,
+      "totalTestsPassing": 536,
+      "totalTestSuites": 65,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-003",
-      "summary": "Leaderboards en el cliente: clasificacion por nivel (trofeo en cards, overlay 5 estados)"
+      "id": "2026-07-10-004",
+      "summary": "Toast de sesion: bienvenida al login y cierre automatico del overlay (simetria en logout)"
     }
   }
 }
