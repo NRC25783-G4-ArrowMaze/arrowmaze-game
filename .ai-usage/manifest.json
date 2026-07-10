@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-09T00:00:00Z",
+    "lastUpdated": "2026-07-10T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -2407,11 +2407,77 @@
           "Cinco commits atomicos (Conventional Commits); rama apilada, rebase --onto pendiente al mergear #40"
         ],
         "notes": "Rama fix/animacion-flechas apilada sobre fix/tamano-flechas; PR no abierto. Id 2026-07-09-005."
+      },
+      {
+        "id": "2026-07-10-001",
+        "date": "2026-07-10",
+        "title": "Badge de usuario logueado en el header (alias del email, sobrevive F5)",
+        "file": "2026-07-10-badge-usuario.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/badge-usuario",
+        "linked_session": "base de la doble mision; feat/leaderboards-cliente se apila encima",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 7,
+          "tests_added": 19,
+          "assets_added": 0
+        },
+        "areas": [
+          "auth",
+          "presentation",
+          "session-identity",
+          "i18n"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "modified": [
+              "ports/IAuthTokenProvider.ts (+get/set/removeEmail)",
+              "services/LoginUser.ts (persiste email tras login)",
+              "services/LogoutUser.ts (borra email en finally, fail-open)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "modified": [
+              "auth/CapacitorTokenProvider.ts (clave auth_session_email, getEmail fail-safe)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "account/aliasFromEmail.ts (funcion pura)",
+              "components/AccountButton.tsx (badge)"
+            ],
+            "modified": [
+              "components/AccountOverlay.tsx (onAuthChanged con email)",
+              "App.tsx (userEmail, F5, 401 limpia email)",
+              "i18n/catalogs/es.ts + en.ts (+account.ariaLoggedIn)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 504 tests / 60 suites (base dev 485/57 -> +19 tests, +3 suites; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Extender IAuthTokenProvider (opcion a): email y token comparten ciclo de vida y store; cero cambios de constructor en LoginUser/LogoutUser",
+          "Email persistido SOLO tras login exitoso; jamas tecleando/registrando ni en logs; borrado siempre en logout incl. fail-open",
+          "aliasFromEmail puro: trim, parte local tal cual (sin lowercase), sin @ cadena completa, vacio -> (el boton decide el fallback)",
+          "Alias = contenido (no se traduce); aria-label con clave i18n en ambos catalogos",
+          "Migracion: token sin email guardado -> label generico sin crash (test)"
+        ],
+        "notes": "Rama feat/badge-usuario nace de dev; PR hacia dev de inmediato. feat/leaderboards-cliente se apila encima. Id 2026-07-10-001."
       }
     ],
     "statistics": {
-      "totalReports": 44,
-      "lastUpdated": "2026-07-09T00:00:00Z",
+      "totalReports": 45,
+      "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -2436,15 +2502,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 174,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 485,
-      "totalTestSuites": 57,
+      "totalTestsPassing": 504,
+      "totalTestSuites": 60,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-09-005",
-      "summary": "Animacion de flechas: glide sobre riel persistente, orientacion en reposo, salida voladora, recalibracion del choque"
+      "id": "2026-07-10-001",
+      "summary": "Badge de usuario logueado en el header (alias del email, sobrevive F5)"
     }
   }
 }
