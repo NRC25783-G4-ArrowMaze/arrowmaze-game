@@ -2612,10 +2612,62 @@
           "Renumerada de 2026-07-10-002 a -003 al integrar el PR #44 (que tomo el -002) durante el rebase"
         ],
         "notes": "Rama apilada; rebases --onto tras #43 y #44. Id 2026-07-10-003."
+      },
+      {
+        "id": "2026-07-10-004",
+        "date": "2026-07-10",
+        "title": "Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md)",
+        "file": "2026-07-10-verification-checklist-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-leaderboards-cliente",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 3,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "verification",
+          "auditing"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "doc/VERIFICATION_CHECKLIST.md (12 categorías, roadmap priorizado)"
+            ],
+            "modified": [
+              "README.md (tabla de features grupos C-G)",
+              "arrowmaze-project-core/docs/FEATURES.md (repo externo)",
+              "arrowmaze-project-core/docs/BORRADOR-features-pendientes.md (repo externo, marcado cerrado)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites (evidencia citada dentro de la checklist)",
+          "type_check": "no aplica (cambios solo de documentación)",
+          "lint": "no aplica",
+          "e2e": "verificación cruzada en código (grep de wiring real en App.tsx, SyncProgress.ts, GameFlowController.ts, GetLevelLeaderboard.ts) antes de marcar cada feature como implementada, en vez de confiar en la documentación previa"
+        },
+        "decisions": [
+          "Fase 1 acotada por el usuario a solo generar la checklist, sin CI/LICENSE/CHANGELOG todavía",
+          "Rama nueva docs/verification-checklist-v1 desde dev (no dev directo, no release/)",
+          "Priorizar corregir la documentación desfasada (README + FEATURES.md) antes de seguir con infraestructura de release, a pedido explícito del usuario",
+          "C1/C3/D1/D2/F4/G1/G2 confirmados como implementados con evidencia de código; P20 y P21 marcados como resueltos",
+          "BORRADOR-features-pendientes.md no reescrito por completo — marcado 🔒 CERRADO y preservado como contexto histórico"
+        ],
+        "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
       }
     ],
     "statistics": {
-      "totalReports": 47,
+      "totalReports": 48,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
