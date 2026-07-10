@@ -5,8 +5,13 @@ import { GLIDE_SPEED } from '../rendering/glideConfig';
 import { buildBodyPath, tipDirection, buildHeadPoints } from '../rendering/arrowGlyphPath';
 import { ARROW_GLYPH } from '../theme';
 
-/** Coreografía del rebote de colisión (amago de avance + deformación siguiendo la forma). */
-const RECOIL_MS = 200;
+/**
+ * Coreografía del rebote de colisión (amago de avance + deformación siguiendo la
+ * forma). Recalibrada al glifo reducido (ARROW_SCALE=0.55): con la flecha más
+ * pequeña, la deformación agresiva del glifo 1.0 se sentía exagerada; estos
+ * valores dan un impacto más contenido y proporcionado.
+ */
+const RECOIL_MS = 160;
 /**
  * Fracción de celda que la flecha amaga avanzar antes de regresar. El amago NO es
  * un translate de toda la figura: cada vértice se mueve hacia su PROPIA dirección
@@ -14,11 +19,11 @@ const RECOIL_MS = 200;
  * —el tramo horizontal avanza horizontal, el vertical avanza vertical— en vez de
  * levantarse entero hacia la punta.
  */
-const RECOIL_FRACTION = 0.16;
+const RECOIL_FRACTION = 0.1;
 /** Máximo engrosamiento del cuerpo durante la deformación por impacto (como fracción del stroke). */
-const DEFORM_STROKE_RATIO = 0.5; // 50% más grueso en el pico
+const DEFORM_STROKE_RATIO = 0.2; // 20% más grueso en el pico
 /** Máxima compresión de la punta durante la deformación (la punta se vuelve más pequeña). */
-const DEFORM_HEAD_RATIO = 0.4; // 40% más pequeño en el pico
+const DEFORM_HEAD_RATIO = 0.15; // 15% más pequeño en el pico
 
 /** Props de ArrowComponent: view-model de presentación de UNA flecha. */
 export interface ArrowComponentProps {
