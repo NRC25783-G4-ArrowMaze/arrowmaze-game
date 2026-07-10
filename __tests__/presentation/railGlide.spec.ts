@@ -130,6 +130,20 @@ describe('sampleRailAtArc', () => {
     expect(pointClose(sampleRailAtArc(rail, -3), { x: 0, y: 0 })).toBe(true);
     expect(pointClose(sampleRailAtArc(rail, 100), { x: 10, y: 10 })).toBe(true);
   });
+
+  // Follow-up #4 (PR #42): pasar los arcos precomputados no cambia el resultado.
+  it('el parámetro opcional de arcos precomputados es equivalente a computarlos', () => {
+    const arcs = [0, 10, 20]; // arcos acumulados del riel de arriba.
+    for (const arc of [-5, 0, 3, 5, 10, 15, 20, 50]) {
+      const withArcs = sampleRailAtArc(rail, arc, arcs);
+      const without = sampleRailAtArc(rail, arc);
+      expect(pointClose(withArcs, without)).toBe(true);
+      const dirWith = railDirectionAtArc(rail, arc, arcs);
+      const dirWithout = railDirectionAtArc(rail, arc);
+      expect(pointClose(dirWith.dir as Point, dirWithout.dir as Point)).toBe(true);
+      expect(dirWith.segmentIndex).toBe(dirWithout.segmentIndex);
+    }
+  });
 });
 
 // ── railDirectionAtArc (dirección de la cabeza que gira en la esquina) ────────

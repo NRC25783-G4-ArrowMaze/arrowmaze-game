@@ -2473,10 +2473,79 @@
           "Migracion: token sin email guardado -> label generico sin crash (test)"
         ],
         "notes": "Rama feat/badge-usuario nace de dev; PR hacia dev de inmediato. feat/leaderboards-cliente se apila encima. Id 2026-07-10-001."
+      },
+      {
+        "id": "2026-07-10-002",
+        "date": "2026-07-10",
+        "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
+        "file": "2026-07-10-pr44-followups-42-lint-45.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "Juan David",
+        "phase": "fix+refactor+perf",
+        "feature": "fix/followups-animacion-flechas",
+        "linked_session": "sobre PR #42 (2026-07-09-005); resuelve tambien el issue #45 de lint pre-existente en dev",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 9,
+          "tests_added": 4,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "animation",
+          "svg-rail",
+          "board",
+          "exit-overlay",
+          "domain",
+          "infrastructure",
+          "forge",
+          "tooling"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [],
+            "modified": [
+              "components/BoardComponent.tsx (guard wasLeavingBoard anti fly-off fantasma + clipPath con useId)",
+              "components/ArrowExit.tsx (onDone fuera del updater de setArcOffset)",
+              "rendering/railGlide.ts (cumulativeArcs una vez por frame, param arcs opcional)",
+              "game/LevelSelectScreen.tsx (useMemo en vez de setState-in-effect)",
+              "forge/ForgeApp.tsx (as ToolMode) + forge/components/ValidationPanel.tsx (useMemo por identidad de scene)"
+            ]
+          },
+          "domain": {
+            "status": "modified",
+            "modified": [
+              "services/LevelSelectionProjection.ts (interfaz local LevelMapNode, sin dependencia de application)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "modified": [
+              "api/ForgeApiClient.ts (LevelDataDTO desde application)",
+              "factories/LocalProgressModuleFactory.ts (cause encadenada) + tsconfig.json (lib ES2022)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 489 tests / 57 suites (base 485; +4 tests)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 problemas (antes: 6 — 5 errores + 1 warning)"
+        },
+        "decisions": [
+          "Fix de la salida fantasma: guard geometrico wasLeavingBoard + restriccion a flechas de 1 celda (las de >=2 ya se deduplican via shrink)",
+          "Violaciones de capas resueltas por dependency-inversion (interfaz local en dominio) y apuntando al DTO de application (minimo blast radius), sin mover tipos",
+          "ValidationPanel: [scene] corrige ademas un stale latente de las deps por .length",
+          "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
+          "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
+        ],
+        "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
       }
     ],
     "statistics": {
-      "totalReports": 45,
+      "totalReports": 46,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2500,17 +2569,82 @@
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
-      "totalFilesCreated": 174,
+      "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 504,
+      "totalTestsPassing": 508,
       "totalTestSuites": 60,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-001",
-      "summary": "Badge de usuario logueado en el header (alias del email, sobrevive F5)"
+      "id": "2026-07-10-002",
+      "date": "2026-07-10",
+      "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
+      "file": "2026-07-10-pr44-followups-42-lint-45.md",
+      "tool": "Claude Code (claude.ai/code)",
+      "model": "Claude Opus 4.8",
+      "author": "Juan David",
+      "phase": "fix+refactor+perf",
+      "feature": "fix/followups-animacion-flechas",
+      "linked_session": "sobre PR #42 (2026-07-09-005); resuelve tambien el issue #45 de lint pre-existente en dev",
+      "status": "completed",
+      "deliverables": {
+        "files_created": 1,
+        "files_modified": 9,
+        "tests_added": 4,
+        "assets_added": 0
+      },
+      "areas": [
+        "presentation",
+        "animation",
+        "svg-rail",
+        "board",
+        "exit-overlay",
+        "domain",
+        "infrastructure",
+        "forge",
+        "tooling"
+      ],
+      "layers": {
+        "presentation": {
+          "status": "modified",
+          "created": [],
+          "modified": [
+            "components/BoardComponent.tsx (guard wasLeavingBoard anti fly-off fantasma + clipPath con useId)",
+            "components/ArrowExit.tsx (onDone fuera del updater de setArcOffset)",
+            "rendering/railGlide.ts (cumulativeArcs una vez por frame, param arcs opcional)",
+            "game/LevelSelectScreen.tsx (useMemo en vez de setState-in-effect)",
+            "forge/ForgeApp.tsx (as ToolMode) + forge/components/ValidationPanel.tsx (useMemo por identidad de scene)"
+          ]
+        },
+        "domain": {
+          "status": "modified",
+          "modified": [
+            "services/LevelSelectionProjection.ts (interfaz local LevelMapNode, sin dependencia de application)"
+          ]
+        },
+        "infrastructure": {
+          "status": "modified",
+          "modified": [
+            "api/ForgeApiClient.ts (LevelDataDTO desde application)",
+            "factories/LocalProgressModuleFactory.ts (cause encadenada) + tsconfig.json (lib ES2022)"
+          ]
+        }
+      },
+      "validation": {
+        "tests": "passed — 489 tests / 57 suites (base 485; +4 tests)",
+        "type_check": "passed — tsc --noEmit exit 0",
+        "lint": "0 problemas (antes: 6 — 5 errores + 1 warning)"
+      },
+      "decisions": [
+        "Fix de la salida fantasma: guard geometrico wasLeavingBoard + restriccion a flechas de 1 celda (las de >=2 ya se deduplican via shrink)",
+        "Violaciones de capas resueltas por dependency-inversion (interfaz local en dominio) y apuntando al DTO de application (minimo blast radius), sin mover tipos",
+        "ValidationPanel: [scene] corrige ademas un stale latente de las deps por .length",
+        "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
+        "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
+      ],
+      "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
     }
   }
 }

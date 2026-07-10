@@ -1,4 +1,4 @@
-import type { LevelDataDTO } from '../../presentation/game/scene'
+import type { LevelDataDTO } from '../../application/dtos/LevelDataDTOs'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 

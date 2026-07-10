@@ -42,6 +42,7 @@ export const ArrowExit: React.FC<ArrowExitProps> = ({
 }) => {
   const count = centers.length;
   const [arcOffset, setArcOffset] = useState(0);
+  const offsetRef = useRef(0); // espejo del offset para conducir el loop sin leer el estado.
   const doneRef = useRef(false);
   const rafRef = useRef(0);
 
@@ -80,16 +81,14 @@ export const ArrowExit: React.FC<ArrowExitProps> = ({
     const frame = (now: number): void => {
       const dt = now - last;
       last = now;
-      setArcOffset((prev) => {
-        const next = Math.min(prev + speed * dt, flyTarget);
-        if (next >= flyTarget) {
-          finish();
-        }
-        return next;
-      });
-      if (!doneRef.current) {
-        rafRef.current = requestAnimationFrame(frame);
+      const next = Math.min(offsetRef.current + speed * dt, flyTarget);
+      offsetRef.current = next;
+      setArcOffset(next); // updater puro: sin efectos secundarios dentro del setState.
+      if (next >= flyTarget) {
+        finish(); // el side-effect (onDone) va FUERA del updater, tras avanzar el offset.
+        return;
       }
+      rafRef.current = requestAnimationFrame(frame);
     };
     rafRef.current = requestAnimationFrame(frame);
     return () => {
