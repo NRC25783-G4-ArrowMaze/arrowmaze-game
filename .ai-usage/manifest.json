@@ -2542,10 +2542,80 @@
           "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
         ],
         "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
+      },
+      {
+        "id": "2026-07-10-003",
+        "date": "2026-07-10",
+        "title": "Leaderboards en el cliente: clasificacion por nivel (trofeo en cards, overlay 5 estados)",
+        "file": "2026-07-10-leaderboards-cliente.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context) + Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/leaderboards-cliente",
+        "linked_session": "apilada sobre feat/badge-usuario; sinergia no-logueado -> AccountOverlay",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 9,
+          "files_modified": 5,
+          "tests_added": 23,
+          "assets_added": 0
+        },
+        "areas": [
+          "leaderboards",
+          "presentation",
+          "application",
+          "infrastructure-adapter",
+          "i18n",
+          "http-contract"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "created": [
+              "dtos/LeaderboardDTOs.ts",
+              "ports/ILeaderboardApiClient.ts (+LevelNotRegisteredError)",
+              "services/GetLevelLeaderboard.ts"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "created": [
+              "api/FetchLeaderboardApiClient.ts (GET /api/v1/leaderboards/:levelId, Bearer, mapeo 401/404/500)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "components/LeaderboardOverlay.tsx (5 estados)"
+            ],
+            "modified": [
+              "game/LevelNodeCard.tsx (trofeo en todas las cards)",
+              "game/LevelSelectScreen.tsx",
+              "App.tsx (composition root + estado)",
+              "i18n/catalogs es+en (seccion leaderboard.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites post-rebase sobre dev con #44 (0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados",
+          "e2e": "backend real: 200 vacio en nivel sin records; 404 en nivel no registrado; QA visual de los 4 flujos aprobado"
+        },
+        "decisions": [
+          "Contrato verificado contra el backend real: vacio = 200 topPlayers:[] (no 404); 404 solo si el nivel no existe en el registro",
+          "El adapter distingue 404 (LevelNotRegisteredError) del vacio; la equivalencia visual 404≡vacio la decide el overlay (+console.warn) por el gap del seed",
+          "Trofeo en TODAS las cards incl. bloqueadas (informacion social) con stopPropagation y aria-label",
+          "currentRecord null -> hint sutil (leaderboard.noRecord); achievedAt oculto en v1; tiempo reutiliza formatDuration (G3)",
+          "No logueado / 401 en vuelo -> CTA que cierra el leaderboard y abre AccountOverlay",
+          "Renumerada de 2026-07-10-002 a -003 al integrar el PR #44 (que tomo el -002) durante el rebase"
+        ],
+        "notes": "Rama apilada; rebases --onto tras #43 y #44. Id 2026-07-10-003."
       }
     ],
     "statistics": {
-      "totalReports": 46,
+      "totalReports": 47,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2571,80 +2641,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 508,
-      "totalTestSuites": 60,
+      "totalTestsPassing": 531,
+      "totalTestSuites": 64,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-002",
-      "date": "2026-07-10",
-      "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
-      "file": "2026-07-10-pr44-followups-42-lint-45.md",
-      "tool": "Claude Code (claude.ai/code)",
-      "model": "Claude Opus 4.8",
-      "author": "Juan David",
-      "phase": "fix+refactor+perf",
-      "feature": "fix/followups-animacion-flechas",
-      "linked_session": "sobre PR #42 (2026-07-09-005); resuelve tambien el issue #45 de lint pre-existente en dev",
-      "status": "completed",
-      "deliverables": {
-        "files_created": 1,
-        "files_modified": 9,
-        "tests_added": 4,
-        "assets_added": 0
-      },
-      "areas": [
-        "presentation",
-        "animation",
-        "svg-rail",
-        "board",
-        "exit-overlay",
-        "domain",
-        "infrastructure",
-        "forge",
-        "tooling"
-      ],
-      "layers": {
-        "presentation": {
-          "status": "modified",
-          "created": [],
-          "modified": [
-            "components/BoardComponent.tsx (guard wasLeavingBoard anti fly-off fantasma + clipPath con useId)",
-            "components/ArrowExit.tsx (onDone fuera del updater de setArcOffset)",
-            "rendering/railGlide.ts (cumulativeArcs una vez por frame, param arcs opcional)",
-            "game/LevelSelectScreen.tsx (useMemo en vez de setState-in-effect)",
-            "forge/ForgeApp.tsx (as ToolMode) + forge/components/ValidationPanel.tsx (useMemo por identidad de scene)"
-          ]
-        },
-        "domain": {
-          "status": "modified",
-          "modified": [
-            "services/LevelSelectionProjection.ts (interfaz local LevelMapNode, sin dependencia de application)"
-          ]
-        },
-        "infrastructure": {
-          "status": "modified",
-          "modified": [
-            "api/ForgeApiClient.ts (LevelDataDTO desde application)",
-            "factories/LocalProgressModuleFactory.ts (cause encadenada) + tsconfig.json (lib ES2022)"
-          ]
-        }
-      },
-      "validation": {
-        "tests": "passed — 489 tests / 57 suites (base 485; +4 tests)",
-        "type_check": "passed — tsc --noEmit exit 0",
-        "lint": "0 problemas (antes: 6 — 5 errores + 1 warning)"
-      },
-      "decisions": [
-        "Fix de la salida fantasma: guard geometrico wasLeavingBoard + restriccion a flechas de 1 celda (las de >=2 ya se deduplican via shrink)",
-        "Violaciones de capas resueltas por dependency-inversion (interfaz local en dominio) y apuntando al DTO de application (minimo blast radius), sin mover tipos",
-        "ValidationPanel: [scene] corrige ademas un stale latente de las deps por .length",
-        "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
-        "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
-      ],
-      "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
+      "id": "2026-07-10-003",
+      "summary": "Leaderboards en el cliente: clasificacion por nivel (trofeo en cards, overlay 5 estados)"
     }
   }
 }
