@@ -106,12 +106,24 @@ export const es: Catalog = {
     register: {
       success: 'Cuenta creada. Inicia sesión para continuar.',
     },
+    terms: {
+      summary: 'Términos y uso de datos',
+      academic:
+        'ArrowMaze es un proyecto académico sin fines comerciales, creado con fines educativos. No está pensado para producción y el servicio puede interrumpirse o reiniciarse en cualquier momento.',
+      dataTitle: 'Datos que usamos',
+      dataUse:
+        'Al registrarte guardamos tu correo y tu contraseña (cifrada en el servidor) para identificar tu cuenta. Tu progreso y tus puntuaciones se guardan para mostrar la clasificación, donde apareces con un alias derivado de tu correo.',
+      dataRights:
+        'No vendemos ni compartimos tus datos con terceros. Al ser un proyecto académico, los datos pueden eliminarse en cualquier momento; por favor no registres información sensible.',
+      accept: 'He leído y acepto los términos y el uso de datos',
+    },
     back: 'Volver',
     error: {
       invalidCredentials: 'Correo o contraseña incorrectos',
       emailInUse: 'Ese correo ya está registrado',
       invalidEmail: 'Formato de correo inválido',
       weakPassword: 'La contraseña debe tener mínimo 8 caracteres, 1 número y 1 mayúscula',
+      termsRequired: 'Debes aceptar los términos para registrarte',
       network: 'Error de conexión. Inténtalo de nuevo.',
     },
   },

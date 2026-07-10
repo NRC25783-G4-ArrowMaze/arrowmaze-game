@@ -68,6 +68,9 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [errorKey, setErrorKey] = useState<string | null>(null);
   const [successKey, setSuccessKey] = useState<string | null>(null);
+  // Aceptación de términos + uso de datos: obligatoria para registrarse
+  // (proyecto académico). Se reinicia al cambiar de pestaña o tras registrar.
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   if (!visible) {
     return null;
@@ -80,6 +83,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
 
   const switchMode = (next: Mode): void => {
     setMode(next);
+    setAcceptedTerms(false);
     resetMessages();
   };
 
@@ -98,6 +102,11 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
       setErrorKey('account.error.weakPassword');
       return;
     }
+    // Puerta de términos: red de seguridad además del botón deshabilitado.
+    if (mode === 'register' && !acceptedTerms) {
+      setErrorKey('account.error.termsRequired');
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -112,6 +121,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
         // El backend responde 201 sin token: no hay auto-login. Volvemos a
         // login con el mensaje de éxito.
         setPassword('');
+        setAcceptedTerms(false);
         setMode('login');
         setSuccessKey('account.register.success');
       }
@@ -270,13 +280,54 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                 />
               </label>
 
+              {mode === 'register' && (
+                <div style={{ textAlign: 'left' }}>
+                  {/* Mismo patrón desplegable que los créditos de audio de
+                      Ajustes: el texto legal no satura el formulario. */}
+                  <details
+                    data-testid="account-terms"
+                    style={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.45 }}
+                  >
+                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#374151' }}>
+                      {t('account.terms.summary')}
+                    </summary>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+                      <p>{t('account.terms.academic')}</p>
+                      <strong style={{ color: '#374151' }}>{t('account.terms.dataTitle')}</strong>
+                      <p>{t('account.terms.dataUse')}</p>
+                      <p>{t('account.terms.dataRights')}</p>
+                    </div>
+                  </details>
+                  <label
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '8px',
+                      marginTop: '10px',
+                      fontSize: '0.85rem',
+                      color: '#374151',
+                      fontWeight: 500,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={acceptedTerms}
+                      onChange={(e) => setAcceptedTerms(e.target.checked)}
+                      aria-label={t('account.terms.accept')}
+                      style={{ marginTop: '2px', minHeight: 'auto' }}
+                    />
+                    {t('account.terms.accept')}
+                  </label>
+                </div>
+              )}
+
               {errorKey !== null && <div style={dangerText}>{t(errorKey)}</div>}
               {successKey !== null && <div style={successText}>{t(successKey)}</div>}
 
               <button
                 type="submit"
                 className="btn-primary"
-                disabled={submitting}
+                disabled={submitting || (mode === 'register' && !acceptedTerms)}
                 style={{ width: '100%', marginTop: '4px' }}
               >
                 {submitting
