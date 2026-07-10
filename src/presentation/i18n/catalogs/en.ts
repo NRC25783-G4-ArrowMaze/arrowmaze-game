@@ -106,12 +106,24 @@ export const en: Catalog = {
     register: {
       success: 'Account created. Log in to continue.',
     },
+    terms: {
+      summary: 'Terms & data usage',
+      academic:
+        'ArrowMaze is a non-commercial academic project built for educational purposes. It is not intended for production and the service may be interrupted or reset at any time.',
+      dataTitle: 'Data we use',
+      dataUse:
+        'When you register we store your email and your password (hashed on the server) to identify your account. Your progress and scores are stored to show the leaderboard, where you appear under an alias derived from your email.',
+      dataRights:
+        'We do not sell or share your data with third parties. As an academic project, data may be deleted at any time; please do not enter sensitive information.',
+      accept: 'I have read and accept the terms and data usage',
+    },
     back: 'Back',
     error: {
       invalidCredentials: 'Invalid email or password',
       emailInUse: 'That email is already registered',
       invalidEmail: 'Invalid email format',
       weakPassword: 'Password must have at least 8 characters, 1 number and 1 uppercase letter',
+      termsRequired: 'You must accept the terms to sign up',
       network: 'Connection error. Please try again.',
     },
   },
