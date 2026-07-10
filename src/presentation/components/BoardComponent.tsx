@@ -2,7 +2,6 @@ import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   computeBoardLayout,
   cellCenter,
-  boundingBoxPositions,
   portDelta,
   type Point,
 } from '../rendering/boardLayout';
@@ -223,8 +222,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   // voladora + fade reemplaza al "pop" en el borde.
   const exitActive = exits.length > 0;
 
-  // Grilla completa de puntos: una posición por celda del bounding box.
-  const dotPositions = boundingBoxPositions(maxCol, maxRow);
+  // Puntos SOLO en los nodos reales del tablero (grafo), no en un rectángulo de
+  // fondo: un mapa disperso (p. ej. el corazón) no debe mostrar celdas fantasma.
+  // Los niveles de rejilla completa se ven igual: sus celdas llenan el bounding box.
+  const dotPositions = cells;
 
   // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
   const burstOrigin =
@@ -257,9 +258,9 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
 
       {/* Pasada 1: grilla de puntos sobre todo el bounding box. */}
       <g data-testid="pass-cells">
-        {dotPositions.map(({ col, row }) => (
+        {dotPositions.map(({ id, col, row }) => (
           <CellComponent
-            key={`${col},${row}`}
+            key={id}
             center={cellCenter(col, row, cellSize, offset)}
             radius={dotRadius}
           />
