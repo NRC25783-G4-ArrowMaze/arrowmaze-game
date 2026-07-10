@@ -7,7 +7,7 @@
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
 }
 
 .app-header {
@@ -16,16 +16,16 @@
   flex-wrap: wrap;
   gap: 12px;
   padding: clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 32px);
-  background: white;
-  border-bottom: 3px solid #e0e4e8;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: var(--surface);
+  border-bottom: 3px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
 }
 
 .app-header h1 {
   margin: 0 auto 0 0; /* empuja acciones y stats a la derecha */
   font-size: clamp(20px, 1.4rem + 0.8vw, 30px);
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text);
   letter-spacing: -0.5px;
 }
 
@@ -60,7 +60,7 @@
 .stat-label {
   font-size: clamp(10px, 0.55rem + 0.3vw, 12px);
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -68,7 +68,7 @@
 .stat-value {
   font-size: clamp(26px, 1.4rem + 1.2vw, 40px);
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -76,9 +76,9 @@
 .stat-status {
   font-size: clamp(12px, 0.7rem + 0.2vw, 14px);
   font-weight: 500;
-  color: #666;
+  color: var(--text-muted);
   padding: 8px 12px;
-  background: #f0f4f8;
+  background: var(--surface-muted);
   border-radius: 6px;
   min-width: 100px;
   text-align: center;
@@ -86,12 +86,12 @@
 
 .stat-status--won {
   color: var(--success);
-  background: #f0fdf4;
+  background: var(--success-bg);
 }
 
 .stat-status--lost {
   color: var(--danger);
-  background: #fef2f2;
+  background: var(--danger-bg);
 }
 
 .app-main {
@@ -112,10 +112,11 @@
 .board-frame {
   width: min(100%, calc(100vh - 190px), 760px);
   width: min(100%, calc(100dvh - 190px), 760px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--shadow-md);
   border-radius: 12px;
   overflow: hidden;
-  background: white;
+  /* Mismo token que el lienzo SVG: las esquinas redondeadas no desentonan. */
+  background: var(--board-bg);
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
@@ -133,7 +134,7 @@
   align-items: center;
   justify-content: center;
   padding: clamp(12px, 3vw, 32px);
-  background: rgba(17, 24, 39, 0.45);
+  background: var(--backdrop);
 }
 
 .overlay-card {
@@ -146,7 +147,7 @@
   overflow-y: auto;
   background: var(--surface);
   border-radius: 16px;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-lg);
   padding: clamp(20px, 4vw, 32px);
   text-align: center;
 }

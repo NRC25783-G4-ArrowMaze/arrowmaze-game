@@ -156,7 +156,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
     borderRadius: '8px',
     border: '1px solid var(--border)',
     fontSize: '1em',
-    color: '#374151',
+    color: 'var(--text)',
   };
 
   return (
@@ -167,13 +167,13 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
       className="overlay-backdrop"
     >
       <div className="overlay-card">
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>
           <span aria-hidden="true">👤</span> {t('account.title')}
         </div>
 
         {authenticated ? (
           <>
-            <div style={{ color: '#6b7280' }}>{t('account.status.loggedIn')}</div>
+            <div style={{ color: 'var(--text-muted)' }}>{t('account.status.loggedIn')}</div>
             <button
               className="btn-primary"
               onClick={() => void handleLogout()}
@@ -193,7 +193,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
               style={{
                 display: 'flex',
                 width: 'min(300px, 100%)',
-                background: '#f0f4f8',
+                background: 'var(--surface-muted)',
                 borderRadius: '999px',
                 padding: '4px',
               }}
@@ -209,7 +209,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                   borderRadius: '999px',
                   border: 'none',
                   fontSize: '0.95rem',
-                  ...(mode === 'login' ? {} : { background: 'transparent', color: '#6b7280' }),
+                  ...(mode === 'login' ? {} : { background: 'transparent', color: 'var(--text-muted)' }),
                 }}
               >
                 {t('account.tab.login')}
@@ -225,7 +225,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                   borderRadius: '999px',
                   border: 'none',
                   fontSize: '0.95rem',
-                  ...(mode === 'register' ? {} : { background: 'transparent', color: '#6b7280' }),
+                  ...(mode === 'register' ? {} : { background: 'transparent', color: 'var(--text-muted)' }),
                 }}
               >
                 {t('account.tab.register')}
@@ -242,7 +242,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
-                  color: '#374151',
+                  color: 'var(--text)',
                   textAlign: 'left',
                   fontSize: '0.9rem',
                   fontWeight: 600,
@@ -263,7 +263,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
-                  color: '#374151',
+                  color: 'var(--text)',
                   textAlign: 'left',
                   fontSize: '0.9rem',
                   fontWeight: 600,
@@ -286,14 +286,14 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                       Ajustes: el texto legal no satura el formulario. */}
                   <details
                     data-testid="account-terms"
-                    style={{ fontSize: '0.85rem', color: '#6b7280', lineHeight: 1.45 }}
+                    style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.45 }}
                   >
-                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#374151' }}>
+                    <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--text)' }}>
                       {t('account.terms.summary')}
                     </summary>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
                       <p>{t('account.terms.academic')}</p>
-                      <strong style={{ color: '#374151' }}>{t('account.terms.dataTitle')}</strong>
+                      <strong style={{ color: 'var(--text)' }}>{t('account.terms.dataTitle')}</strong>
                       <p>{t('account.terms.dataUse')}</p>
                       <p>{t('account.terms.dataRights')}</p>
                     </div>
@@ -305,7 +305,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                       gap: '8px',
                       marginTop: '10px',
                       fontSize: '0.85rem',
-                      color: '#374151',
+                      color: 'var(--text)',
                       fontWeight: 500,
                     }}
                   >
@@ -347,7 +347,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
             width: 'min(300px, 100%)',
             border: 'none',
             background: 'transparent',
-            color: '#6b7280',
+            color: 'var(--text-muted)',
             fontWeight: 500,
           }}
         >

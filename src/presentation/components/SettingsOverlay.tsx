@@ -1,6 +1,8 @@
 import React from 'react';
 import { useTranslation } from '../i18n/I18nContext';
 import { SUPPORTED_LANGUAGES, type Lang } from '../i18n/i18n';
+import { useTheme } from '../theming/ThemeContext';
+import { SUPPORTED_THEMES, type ThemeMode } from '../theming/themeMode';
 import { useAudioContext } from '../audio/AudioContext';
 import { AUDIO_CREDITS } from '../audio/audioCredits';
 
@@ -18,13 +20,21 @@ const LANGUAGE_LABEL_KEY: Record<Lang, string> = {
   en: 'settings.language.en',
 };
 
+/** Etiqueta de cada tema en el selector; sale del catálogo. */
+const THEME_LABEL_KEY: Record<ThemeMode, string> = {
+  light: 'settings.theme.light',
+  dark: 'settings.theme.dark',
+};
+
 /**
  * SettingsOverlay — Contenedor de ajustes (C4). Aloja el selector de idioma
- * (G2, cambio en caliente + persistencia) y los controles de audio (G1: mute,
- * volúmenes independientes y créditos), ambos vía sus contextos.
+ * (G2, cambio en caliente + persistencia), el de tema (misma fuente de verdad
+ * que el toggle del header, vía useTheme) y los controles de audio (G1: mute,
+ * volúmenes independientes y créditos), todos vía sus contextos.
  */
 export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClose }) => {
   const { t, lang, setLang } = useTranslation();
+  const { theme, setTheme } = useTheme();
   const { prefs, setPrefs } = useAudioContext();
 
   if (!visible) {
@@ -39,7 +49,7 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClo
       className="overlay-backdrop"
     >
       <div className="overlay-card">
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('settings.title')}</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>{t('settings.title')}</div>
         <section style={{ textAlign: 'center' }}>
           <h3 style={{ margin: '4px 0' }}>{t('settings.language.title')}</h3>
           <div data-testid="language-selector" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -52,6 +62,22 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClo
                 style={{ minWidth: '90px' }}
               >
                 {t(LANGUAGE_LABEL_KEY[code])}
+              </button>
+            ))}
+          </div>
+        </section>
+        <section style={{ textAlign: 'center' }} data-testid="theme-settings">
+          <h3 style={{ margin: '4px 0' }}>{t('settings.theme.title')}</h3>
+          <div data-testid="theme-selector" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            {SUPPORTED_THEMES.map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setTheme(mode)}
+                aria-pressed={theme === mode}
+                className={theme === mode ? 'btn-primary' : undefined}
+                style={{ minWidth: '90px' }}
+              >
+                {t(THEME_LABEL_KEY[mode])}
               </button>
             ))}
           </div>
@@ -90,7 +116,7 @@ export const SettingsOverlay: React.FC<SettingsOverlayProps> = ({ visible, onClo
           </label>
           <details data-testid="audio-credits" style={{ marginTop: '8px' }}>
             <summary>{t('settings.audio.credits')}</summary>
-            <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: '#6b7280' }}>
+            <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: 'var(--text-muted)' }}>
               {AUDIO_CREDITS.map((credit) => (
                 <li key={credit.file}>
                   {credit.title} — {credit.author}

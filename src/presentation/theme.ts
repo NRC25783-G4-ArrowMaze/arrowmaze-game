@@ -1,21 +1,23 @@
 /**
  * theme — Constantes visuales de la capa de presentación (look de referencia).
  *
- * Tema CLARO: lienzo blanco con una grilla de puntos gris claro de fondo y las
- * flechas dibujadas encima conservando el color que viene del dato (regla B1).
+ * Lienzo con una grilla de puntos neutra de fondo y las flechas dibujadas
+ * encima conservando el color que viene del dato (regla B1: los colores de
+ * flecha son contenido del nivel y NO cambian con el tema).
  *
- * Centralizar aquí los colores/proporciones evita que cada componente invente
- * su propia paleta y mantiene un único punto de cambio para el look.
+ * Los colores del lienzo son referencias a tokens CSS (index.css): el SVG es
+ * inline en el DOM, así que var() resuelve dentro de fill/stroke y el cambio
+ * claro↔oscuro es en caliente, sin re-render.
  */
 
-/** Color de fondo del lienzo SVG. Tema claro → blanco. */
-export const BOARD_BACKGROUND = '#ffffff';
+/** Color de fondo del lienzo SVG (token: blanco en claro, azul noche en oscuro). */
+export const BOARD_BACKGROUND = 'var(--board-bg)';
 
 /**
- * Color neutro de TODOS los puntos de la grilla de fondo (gris claro).
+ * Color neutro de TODOS los puntos de la grilla de fondo.
  * Ningún punto puede individualizar su color (regla B1: dots homogéneos).
  */
-export const DOT_COLOR = '#d3d7e0';
+export const DOT_COLOR = 'var(--board-dot)';
 
 /** Radio del punto de la grilla como fracción de cellSize. */
 export const DOT_RADIUS_RATIO = 0.09;

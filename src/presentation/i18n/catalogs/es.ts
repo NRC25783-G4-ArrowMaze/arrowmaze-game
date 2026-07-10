@@ -50,6 +50,11 @@ export const es: Catalog = {
       es: 'Español',
       en: 'English',
     },
+    theme: {
+      title: 'Tema',
+      light: 'Claro',
+      dark: 'Oscuro',
+    },
     audio: {
       title: 'Audio',
       mute: 'Silenciar todo',
@@ -125,6 +130,12 @@ export const es: Catalog = {
       weakPassword: 'La contraseña debe tener mínimo 8 caracteres, 1 número y 1 mayúscula',
       termsRequired: 'Debes aceptar los términos para registrarte',
       network: 'Error de conexión. Inténtalo de nuevo.',
+    },
+  },
+  theme: {
+    toggle: {
+      toDark: 'Cambiar a tema oscuro',
+      toLight: 'Cambiar a tema claro',
     },
   },
   leaderboard: {

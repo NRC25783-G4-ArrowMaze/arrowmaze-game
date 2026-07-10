@@ -36,9 +36,9 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
       style={{ padding: 'clamp(16px, 3vw, 32px)', width: '100%', maxWidth: '1100px' }}
     >
       <header style={{ marginBottom: '24px' }}>
-        {/* Color explícito: sin él, el modo oscuro del sistema lo heredaba
-            blanco sobre la pantalla clara y el título desaparecía. */}
-        <h1 style={{ color: '#1f2937', fontSize: 'clamp(20px, 1.2rem + 0.8vw, 28px)' }}>{t('levelSelect.title')}</h1>
+        {/* Color explícito (vía token): sin él, un tema del SO distinto al de
+            la app lo heredaba ilegible y el título desaparecía. */}
+        <h1 style={{ color: 'var(--text)', fontSize: 'clamp(20px, 1.2rem + 0.8vw, 28px)' }}>{t('levelSelect.title')}</h1>
       </header>
 
       <main

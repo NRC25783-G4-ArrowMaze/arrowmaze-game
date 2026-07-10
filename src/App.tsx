@@ -21,6 +21,7 @@ import { AccountOverlay } from './presentation/components/AccountOverlay';
 import { LeaderboardOverlay } from './presentation/components/LeaderboardOverlay';
 import { SettingsOverlay } from './presentation/components/SettingsOverlay';
 import { AccountButton } from './presentation/components/AccountButton';
+import { ThemeToggleButton } from './presentation/components/ThemeToggleButton';
 import { Toast } from './presentation/components/Toast';
 import { createSessionSyncControl } from './presentation/sync/createSyncScheduler';
 import { aliasFromEmail } from './presentation/account/aliasFromEmail';
@@ -309,6 +310,7 @@ const App: React.FC = () => {
             >
               <span aria-hidden="true">⚙️</span>
             </button>
+            <ThemeToggleButton />
             <AccountButton
               alias={userEmail !== null ? aliasFromEmail(userEmail) : ''}
               onClick={() => setAccountVisible(true)}

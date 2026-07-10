@@ -53,9 +53,9 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
         transform: isFocal ? 'scale(1.1)' : isBlocked ? 'scale(0.9)' : 'scale(1)',
         transition: 'all 0.2s ease',
         padding: '16px',
-        border: isFocal ? '2px solid #4CAF50' : '1px solid #d1d5db',
+        border: isFocal ? '2px solid var(--success)' : '1px solid var(--border)',
         borderRadius: '8px',
-        backgroundColor: isBlocked ? '#f3f4f6' : '#fff',
+        backgroundColor: isBlocked ? 'var(--surface-muted)' : 'var(--surface)',
         textAlign: 'center',
         position: 'relative',
       }}
@@ -84,14 +84,14 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
           🏆
         </button>
       )}
-      {/* Color SIEMPRE explícito: heredarlo del sistema (modo oscuro) lo
-          volvía blanco sobre la card clara — título invisible. */}
+      {/* Color SIEMPRE explícito (vía token): heredarlo del sistema volvía el
+          título invisible sobre la card cuando SO y tema de la app difieren. */}
       <div
         className="level-node-title"
         style={{
           fontWeight: 'bold',
           marginBottom: '8px',
-          color: isBlocked ? '#9ca3af' : '#1f2937',
+          color: isBlocked ? 'var(--text-disabled)' : 'var(--text)',
         }}
       >
         {metadata?.name || node.levelId}
@@ -105,18 +105,18 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
         <>
           <div style={{ fontSize: '18px', marginBottom: '4px' }}>✓</div>
           {node.stars !== undefined && (
-            <div style={{ fontSize: '16px', marginBottom: '4px', color: '#FFD700' }}>
+            <div style={{ fontSize: '16px', marginBottom: '4px', color: 'var(--gold)' }}>
               {stars}
             </div>
           )}
-          <div style={{ fontSize: '14px', color: '#666' }}>
+          <div style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
             {t('common.score', { score: node.bestScore ?? 0 })}
           </div>
         </>
       )}
 
       {node.state === 'disponible' && !isFocal && (
-        <div style={{ fontSize: '12px', color: '#999' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-disabled)' }}>
           {t('levelSelect.status.available')}
         </div>
       )}
@@ -126,7 +126,9 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
           style={{
             fontSize: '12px',
             fontWeight: 'bold',
-            color: '#4CAF50',
+            // Consolidación aprobada: el verde Material (#4CAF50) del focal se
+            // unifica con --success (#16a34a) — cambio sutil de tono en claro.
+            color: 'var(--success)',
             animation: 'pulse 1s infinite',
           }}
         >
@@ -135,7 +137,7 @@ export const LevelNodeCard: React.FC<LevelNodeCardProps> = ({
       )}
 
       {metadata?.difficulty && (
-        <div style={{ fontSize: '12px', marginTop: '8px', color: '#888' }}>
+        <div style={{ fontSize: '12px', marginTop: '8px', color: 'var(--text-disabled)' }}>
           {t(`level.difficulty.${metadata.difficulty}`)}
         </div>
       )}

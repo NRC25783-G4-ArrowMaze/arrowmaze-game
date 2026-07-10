@@ -43,7 +43,7 @@ export const PauseOverlay: React.FC<PauseOverlayProps> = ({
       className="overlay-backdrop"
     >
       <div className="overlay-card">
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('pause.title')}</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>{t('pause.title')}</div>
         <button className="btn-primary" onClick={onResume} style={{ minWidth: '180px' }}>
           {t('pause.resume')}
         </button>

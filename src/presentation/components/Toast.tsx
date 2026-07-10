@@ -73,8 +73,11 @@ export const Toast: React.FC<ToastProps> = ({
         transform: `translate(-50%, ${hidden ? '12px' : '0'})`,
         opacity: hidden ? 0 : 1,
         transition: `opacity ${TOAST_EXIT_MS}ms ease, transform ${TOAST_EXIT_MS}ms ease`,
-        background: '#1f2937',
-        color: '#ffffff',
+        // Superficie "inversa": panel oscuro en claro; en oscuro pasa a
+        // superficie elevada (ya no invierte — seguiría siendo legible pero
+        // se fundiría con el fondo).
+        background: 'var(--inverse-surface)',
+        color: 'var(--inverse-text)',
         padding: '10px 20px',
         borderRadius: '999px',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',

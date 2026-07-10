@@ -88,17 +88,17 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
     return null;
   }
 
-  const cellStyle: React.CSSProperties = { padding: '6px 10px', color: '#374151' };
+  const cellStyle: React.CSSProperties = { padding: '6px 10px', color: 'var(--text)' };
   const headerCellStyle: React.CSSProperties = {
     ...cellStyle,
     fontWeight: 700,
-    borderBottom: '2px solid var(--border, #d1d5db)',
+    borderBottom: '2px solid var(--border)',
   };
 
   const renderRow = (e: LeaderboardEntry, highlighted: boolean): React.ReactElement => (
     <tr
       key={`${e.rank}-${e.username}`}
-      style={highlighted ? { background: '#fef9c3', fontWeight: 700 } : undefined}
+      style={highlighted ? { background: 'var(--highlight)', fontWeight: 700 } : undefined}
     >
       <td style={cellStyle}>{e.rank}</td>
       {/* Alias seguro del backend: contenido, jamás clave i18n. */}
@@ -118,13 +118,13 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
       className="overlay-backdrop"
     >
       <div className="overlay-card">
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text)' }}>
           🏆 {t('leaderboard.title')}
         </div>
 
         {state.kind === 'loginRequired' && (
           <>
-            <div style={{ color: '#6b7280' }}>{t('leaderboard.loginRequired')}</div>
+            <div style={{ color: 'var(--text-muted)' }}>{t('leaderboard.loginRequired')}</div>
             <button
               className="btn-primary"
               onClick={onRequestLogin}
@@ -136,16 +136,16 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
         )}
 
         {state.kind === 'loading' && (
-          <div style={{ color: '#6b7280' }}>{t('leaderboard.loading')}</div>
+          <div style={{ color: 'var(--text-muted)' }}>{t('leaderboard.loading')}</div>
         )}
 
         {state.kind === 'error' && (
-          <div style={{ color: 'var(--danger, #b91c1c)' }}>{t('leaderboard.error')}</div>
+          <div style={{ color: 'var(--danger)' }}>{t('leaderboard.error')}</div>
         )}
 
         {state.kind === 'data' &&
           (state.response.topPlayers.length === 0 ? (
-            <div style={{ color: '#6b7280' }}>{t('leaderboard.empty')}</div>
+            <div style={{ color: 'var(--text-muted)' }}>{t('leaderboard.empty')}</div>
           ) : (
             <div style={{ maxHeight: 'min(50dvh, 420px)', overflowY: 'auto', width: 'min(420px, 100%)' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
@@ -165,7 +165,7 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
 
               {state.response.currentRecord !== null ? (
                 <div style={{ marginTop: '12px' }}>
-                  <div style={{ fontWeight: 700, color: '#374151', padding: '0 10px' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text)', padding: '0 10px' }}>
                     {t('leaderboard.yourRecord')}
                   </div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
@@ -173,7 +173,7 @@ export const LeaderboardOverlay: React.FC<LeaderboardOverlayProps> = ({
                   </table>
                 </div>
               ) : (
-                <div style={{ marginTop: '12px', color: '#6b7280', padding: '0 10px' }}>
+                <div style={{ marginTop: '12px', color: 'var(--text-muted)', padding: '0 10px' }}>
                   {t('leaderboard.noRecord')}
                 </div>
               )}
