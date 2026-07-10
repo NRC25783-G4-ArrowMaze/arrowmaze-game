@@ -157,7 +157,9 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
       className="overlay-backdrop"
     >
       <div className="overlay-card">
-        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>{t('account.title')}</div>
+        <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#374151' }}>
+          <span aria-hidden="true">👤</span> {t('account.title')}
+        </div>
 
         {authenticated ? (
           <>
@@ -166,19 +168,39 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
               className="btn-primary"
               onClick={() => void handleLogout()}
               disabled={submitting}
-              style={{ minWidth: '220px', maxWidth: '100%' }}
+              style={{ width: 'min(300px, 100%)' }}
             >
               {submitting ? t('account.loading') : t('account.logout')}
             </button>
           </>
         ) : (
           <>
-            <div data-testid="account-tabs" style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+            {/* Control segmentado: la pestaña activa mantiene btn-primary; la
+                inactiva se funde con la pista (sin borde) para leerse como
+                selector, no como dos botones sueltos. */}
+            <div
+              data-testid="account-tabs"
+              style={{
+                display: 'flex',
+                width: 'min(300px, 100%)',
+                background: '#f0f4f8',
+                borderRadius: '999px',
+                padding: '4px',
+              }}
+            >
               <button
                 onClick={() => switchMode('login')}
                 aria-pressed={mode === 'login'}
                 className={mode === 'login' ? 'btn-primary' : undefined}
-                style={{ minWidth: '120px' }}
+                style={{
+                  flex: 1,
+                  minHeight: '38px',
+                  padding: '0.3em 0.6em',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontSize: '0.95rem',
+                  ...(mode === 'login' ? {} : { background: 'transparent', color: '#6b7280' }),
+                }}
               >
                 {t('account.tab.login')}
               </button>
@@ -186,7 +208,15 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                 onClick={() => switchMode('register')}
                 aria-pressed={mode === 'register'}
                 className={mode === 'register' ? 'btn-primary' : undefined}
-                style={{ minWidth: '120px' }}
+                style={{
+                  flex: 1,
+                  minHeight: '38px',
+                  padding: '0.3em 0.6em',
+                  borderRadius: '999px',
+                  border: 'none',
+                  fontSize: '0.95rem',
+                  ...(mode === 'register' ? {} : { background: 'transparent', color: '#6b7280' }),
+                }}
               >
                 {t('account.tab.register')}
               </button>
@@ -197,7 +227,17 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
               onSubmit={(e) => void handleSubmit(e)}
               style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: 'min(300px, 100%)' }}
             >
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#374151' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  color: '#374151',
+                  textAlign: 'left',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                }}
+              >
                 {t('account.email')}
                 <input
                   type="email"
@@ -208,7 +248,17 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                   style={inputStyle}
                 />
               </label>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#374151' }}>
+              <label
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '4px',
+                  color: '#374151',
+                  textAlign: 'left',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                }}
+              >
                 {t('account.password')}
                 <input
                   type="password"
@@ -227,7 +277,7 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
                 type="submit"
                 className="btn-primary"
                 disabled={submitting}
-                style={{ minWidth: '220px', maxWidth: '100%' }}
+                style={{ width: '100%', marginTop: '4px' }}
               >
                 {submitting
                   ? t('account.loading')
@@ -239,7 +289,17 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
           </>
         )}
 
-        <button onClick={onClose} style={{ minWidth: '220px', maxWidth: '100%' }}>
+        {/* Acción secundaria: sin borde ni fondo para no competir con el submit. */}
+        <button
+          onClick={onClose}
+          style={{
+            width: 'min(300px, 100%)',
+            border: 'none',
+            background: 'transparent',
+            color: '#6b7280',
+            fontWeight: 500,
+          }}
+        >
           {t('account.back')}
         </button>
       </div>
