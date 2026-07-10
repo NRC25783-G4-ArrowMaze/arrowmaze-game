@@ -22,7 +22,7 @@
   - Nota de hechos del diagnóstico: el disparo tras ganar YA existía (GameView, D2); esta misión es higiene (gate + anti-solape), no el fix del síntoma de QA.
 
 - **Validación realizada:**
-  - `npm test` → **543 tests / 66 suites** (base 536/65 → +7; 0 regresiones).
+  - `npm test` → **544 tests / 66 suites** (base 537/65 → +7; 0 regresiones).
   - `npx tsc --noEmit` → **0 errores**; `eslint` → 0 en los archivos tocados (incluido el React Compiler).
 
 #### 📋 Resumen de la sesión

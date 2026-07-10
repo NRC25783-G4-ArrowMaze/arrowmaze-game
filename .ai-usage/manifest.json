@@ -2851,7 +2851,7 @@
           }
         },
         "validation": {
-          "tests": "passed — 543 tests / 66 suites (base 536/65 -> +7; 0 regresiones)",
+          "tests": "passed — 544 tests / 66 suites (base 537/65 -> +7; 0 regresiones)",
           "type_check": "passed — tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados"
         },
@@ -2892,7 +2892,7 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 543,
+      "totalTestsPassing": 544,
       "totalTestSuites": 66,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",

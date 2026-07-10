@@ -82,7 +82,7 @@ Cada entrada en este registro sigue el formato estándar:
 
 - **Total de reportes:** 52
 - **Última actualización:** 2026-07-10
-- **Suite de tests (actual):** 543/543 ✅ en 66 suites
+- **Suite de tests (actual):** 544/544 ✅ en 66 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 
