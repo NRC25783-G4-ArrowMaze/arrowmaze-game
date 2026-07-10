@@ -2719,10 +2719,53 @@
           "Diagrama exportado con el plantuml.jar ya vendorizado por node-plantuml, sin depender de internet"
         ],
         "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
+      },
+      {
+        "id": "2026-07-10-006",
+        "date": "2026-07-10",
+        "title": "Push y apertura del PR #48 (checklist + scaffolding de release)",
+        "file": "2026-07-10-pr48-checklist-release-scaffolding.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1, 2026-07-10-release-scaffolding-gof-solid",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 0,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "git-workflow"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              ".ai-usage/2026-07-10-pr48-checklist-release-scaffolding.md"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "no aplica (solo git push + gh pr create)",
+          "type_check": "no aplica",
+          "lint": "no aplica",
+          "e2e": "git log --oneline dev..docs/verification-checklist-v1 confirmado antes de abrir el PR; URL de PR #48 devuelta por gh como confirmación"
+        },
+        "decisions": [
+          "PR #48 abierto contra dev (no main), confirmado explícitamente por el usuario",
+          "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
+        ],
+        "notes": "PR #48 abierto sin mergear, pendiente de revisión."
       }
     ],
     "statistics": {
-      "totalReports": 49,
+      "totalReports": 50,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
