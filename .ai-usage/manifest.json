@@ -2863,10 +2863,77 @@
           "DEUDA DOCUMENTADA: progreso local = dispositivo, no cuenta (tabla sin usuario) — la resuelve D1.5 (paso 3)"
         ],
         "notes": "Correccion de hechos: el disparo tras ganar ya existia (GameView, D2); esta mision es higiene, no el fix del sintoma de QA. Id 2026-07-10-008 (renumerado de -005 al integrar #48/#49/#51 durante el rebase)."
+      },
+      {
+        "id": "2026-07-10-009",
+        "date": "2026-07-10",
+        "title": "Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente y toggle en el header",
+        "file": "2026-07-10-modo-oscuro.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/modo-oscuro",
+        "linked_session": "2026-07-10-higiene-sync; paso adelantado en la cola sync -> D1.5 -> modo-oscuro",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 7,
+          "files_modified": 16,
+          "tests_added": 15,
+          "assets_added": 0
+        },
+        "areas": [
+          "theming",
+          "presentation",
+          "accessibility",
+          "i18n",
+          "infrastructure"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "created": [
+              "ports/IThemePreference.ts (calca de ILanguagePreferenceProvider)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "created": [
+              "theme/CapacitorThemePreference.ts (key ui_theme_preference)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "theming/{themeMode,ThemeContext,ThemeProvider} (resolucion guardada > prefers-color-scheme > claro; data-theme en <html>, cambio en caliente)",
+              "components/ThemeToggleButton.tsx (header, emoji sol/luna = estado actual, aria-label i18n dinamico)"
+            ],
+            "modified": [
+              "index.css (19 tokens nuevos + bloque dark + color-scheme), App.css, theme.ts del SVG (var(--board-bg)/var(--board-dot))",
+              "overlays Account/Game/Pause/Settings/Leaderboard, Toast, LevelNodeCard, LevelSelectScreen, GameController (60+ colores inline a tokens; deuda del review del #38 saldada)",
+              "SettingsOverlay (seccion Tema), App.tsx (toggle en header), main.tsx (wiring), catalogos es/en (settings.theme.* + theme.toggle.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 559 tests / 70 suites (base 544/66 -> +15; 0 regresiones; paridad i18n cubre las claves nuevas)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed — eslint . limpio",
+          "qa": "PENDIENTE QA visual del usuario: el focal del mapa cambia sutilmente de verde en claro (#4CAF50 -> --success #16a34a, consolidacion aprobada)"
+        },
+        "decisions": [
+          "Nomenclatura: se conservan los tokens existentes (--text/--text-muted/--primary, capa original de Jesus en /preview) — continuidad de equipo sobre renombre",
+          "DECISION CONSCIENTE — 2 opciones sin 'sistema': elegir manualmente un tema desactiva el seguimiento de prefers-color-scheme para siempre (sin 'volver a auto'); precedente del selector de idioma",
+          "Forge (H1) y /preview fuera del v1; /preview (pagina de Jesus) intocada y citada como referencia",
+          "Regla B1: colores de flechas = dato del nivel, NO migran; contraste verificado sobre --board-bg oscuro (peor caso blue #3b82f6 ~3:1)",
+          "Glifos del toggle: emoji directo — patron que el #49 establecio para los iconos del header (⚙️/👤), nitido en ambos temas sin assets",
+          "Fix emergente cazado por el spec del provider: la carga async de la preferencia pisaba una eleccion previa del usuario (ref userChose: la eleccion explicita gana)"
+        ],
+        "notes": "Rama feat/modo-oscuro desde 76f5571 (tip de fix/higiene-sync rebasado sobre dev post-#51 en el Paso A de esta sesion). Falta espejar G4-modo-oscuro.feature en arrowmaze-project-core. Id 2026-07-10-009."
       }
     ],
     "statistics": {
-      "totalReports": 52,
+      "totalReports": 53,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2892,15 +2959,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 544,
-      "totalTestSuites": 66,
+      "totalTestsPassing": 559,
+      "totalTestSuites": 70,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-005",
-      "summary": "Higiene del sync: scheduler single-flight con gate de sesion"
+      "id": "2026-07-10-009",
+      "summary": "Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente y toggle en el header"
     }
   }
 }
