@@ -2352,10 +2352,65 @@
           "Alcance estricto a presentacion; dominio y aplicacion intactos"
         ],
         "notes": "Rama fix/tamano-flechas nace de dev; PR hacia dev (no abierto). Animaciones de choque se recalibran en la rama siguiente (fix/animacion-flechas)."
+      },
+      {
+        "id": "2026-07-09-005",
+        "date": "2026-07-09",
+        "title": "Animacion de flechas: glide sobre riel persistente, orientacion en reposo, salida voladora, recalibracion del choque",
+        "file": "2026-07-09-animacion-flechas.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "fix+feature",
+        "feature": "fix/animacion-flechas",
+        "linked_session": "apilada sobre fix/tamano-flechas; el glifo al 55% dejo al descubierto la deformacion del choque",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 2,
+          "tests_added": 43,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "animation",
+          "svg-rail",
+          "board",
+          "exit-overlay"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "rendering/railGlide.ts (riel persistente + offset continuo + extension de salida)",
+              "rendering/arrowGlyphPath.ts (primitivas de dibujo compartidas)",
+              "rendering/glideConfig.ts (diales GLIDE_SPEED / EXIT_*)",
+              "components/ArrowExit.tsx (overlay de salida voladora)"
+            ],
+            "modified": [
+              "components/ArrowComponent.tsx (glide sobre riel + orientacion en reposo + recalibracion del choque)",
+              "components/BoardComponent.tsx (deteccion de salida, overlays, clipPath, gating de burst)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 485 tests / 57 suites (base 442/52 -> +43 tests, +5 suites; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Glide reescrito a riel PERSISTENTE parametrizado por un escalar arcOffset que un rAF persigue a velocidad constante (elimina diagonales en giros y el freno entre ticks; absorbe la Fase B)",
+          "La orientacion de la cabeza en reposo la dicta el dominio (exitDir), no el riel (fix del volteo de la flecha de 1 celda)",
+          "Salida voladora como OVERLAY fuera de la flecha viva (patron ArrowBurst), riel extendido con nodos virtuales, fade y clipPath al tablero; burst/disintegrate gateados (no borrados)",
+          "Recalibracion del choque (DEFORM/RECOIL) al glifo al 55%",
+          "Guard/try-catch en todo el riel: lo cosmetico jamas lanza; domain/application/TICK_MS intactos",
+          "Cinco commits atomicos (Conventional Commits); rama apilada, rebase --onto pendiente al mergear #40"
+        ],
+        "notes": "Rama fix/animacion-flechas apilada sobre fix/tamano-flechas; PR no abierto. Id 2026-07-09-005."
       }
     ],
     "statistics": {
-      "totalReports": 43,
+      "totalReports": 44,
       "lastUpdated": "2026-07-09T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -2381,15 +2436,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 174,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 442,
-      "totalTestSuites": 52,
+      "totalTestsPassing": 485,
+      "totalTestSuites": 57,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-09-004",
-      "summary": "Reducir el glifo de las flechas al 55% con escala unificada (ARROW_SCALE + ARROW_GLYPH)"
+      "id": "2026-07-09-005",
+      "summary": "Animacion de flechas: glide sobre riel persistente, orientacion en reposo, salida voladora, recalibracion del choque"
     }
   }
 }
