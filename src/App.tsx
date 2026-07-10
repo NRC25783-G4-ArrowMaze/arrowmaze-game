@@ -16,6 +16,8 @@ import { LoginUser } from './application/services/LoginUser';
 import { RegisterUser } from './application/services/RegisterUser';
 import { LogoutUser } from './application/services/LogoutUser';
 import { AccountOverlay } from './presentation/components/AccountOverlay';
+import { AccountButton } from './presentation/components/AccountButton';
+import { aliasFromEmail } from './presentation/account/aliasFromEmail';
 import type { LevelProgress } from './domain/entities/LevelProgress';
 import { useTranslation } from './presentation/i18n/I18nContext';
 
@@ -53,6 +55,9 @@ const App: React.FC = () => {
   const [allProgress, setAllProgress] = useState<LevelProgress[]>([]);
   const [accountVisible, setAccountVisible] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Email de la sesión activa para el badge del header (null = deslogueado o
+  // sesión previa a este feature sin email guardado → el botón cae al label).
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Composition root de autenticación (E1/E2): una sola instancia de los casos
   // de uso, reutilizando el mismo TokenProvider nativo que el bootstrap de
@@ -68,19 +73,27 @@ const App: React.FC = () => {
     };
   }, [apiBaseUrl, tokenProvider]);
 
-  // Estado de sesión inicial para el badge/overlay: token presente = logueado.
+  // Estado de sesión inicial para el badge/overlay: token presente = logueado; y
+  // el email guardado alimenta el alias del botón (sobrevive al F5). Migración:
+  // si hay token pero no email (sesión previa a este feature), userEmail queda
+  // null y el botón cae al label genérico.
   useEffect(() => {
     let active = true;
     tokenProvider.getToken()
       .then((token) => { if (active) setIsAuthenticated(token !== null); })
       .catch(() => { /* token ilegible: se asume deslogueado */ });
+    tokenProvider.getEmail()
+      .then((email) => { if (active) setUserEmail(email); })
+      .catch(() => { /* email ilegible: sin alias, el botón usa el label */ });
     return () => { active = false; };
   }, [tokenProvider]);
 
-  // Cambios de sesión desde el overlay: actualiza el badge y, al iniciar sesión,
-  // dispara una sincronización (D2) ahora que las peticiones llevan el token.
-  const handleAuthChanged = (authenticated: boolean): void => {
+  // Cambios de sesión desde el overlay: actualiza el badge (identidad + estado) y,
+  // al iniciar sesión, dispara una sincronización (D2) ahora que las peticiones
+  // llevan el token.
+  const handleAuthChanged = (authenticated: boolean, email?: string): void => {
     setIsAuthenticated(authenticated);
+    setUserEmail(authenticated ? (email ?? null) : null);
     if (authenticated) {
       progressModule?.syncProgress.execute()
         .then(() => console.log('[App] Sincronización tras login completada.'))
@@ -135,7 +148,14 @@ const App: React.FC = () => {
             // Si el error es de sesión (401 SessionExpiredError),
             // podemos borrar el token inválido automáticamente.
             if (error instanceof Error && error.name === 'SessionExpiredError') {
+              // La sesión murió: token y badge se limpian juntos (invariante
+              // email persistido ⟺ token persistido).
               await tokenProvider.removeToken();
+              await tokenProvider.removeEmail();
+              if (isMounted) {
+                setIsAuthenticated(false);
+                setUserEmail(null);
+              }
               // TODO: Despachar evento para redirigir al Login
             }
           });
@@ -230,7 +250,10 @@ const App: React.FC = () => {
         <header className="app-header">
           <h1>{t('app.title')}</h1>
           <div className="app-actions">
-            <button onClick={() => setAccountVisible(true)}>{t('account.button')}</button>
+            <AccountButton
+              alias={userEmail !== null ? aliasFromEmail(userEmail) : ''}
+              onClick={() => setAccountVisible(true)}
+            />
           </div>
         </header>
         <main className="app-main">

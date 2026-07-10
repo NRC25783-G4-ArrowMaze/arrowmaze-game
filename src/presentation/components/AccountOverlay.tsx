@@ -21,8 +21,12 @@ export interface AccountOverlayProps {
   loginUser: LoginUser;
   registerUser: RegisterUser;
   logoutUser: LogoutUser;
-  /** Notifica al composition root los cambios de sesión (badge del header, re-sync D2). */
-  onAuthChanged?: (authenticated: boolean) => void;
+  /**
+   * Notifica al composition root los cambios de sesión (badge del header, re-sync
+   * D2). En el login pasa el email para el badge inmediato (sin flicker); en el
+   * logout se omite.
+   */
+  onAuthChanged?: (authenticated: boolean, email?: string) => void;
 }
 
 type Mode = 'login' | 'register';
@@ -100,7 +104,8 @@ export const AccountOverlay: React.FC<AccountOverlayProps> = ({
         await loginUser.execute(email, password);
         setPassword('');
         setAuthenticated(true);
-        onAuthChanged?.(true);
+        // Pasa el email para el badge inmediato; LoginUser ya lo persistió.
+        onAuthChanged?.(true, email);
       } else {
         await registerUser.execute(email, password);
         // El backend responde 201 sin token: no hay auto-login. Volvemos a
