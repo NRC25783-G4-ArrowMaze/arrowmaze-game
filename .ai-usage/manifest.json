@@ -2664,10 +2664,65 @@
           "BORRADOR-features-pendientes.md no reescrito por completo — marcado 🔒 CERRADO y preservado como contexto histórico"
         ],
         "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
+      },
+      {
+        "id": "2026-07-10-005",
+        "date": "2026-07-10",
+        "title": "LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README",
+        "file": "2026-07-10-release-scaffolding-gof-solid.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 4,
+          "tests_added": 0,
+          "assets_added": 1
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "design-patterns",
+          "solid",
+          "diagrams"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "LICENSE (MIT)",
+              "CHANGELOG.md (Keep a Changelog, v0.1.0 -> v1.0.0)",
+              "doc/classes.svg (exportado localmente con plantuml.jar vendorizado)"
+            ],
+            "modified": [
+              "package.json (version -> 1.0.0)",
+              "android/app/build.gradle (versionName/versionCode -> 1.0.0/4)",
+              "README.md (secciones GoF, SOLID, Diagrama de clases, Licencia)",
+              "doc/VERIFICATION_CHECKLIST.md (secciones 6/10/12 y roadmap actualizados)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites con arrowmaze-game@1.0.0",
+          "type_check": "no aplica (cambios de documentación/config)",
+          "lint": "no aplica",
+          "e2e": "verificacion del SVG generado (120 clases/interfaces renderizadas, sin errores de sintaxis PlantUML); CHANGELOG.md contrastado contra git log --oneline por rango de tags"
+        },
+        "decisions": [
+          "MIT confirmado explícitamente por el usuario antes de crear LICENSE",
+          "CHANGELOG.md generado tras explicar su propósito (Keep a Changelog) porque el usuario no tenía claro para qué servía",
+          "Segunda fuente de versión descubierta en el camino (android/app/build.gradle) y corregida junto con package.json, siguiendo el patrón del backend (swagger.ts)",
+          "Diagrama exportado con el plantuml.jar ya vendorizado por node-plantuml, sin depender de internet"
+        ],
+        "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
       }
     ],
     "statistics": {
-      "totalReports": 48,
+      "totalReports": 49,
       "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",

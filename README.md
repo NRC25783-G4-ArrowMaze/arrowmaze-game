@@ -77,6 +77,119 @@ src/
 
 ---
 
+## Design Patterns (GoF)
+
+### Factory Method — `LocalProgressModuleFactory`
+
+Ensambla el módulo de persistencia local + sincronización (driver SQLite, cliente HTTP y los
+casos de uso que dependen de ellos) detrás de un único punto de construcción, para que el resto
+de la app no conozca los detalles de infraestructura concretos.
+
+```ts
+// src/infrastructure/factories/LocalProgressModuleFactory.ts
+export class LocalProgressModuleFactory {
+  public static async create(
+    apiBaseUrl: string,
+    tokenProvider: IAuthTokenProvider
+  ): Promise<LocalProgressModule> {
+    const driver = new CapacitorSqliteDriver();
+    await driver.openDatabase('game_progress_db');
+
+    const repository = new SqliteProgressRepository(driver);
+    await repository.initialize();
+
+    const apiClient = new FetchProgressApiClient(apiBaseUrl, tokenProvider);
+
+    return {
+      saveLocalProgress: new SaveLocalProgress(repository),
+      getLocalProgress: new GetLocalProgress(repository),
+      syncOfflineProgress: new SyncOfflineProgress(repository),
+      syncProgress: new SyncProgress(repository, apiClient),
+    };
+  }
+}
+```
+
+### Adapter — `FetchProgressApiClient`
+
+Adapta el contrato HTTP real del backend (`fetch`, headers, DTOs, códigos de estado) al puerto
+`IProgressApiClient` que la capa de aplicación conoce. La aplicación nunca ve `fetch` ni JSON.
+
+```ts
+// src/infrastructure/api/FetchProgressApiClient.ts
+export class FetchProgressApiClient implements IProgressApiClient {
+  async pushProgress(progress: LevelProgress): Promise<void> {
+    const response = await fetch(`${this._baseUrl}/api/v1/progress`, {
+      method: 'POST',
+      headers: await this.getHeaders(),
+      body: JSON.stringify(this.toDTO(progress)),
+    });
+    if (response.status === 401) throw new SessionExpiredError();
+    if (!response.ok) throw new NetworkError(`Error del servidor: ${response.status}`);
+  }
+}
+```
+
+### State (autómata de pila) — `GameFlowController`
+
+El flujo de una partida (ACTIVE / PAUSED / SETTINGS, C1) se modela como una pila de estados en
+vez de un enum plano: `openSettings()` solo es válido desde `PAUSED`, `resume()` solo desde
+`PAUSED`, etc. — las transiciones inválidas lanzan `InvalidFlowTransitionError` en vez de dejar
+la UI en un estado inconsistente.
+
+```ts
+// src/application/services/GameFlowController.ts
+export class GameFlowController {
+  pause(): void {
+    if (this.current !== 'ACTIVE' || this._session.status !== 'IN_PROGRESS') {
+      throw new InvalidFlowTransitionError('pause', this.current);
+    }
+    this._stack.push('PAUSED');
+  }
+
+  resume(): void {
+    if (this.current !== 'PAUSED') {
+      throw new InvalidFlowTransitionError('resume', this.current);
+    }
+    this._stack.pop();
+  }
+}
+```
+
+---
+
+## SOLID en el código
+
+| Principio | Evidencia |
+|-----------|-----------|
+| **S — Single Responsibility** | Casos de uso de una sola responsabilidad: `SaveLocalProgress`, `GetLocalProgress`, `SyncProgress` viven separados en vez de un "ProgressService" monolítico |
+| **O — Open/Closed** | `InMemoryLevelRepository` implementa `ILevelRepository`; se puede añadir un repositorio SQLite o remoto sin tocar el dominio ni los casos de uso |
+| **L — Liskov Substitution** | Cualquier `I*ApiClient` (`FetchAuthApiClient`, `FetchProgressApiClient`, `FetchLevelApiClient`, `FetchLeaderboardApiClient`) es sustituible donde su puerto se use, sin romper el contrato |
+| **I — Interface Segregation** | Puertos finos y de propósito único en `src/application/ports/` (11 interfaces, p. ej. `IClock`, `IAudioPreferences`, `ILocalProgressRepository` — ver contrato abajo) en vez de una interfaz de infraestructura gigante |
+| **D — Dependency Inversion** | Los casos de uso dependen de abstracciones (`IProgressApiClient`), nunca de `fetch` directo; la implementación concreta se inyecta desde `LocalProgressModuleFactory` |
+
+```ts
+// src/application/ports/ILocalProgressRepository.ts — puerto segregado (I),
+// del que dependen los casos de uso sin conocer SQLite (D)
+export interface ILocalProgressRepository {
+  initialize(): Promise<void>;
+  findByLevelId(levelId: string): Promise<LevelProgress | null>;
+  findAll(): Promise<LevelProgress[]>;
+  save(progress: LevelProgress): Promise<void>;
+  findPendingSync(): Promise<LevelProgress[]>;
+  markAsSynced(levelId: string): Promise<void>;
+}
+```
+
+---
+
+## Diagrama de clases
+
+Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`. Versión navegable en SVG:
+[`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
+
+---
+
 ## Features — Estado sincronizado con arrowmaze-project-core
 
 > **Leyenda:** ✅ Implementado · ⚠️ Parcial · ❌ Pendiente · 📝 Spec lista (sin implementar)
@@ -270,4 +383,4 @@ pnpm build
 
 ## Licencia
 
-Proyecto privado. Todos los derechos reservados.
+MIT — ver [`LICENSE`](./LICENSE).

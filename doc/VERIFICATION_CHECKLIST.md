@@ -180,19 +180,17 @@ Time:        ~4.3 s
 ### Criterios requeridos
 - [x] **Diagrama de Clases** — `classes.puml` (690 líneas, generable con `pnpm gen-uml`)
 - [ ] **Diagrama de Capas** — no existe como artefacto dedicado
-- [ ] Diagramas **embebidos en el README** como imágenes
+- [x] Diagrama **embebido en el README** como imagen — `doc/classes.svg` (exportado con el `plantuml.jar` vendorizado por `node-plantuml`, sin dependencias externas)
 
 ### Estado actual
 
 | Diagrama | Archivo | En README | Completo |
 |----------|---------|-----------|---------|
-| Clases | `classes.puml` | ❌ | 🟡 verificar cobertura |
+| Clases | `classes.puml` → `doc/classes.svg` | ✅ | ✅ (120 clases/interfaces renderizadas) |
 | Capas | — | ❌ | ❌ |
 
 ### 🎯 Acciones pendientes
-- [ ] Ejecutar `pnpm gen-uml` y verificar cobertura de `classes.puml`
-- [ ] Exportar a imagen (PNG/SVG) y embeber en README
-- [ ] Crear diagrama de capas hexagonales
+- [ ] Crear diagrama de capas hexagonales (Domain/Application/Infrastructure/Presentation)
 
 ---
 
@@ -271,18 +269,14 @@ Time:        ~4.3 s
 ### Criterios requeridos
 - [x] Descripción, Stack, Arquitectura, Conceptos de dominio, Tests, Comandos
 - [x] Sección de Features — **ya actualizada** en esta rama al estado real
-- [ ] SOLID con snippets · GoF · (AOP N/A en cliente) documentados
-- [ ] Diagramas embebidos como imágenes
-- [ ] Sección **Licencia** apunta a un archivo `LICENSE` (que **no existe**)
-
-### ⚠️ Issues detectados
-- Faltan secciones GoF/SOLID con snippets y diagramas embebidos.
-- La sección "Licencia" existe en texto pero **no hay archivo `LICENSE`**.
+- [x] SOLID con snippets · GoF documentados — sección `## Design Patterns (GoF)` (Factory Method, Adapter, State) y `## SOLID en el código` añadidas, con snippets reales
+- [x] Diagrama embebido — `doc/classes.svg` referenciado en `## Diagrama de clases`
+- [x] Sección **Licencia** apunta a un archivo `LICENSE` real (MIT)
 
 ### 🎯 Acciones pendientes
 - [x] Actualizar estados de features (G, F4, C/D) al real — hecho en esta rama
-- [ ] Añadir GoF + SOLID con snippets y embeber diagramas
-- [ ] Alinear la sección Licencia con un `LICENSE` real
+- [x] Añadir GoF + SOLID con snippets y embeber diagramas — hecho en esta rama
+- [x] Alinear la sección Licencia con un `LICENSE` real — hecho en esta rama (MIT)
 
 ---
 
@@ -302,10 +296,10 @@ Time:        ~4.3 s
 ## 12. 📬 Entregables de release (v1.0.0)
 
 ### Criterios requeridos
-- [ ] `CHANGELOG.md` — ❌ no existe
-- [ ] `LICENSE` — ❌ no existe
+- [x] `CHANGELOG.md` — creado (Keep a Changelog, historial v0.1.0 → v1.0.0 a partir de los commits reales)
+- [x] `LICENSE` — creado (MIT)
 - [ ] CI (`.github/workflows/ci.yml`) — ❌ no existe
-- [ ] Bump de versión `0.1.2` → `1.0.0` en `package.json`
+- [x] Bump de versión `0.1.2` → `1.0.0` — hecho en `package.json` **y** `android/app/build.gradle` (`versionName`/`versionCode`, segunda fuente de versión análoga a `swagger.ts` en el backend)
 - [ ] Promoción `dev → main` (PR de release) + tag `v1.0.0`
 - [ ] GitHub **Release** con **APK** funcional (Capacitor `build:apk` + `android/`)
 - [x] Build de APK disponible (`pnpm build:apk`, `capacitor.config.ts`, carpeta `android/`)
@@ -315,9 +309,8 @@ Time:        ~4.3 s
 - [ ] `package-lock.json` coexistiendo con `pnpm-lock.yaml` (el gestor es pnpm)
 
 ### 🎯 Acciones pendientes
-- [ ] Crear `LICENSE`, `CHANGELOG.md`, `ci.yml`
-- [ ] Decidir y aplicar el salto de versión a `1.0.0`
-- [ ] Generar APK y adjuntarlo al GitHub Release
+- [ ] Crear `ci.yml`
+- [ ] Promoción `dev → main` + tag `v1.0.0` + GitHub Release con APK
 
 ---
 
@@ -325,15 +318,15 @@ Time:        ~4.3 s
 
 > ✅ = ya implementado en código · ⬜ = pendiente
 
-### 🔴 CRÍTICO — Infraestructura de release (código listo, falta scaffolding)
-1. ⬜ **CI/CD**: `.github/workflows/ci.yml` (install → build → test) — no existe
-2. ⬜ **LICENSE**: crear archivo (la sección del README lo referencia pero no existe)
-3. ⬜ **CHANGELOG.md**: crear con el historial hasta v1.0.0
-4. ⬜ **Bump de versión**: `package.json` `0.1.2` → `1.0.0`
+### 🔴 CRÍTICO — Infraestructura de release
+1. ⬜ **CI/CD**: `.github/workflows/ci.yml` (install → build → test) — único punto crítico que sigue pendiente
+2. ✅ **LICENSE**: creado (MIT)
+3. ✅ **CHANGELOG.md**: creado (Keep a Changelog, v0.1.0 → v1.0.0)
+4. ✅ **Bump de versión**: `package.json` y `android/app/build.gradle` → `1.0.0`
 
 ### 🟡 IMPORTANTE — Documentación
 5. ✅ **Actualizar features** en README y `project-core/FEATURES.md` al estado real (G, F4, C/D) — hecho en esta rama
-6. ⬜ **GoF + SOLID** en README con snippets; embeber diagramas
+6. ✅ **GoF + SOLID** en README con snippets reales; diagrama de clases embebido (`doc/classes.svg`)
 7. ⬜ **AI_USAGE.md** en raíz (o validar que lo existente cumple)
 
 ### 🟢 COMPLETAR — Antes de la entrega
@@ -343,4 +336,4 @@ Time:        ~4.3 s
 
 ---
 
-*Última revisión: 2026-07-10 — código en `dev` verificado (531 tests / 64 suites en verde). Los patrones GoF, la arquitectura hexagonal, el grupo G (audio/i18n/timer) y el leaderboard están implementados; falta la infraestructura de release (CI/LICENSE/CHANGELOG), el bump de versión y la promoción a `main`.*
+*Última revisión: 2026-07-10 — código en `dev` verificado (531 tests / 64 suites en verde). Patrones GoF, arquitectura hexagonal, grupo G (audio/i18n/timer) y leaderboard implementados. En esta rama se resolvió LICENSE, CHANGELOG.md, el bump de versión (ambas fuentes), la sección GoF+SOLID del README y el diagrama de clases embebido. Solo queda pendiente el CI y la promoción a `main` (PR + tag + Release con APK).*
