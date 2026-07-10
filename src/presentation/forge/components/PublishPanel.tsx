@@ -138,7 +138,43 @@ export const PublishPanel: React.FC<PublishPanelProps> = ({
     <div style={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
       <h4 style={{ margin: '0 0 12px 0' }}>Publicación & Export</h4>
 
-      {/* Sin autenticación: form de login */}
+      {/* Export LOCAL: no requiere login (solo Publicar/Cargar usan el backend). */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '12px' }}>
+        <button
+          onClick={handleExportJSON}
+          disabled={loading}
+          style={{
+            padding: '10px',
+            backgroundColor: '#f59e0b',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '3px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '12px',
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          💾 Exportar JSON
+        </button>
+        <button
+          onClick={handleCopyForSeed}
+          disabled={loading}
+          style={{
+            padding: '10px',
+            backgroundColor: '#8b5cf6',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '3px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '12px',
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          📋 Copiar para seed
+        </button>
+      </div>
+
+      {/* Sin autenticación: form de login (solo para Publicar/Cargar del backend) */}
       {!token ? (
         <div>
           <div style={{ marginBottom: '10px' }}>
@@ -251,40 +287,6 @@ export const PublishPanel: React.FC<PublishPanelProps> = ({
               }}
             >
               {loading ? '⏳ Cargando...' : '📥 Cargar nivel...'}
-            </button>
-
-            <button
-              onClick={handleExportJSON}
-              disabled={loading}
-              style={{
-                padding: '10px',
-                backgroundColor: '#f59e0b',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '3px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '12px',
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              💾 Exportar JSON
-            </button>
-
-            <button
-              onClick={handleCopyForSeed}
-              disabled={loading}
-              style={{
-                padding: '10px',
-                backgroundColor: '#8b5cf6',
-                color: '#fff',
-                border: 'none',
-                borderRadius: '3px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '12px',
-                opacity: loading ? 0.6 : 1,
-              }}
-            >
-              📋 Copiar para seed
             </button>
           </div>
         </div>
