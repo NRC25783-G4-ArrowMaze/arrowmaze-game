@@ -2,6 +2,9 @@ import type { LevelDataDTO } from '../../application/dtos/LevelDataDTOs'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
+/** Metadatos de catálogo (GET /levels): sin la topología pesada del nivel. */
+export type LevelMetadata = Omit<LevelDataDTO, 'cells' | 'connections' | 'arrows'>
+
 export class ForgeApiClient {
   /**
    * Login: obtiene JWT token del backend.
@@ -23,6 +26,22 @@ export class ForgeApiClient {
 
     const data = await res.json()
     return data.token
+  }
+
+  /**
+   * Lista el catálogo de niveles existentes (metadatos, público).
+   * Se usa en el FORGE para elegir un mapa ya creado y editarlo.
+   */
+  static async listLevels(): Promise<LevelMetadata[]> {
+    const res = await fetch(`${API_BASE}/api/v1/levels`, { method: 'GET' })
+
+    if (!res.ok) {
+      throw new Error(
+        `No se pudo listar el catálogo de niveles (${res.status}): ${res.statusText}`,
+      )
+    }
+
+    return res.json()
   }
 
   /**
