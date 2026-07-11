@@ -27,4 +27,5 @@ export interface LevelDataDTO {
   arrows: LevelArrowDTO[];
   cells: LevelCellDTO[];
   connections?: LevelConnectionDTO[];
+  collisionBehavior?: 'stay' | 'return';
 }

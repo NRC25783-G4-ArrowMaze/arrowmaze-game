@@ -16,6 +16,8 @@ export interface LevelArrowDTO {
   body: string[]
 }
 
+export type CollisionBehavior = 'stay' | 'return'
+
 export interface LevelDataDTO {
   id: string
   name?: string
@@ -24,6 +26,7 @@ export interface LevelDataDTO {
   cells: LevelCellDTO[]
   connections?: LevelConnectionDTO[]
   arrows: LevelArrowDTO[]
+  collisionBehavior?: CollisionBehavior
 }
 
 export interface SceneCell extends LevelCellDTO {
@@ -34,8 +37,6 @@ export interface SceneCell extends LevelCellDTO {
 export interface SceneArrow extends LevelArrowDTO {
   color: string
 }
-
-export type CollisionBehavior = 'stay' | 'return'
 
 export interface Scene {
   id: string
@@ -68,6 +69,13 @@ export const DEFAULT_ARROW_PALETTE: readonly string[] = [
 export function toLevelDataDTO(scene: Scene): LevelDataDTO {
   return {
     id: scene.id,
+    // Campos opcionales: solo se incluyen si están definidos para no emitir claves
+    // con undefined en el payload.
+    ...(scene.name !== undefined ? { name: scene.name } : {}),
+    ...(scene.difficulty !== undefined ? { difficulty: scene.difficulty } : {}),
+    ...(scene.collisionBehavior !== undefined
+      ? { collisionBehavior: scene.collisionBehavior }
+      : {}),
     allowedMoves: scene.allowedMoves,
     cells: scene.cells.map((c) => ({ id: c.id, portCount: c.portCount })),
     connections: scene.connections,
@@ -91,6 +99,11 @@ export function sceneFromLevelData(
 ): Scene {
   return {
     id: dto.id,
+    ...(dto.name !== undefined ? { name: dto.name } : {}),
+    ...(dto.difficulty !== undefined ? { difficulty: dto.difficulty } : {}),
+    ...(dto.collisionBehavior !== undefined
+      ? { collisionBehavior: dto.collisionBehavior }
+      : {}),
     allowedMoves: dto.allowedMoves,
     cells: dto.cells.map((c) => {
       const [col, row] = c.id.split(',').map(Number)

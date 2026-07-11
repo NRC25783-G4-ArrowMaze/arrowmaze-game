@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Scene } from '../../game/scene'
+import type { Scene, CollisionBehavior } from '../../game/scene'
 
 interface LevelPropertiesPanelProps {
   scene: Scene
@@ -30,6 +30,10 @@ export const LevelPropertiesPanel: React.FC<LevelPropertiesPanelProps> = ({
 
   const handleMovesChange = (newMoves: number) => {
     onSceneUpdate({ allowedMoves: newMoves })
+  }
+
+  const handleCollisionChange = (newBehavior: string) => {
+    onSceneUpdate({ collisionBehavior: newBehavior as CollisionBehavior })
   }
 
   const handleGridColsChange = (newCols: number) => {
@@ -142,6 +146,28 @@ export const LevelPropertiesPanel: React.FC<LevelPropertiesPanelProps> = ({
             boxSizing: 'border-box',
           }}
         />
+      </div>
+
+      {/* Comportamiento al chocar */}
+      <div style={{ marginBottom: '10px' }}>
+        <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>
+          Comportamiento al chocar
+        </label>
+        <select
+          value={scene.collisionBehavior ?? 'return'}
+          onChange={(e) => handleCollisionChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '6px',
+            fontSize: '12px',
+            border: '1px solid #ccc',
+            borderRadius: '3px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <option value="return">Se devuelve al origen (return)</option>
+          <option value="stay">Se queda en el sitio (stay)</option>
+        </select>
       </div>
 
       {/* Grid size */}
