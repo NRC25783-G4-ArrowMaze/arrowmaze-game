@@ -10,6 +10,29 @@
   background: linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
 }
 
+/* Playtest del FORGE: el GameView se reutiliza dentro de un modal, no a pantalla
+   completa. Sin estos overrides, `.app` (min-height:100dvh) y `.board-frame`
+   (width relativo a 100dvh) se dimensionan contra el viewport y el tablero se
+   desborda del modal, quedando fuera de vista. Aquí se acota todo al contenedor
+   del modal. */
+.forge-playtest {
+  height: 100%;
+  overflow: auto;
+}
+
+.forge-playtest .app {
+  min-height: 0;
+  height: 100%;
+}
+
+.forge-playtest .board-frame {
+  width: min(100%, 56vh, 480px);
+}
+
+.forge-playtest .app-main {
+  padding: clamp(8px, 1.5vh, 16px) clamp(8px, 2vw, 16px);
+}
+
 .app-header {
   display: flex;
   align-items: center;
