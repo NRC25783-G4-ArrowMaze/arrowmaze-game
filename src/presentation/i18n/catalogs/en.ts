@@ -86,6 +86,14 @@ export const en: Catalog = {
       hard: 'Hard',
       veryHard: 'Very hard',
     },
+    name: {
+      'level-initial': 'Tutorial',
+      'level-intermediate-a': 'Challenge A',
+      'heart-preview': 'Heart',
+      'level-intermediate-b': 'Challenge B',
+      'level-advanced': 'Advanced',
+      'level-expert': 'Expert',
+    },
   },
   account: {
     button: 'Account',

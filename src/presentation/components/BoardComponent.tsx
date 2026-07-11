@@ -2,7 +2,6 @@ import React, { useId, useLayoutEffect, useRef, useState } from 'react';
 import {
   computeBoardLayout,
   cellCenter,
-  boundingBoxPositions,
   portDelta,
   type Point,
 } from '../rendering/boardLayout';
@@ -94,6 +93,11 @@ export interface BoardComponentProps {
    * Renderiza la punta en su última posición con efecto de fracturas. Ausente → sin efecto.
    */
   headDisintegrating?: { color: string; cellId: string; exitDir: number; nonce: number };
+  /**
+   * Celda que el tutorial guiado está señalando: dibuja una manito con sombra y
+   * un anillo pulsante sobre su centro. Ausente → sin guía.
+   */
+  hintCell?: { col: number; row: number };
 }
 
 /**
@@ -114,6 +118,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   collision,
   vanishing,
   headDisintegrating,
+  hintCell,
 }) => {
   const { cells, arrows } = board;
 
@@ -217,8 +222,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   // voladora + fade reemplaza al "pop" en el borde.
   const exitActive = exits.length > 0;
 
-  // Grilla completa de puntos: una posición por celda del bounding box.
-  const dotPositions = boundingBoxPositions(maxCol, maxRow);
+  // Puntos SOLO en los nodos reales del tablero (grafo), no en un rectángulo de
+  // fondo: un mapa disperso (p. ej. el corazón) no debe mostrar celdas fantasma.
+  // Los niveles de rejilla completa se ven igual: sus celdas llenan el bounding box.
+  const dotPositions = cells;
 
   // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
   const burstOrigin =
@@ -251,9 +258,9 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
 
       {/* Pasada 1: grilla de puntos sobre todo el bounding box. */}
       <g data-testid="pass-cells">
-        {dotPositions.map(({ col, row }) => (
+        {dotPositions.map(({ id, col, row }) => (
           <CellComponent
-            key={`${col},${row}`}
+            key={id}
             center={cellCenter(col, row, cellSize, offset)}
             radius={dotRadius}
           />
@@ -284,6 +291,35 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
           );
         })}
       </g>
+
+      {/* Tutorial guiado: manito con sombra + anillo pulsante sobre la celda a
+          tocar. pointerEvents=none para no robar el toque real al tablero. */}
+      {hintCell !== undefined && cellSize > 0 && (() => {
+        const c = cellCenter(hintCell.col, hintCell.row, cellSize, offset);
+        const ringRadius = cellSize * 0.42;
+        return (
+          <g data-testid="tutorial-hint" style={{ pointerEvents: 'none' }}>
+            <circle
+              className="tutorial-hint-ring"
+              cx={c.x}
+              cy={c.y}
+              r={ringRadius}
+              fill="none"
+              stroke="#111827"
+              strokeWidth={cellSize * 0.06}
+            />
+            <text
+              className="tutorial-hint-hand"
+              x={c.x}
+              y={c.y + cellSize * 0.72}
+              textAnchor="middle"
+              fontSize={cellSize * 0.85}
+            >
+              👆
+            </text>
+          </g>
+        );
+      })()}
 
       {/* Salida voladora: overlays recortados al rect del tablero (la flecha se
           sale del MUNDO y el borde se la va tragando mientras se funde). */}

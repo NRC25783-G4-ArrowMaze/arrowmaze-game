@@ -1,6 +1,7 @@
 import { sceneFromLevelData, type Scene } from '../scene';
 import { SAMPLE_LEVEL } from '../sampleLevel';
 import { SAMPLE_LEVEL_2 } from '../sampleLevel2';
+import { LEVEL_HEART } from './levelHeart';
 import { LEVEL_INTERMEDIATE_B } from './levelIntermediateB';
 import { LEVEL_ADVANCED } from './levelAdvanced';
 import { LEVEL_EXPERT } from './levelExpert';
@@ -23,4 +24,7 @@ export const LOCAL_LEVELS: Record<string, Scene> = {
   'level-intermediate-b': sceneFromLevelData(LEVEL_INTERMEDIATE_B),
   'level-advanced': sceneFromLevelData(LEVEL_ADVANCED),
   'level-expert': sceneFromLevelData(LEVEL_EXPERT),
+  // Corazón (13 flechas, diseñado en el FORGE) como ÚLTIMO nivel. Su id es
+  // 'heart-preview' (registrado en el backend → leaderboards sin 404).
+  'heart-preview': sceneFromLevelData(LEVEL_HEART),
 };

@@ -35,13 +35,16 @@ const nextLevelIdOf = (levelId: string): string | undefined => {
 };
 
 // `difficulty` guarda una CLAVE semántica (no un literal) que la UI traduce vía
-// catálogo i18n (G2); `name` es CONTENIDO del nivel y se muestra tal cual (P24).
-const LEVEL_METADATA: Record<string, { name: string; difficulty: string }> = {
-  'level-initial': { name: 'Nivel Inicial', difficulty: 'easy' },
-  'level-intermediate-a': { name: 'Desafío A', difficulty: 'medium' },
-  'level-intermediate-b': { name: 'Desafío B', difficulty: 'medium' },
-  'level-advanced': { name: 'Avanzado', difficulty: 'hard' },
-  'level-expert': { name: 'Experto', difficulty: 'veryHard' },
+// catálogo i18n (G2). El NOMBRE del nivel también vive en i18n (`level.name.*`)
+// y lo resuelve la card con `t()`, no aquí. Los 6 niveles están catalogados como
+// "easy".
+const LEVEL_METADATA: Record<string, { difficulty: string }> = {
+  'level-initial': { difficulty: 'easy' },
+  'level-intermediate-a': { difficulty: 'easy' },
+  'heart-preview': { difficulty: 'easy' },
+  'level-intermediate-b': { difficulty: 'easy' },
+  'level-advanced': { difficulty: 'easy' },
+  'level-expert': { difficulty: 'easy' },
 };
 
 /**
