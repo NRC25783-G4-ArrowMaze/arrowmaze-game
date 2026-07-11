@@ -3,13 +3,18 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Versionado según [SemVer](https://semver.org/lang/es/).
 
-## [1.0.0] — 2026-07-10 (pendiente de tag)
+## [1.0.0] — 2026-07-11
 
 Primer release estable: motor de juego completo, persistencia local con
-sincronización remota, identidad de usuario, leaderboard, audio, i18n y
-temporizador por nivel.
+sincronización remota, identidad de usuario, leaderboard, audio, i18n,
+temporizador por nivel, tema claro/oscuro, tutorial guiado y editor de mapas
+(forge).
 
 ### Added
+- **Tutorial guiado**: progresión lineal y corazón (13 flechas) como último nivel (#54)
+- **Tema oscuro (G4)**: tokens claro/oscuro, cambio en caliente y toggle ☀️/🌙 (#53)
+- **Forge**: playtest jugable y opción admin para editar los mapas creados (#60)
+- **Términos y uso de datos** en el registro (proyecto académico) (#51)
 - **Leaderboard** por nivel (clasificación, trofeo en las cards del selector, overlay con 5 estados) (#46)
 - **Auth / cuenta**: UI de login, registro y logout; badge de usuario en el header (#38, #43)
 - **i18n**: catálogos ES/EN con paridad de claves, cambio de idioma en caliente, selector en Ajustes (#35)
@@ -18,6 +23,7 @@ temporizador por nivel.
 - Avance directo al siguiente nivel al ganar, sin pasar por el mapa (#29)
 
 ### Fixed
+- Gate de sesión y scheduler single-flight para la sincronización (#52)
 - Ruta del endpoint de login a `/api/v1/auth/login` (#33)
 - Ruta del adapter de sincronización de progreso a `/api/v1/progress` (#39)
 - Progreso perdido al volver al mapa tras avanzar de nivel (#32)
@@ -25,6 +31,7 @@ temporizador por nivel.
 - `manifest.json` inválido tras un merge anterior (#34)
 
 ### Changed
+- UI responsive y pulido visual del cliente (#49)
 - Escala unificada de los glifos de flecha al 55% (`ARROW_SCALE`, `ARROW_GLYPH`) (#40)
 
 ---
