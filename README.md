@@ -77,6 +77,119 @@ src/
 
 ---
 
+## Design Patterns (GoF)
+
+### Factory Method — `LocalProgressModuleFactory`
+
+Ensambla el módulo de persistencia local + sincronización (driver SQLite, cliente HTTP y los
+casos de uso que dependen de ellos) detrás de un único punto de construcción, para que el resto
+de la app no conozca los detalles de infraestructura concretos.
+
+```ts
+// src/infrastructure/factories/LocalProgressModuleFactory.ts
+export class LocalProgressModuleFactory {
+  public static async create(
+    apiBaseUrl: string,
+    tokenProvider: IAuthTokenProvider
+  ): Promise<LocalProgressModule> {
+    const driver = new CapacitorSqliteDriver();
+    await driver.openDatabase('game_progress_db');
+
+    const repository = new SqliteProgressRepository(driver);
+    await repository.initialize();
+
+    const apiClient = new FetchProgressApiClient(apiBaseUrl, tokenProvider);
+
+    return {
+      saveLocalProgress: new SaveLocalProgress(repository),
+      getLocalProgress: new GetLocalProgress(repository),
+      syncOfflineProgress: new SyncOfflineProgress(repository),
+      syncProgress: new SyncProgress(repository, apiClient),
+    };
+  }
+}
+```
+
+### Adapter — `FetchProgressApiClient`
+
+Adapta el contrato HTTP real del backend (`fetch`, headers, DTOs, códigos de estado) al puerto
+`IProgressApiClient` que la capa de aplicación conoce. La aplicación nunca ve `fetch` ni JSON.
+
+```ts
+// src/infrastructure/api/FetchProgressApiClient.ts
+export class FetchProgressApiClient implements IProgressApiClient {
+  async pushProgress(progress: LevelProgress): Promise<void> {
+    const response = await fetch(`${this._baseUrl}/api/v1/progress`, {
+      method: 'POST',
+      headers: await this.getHeaders(),
+      body: JSON.stringify(this.toDTO(progress)),
+    });
+    if (response.status === 401) throw new SessionExpiredError();
+    if (!response.ok) throw new NetworkError(`Error del servidor: ${response.status}`);
+  }
+}
+```
+
+### State (autómata de pila) — `GameFlowController`
+
+El flujo de una partida (ACTIVE / PAUSED / SETTINGS, C1) se modela como una pila de estados en
+vez de un enum plano: `openSettings()` solo es válido desde `PAUSED`, `resume()` solo desde
+`PAUSED`, etc. — las transiciones inválidas lanzan `InvalidFlowTransitionError` en vez de dejar
+la UI en un estado inconsistente.
+
+```ts
+// src/application/services/GameFlowController.ts
+export class GameFlowController {
+  pause(): void {
+    if (this.current !== 'ACTIVE' || this._session.status !== 'IN_PROGRESS') {
+      throw new InvalidFlowTransitionError('pause', this.current);
+    }
+    this._stack.push('PAUSED');
+  }
+
+  resume(): void {
+    if (this.current !== 'PAUSED') {
+      throw new InvalidFlowTransitionError('resume', this.current);
+    }
+    this._stack.pop();
+  }
+}
+```
+
+---
+
+## SOLID en el código
+
+| Principio | Evidencia |
+|-----------|-----------|
+| **S — Single Responsibility** | Casos de uso de una sola responsabilidad: `SaveLocalProgress`, `GetLocalProgress`, `SyncProgress` viven separados en vez de un "ProgressService" monolítico |
+| **O — Open/Closed** | `InMemoryLevelRepository` implementa `ILevelRepository`; se puede añadir un repositorio SQLite o remoto sin tocar el dominio ni los casos de uso |
+| **L — Liskov Substitution** | Cualquier `I*ApiClient` (`FetchAuthApiClient`, `FetchProgressApiClient`, `FetchLevelApiClient`, `FetchLeaderboardApiClient`) es sustituible donde su puerto se use, sin romper el contrato |
+| **I — Interface Segregation** | Puertos finos y de propósito único en `src/application/ports/` (11 interfaces, p. ej. `IClock`, `IAudioPreferences`, `ILocalProgressRepository` — ver contrato abajo) en vez de una interfaz de infraestructura gigante |
+| **D — Dependency Inversion** | Los casos de uso dependen de abstracciones (`IProgressApiClient`), nunca de `fetch` directo; la implementación concreta se inyecta desde `LocalProgressModuleFactory` |
+
+```ts
+// src/application/ports/ILocalProgressRepository.ts — puerto segregado (I),
+// del que dependen los casos de uso sin conocer SQLite (D)
+export interface ILocalProgressRepository {
+  initialize(): Promise<void>;
+  findByLevelId(levelId: string): Promise<LevelProgress | null>;
+  findAll(): Promise<LevelProgress[]>;
+  save(progress: LevelProgress): Promise<void>;
+  findPendingSync(): Promise<LevelProgress[]>;
+  markAsSynced(levelId: string): Promise<void>;
+}
+```
+
+---
+
+## Diagrama de clases
+
+Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`. Versión navegable en SVG:
+[`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
+
+---
+
 ## Features — Estado sincronizado con arrowmaze-project-core
 
 > **Leyenda:** ✅ Implementado · ⚠️ Parcial · ❌ Pendiente · 📝 Spec lista (sin implementar)
@@ -109,39 +222,39 @@ src/
 |---|---|---|---|
 | [C1](./features/C1-maquina_estados_partida.feature) | Máquina de estados del flujo de una partida (autómata de pila: ACTIVE/PAUSED/SETTINGS) | A4 | ✅ Implementado (`GameFlowController`, PR #22/#23) |
 | [C2](./features/C2-carga-deserializacion-niveles.feature) | Carga y deserialización de definiciones de niveles desde archivos locales | A1, A2 | ✅ Implementado |
-| [C3](./features/C3-seleccion-niveles-progreso.feature) | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | C2, D1 | 📝 Spec lista (Presentation; desbloqueo por grafo, lee D1) |
-| [C4](./features/C4-pantallas-soporte.feature) | Pantallas de soporte del juego (inicio, victoria, derrota, pausa, ajustes) | C1 | ⚠️ Parcial (`GameOverlay` de fin de partida); escenarios Gherkin sin redactar |
+| [C3](./features/C3-seleccion-niveles-progreso.feature) | Pantalla de selección de niveles con indicador de progreso y control de desbloqueo | C2, D1 | ✅ Implementado (`LevelSelectScreen` + `LevelSelectionProjection`, progreso wired desde `App.tsx`) |
+| [C4](./features/C4-pantallas-soporte.feature) | Pantallas de soporte del juego (inicio, victoria, derrota, pausa, ajustes) | C1 | ⚠️ Parcial — `GameOverlay` (victoria/derrota), `PauseOverlay`, `SettingsOverlay` implementados; no hay una pantalla de inicio separada del selector de niveles |
 
 ### Grupo D — Persistencia local
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| [D1](./features/D1-persistencia-local.feature) | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ❌ Pendiente |
-| [D2](./features/D2-sincronizacion-local-remota.feature) | Sincronización del progreso local con el servidor remoto | D1, E2 | ❌ Pendiente |
+| [D1](./features/D1-persistencia-local.feature) | Persistencia local del progreso y puntuaciones del jugador en SQLite | A5 | ✅ Implementado — escritura y lectura (`SqliteProgressRepository`, `SaveLocalProgress`, `GetLocalProgress`) wired en `App.tsx` y consumidas por `LevelSelectScreen` (C3) |
+| [D2](./features/D2-sincronizacion-local-remota.feature) | Sincronización del progreso local con el servidor remoto | D1, E2 | ✅ Implementado — upstream/downstream (`SyncProgress`, wired en `App.tsx`/`GameView`); conflictos resueltos conservando el registro superior (`LevelProgress.isBeatenBy`, P21) |
 
 ### Grupo E — Identidad y sesión
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| [E1](./features/E1-register_and_login.feature) | Registro e inicio de sesión de usuario | — | 📝 Spec lista (backend) |
-| [E2](./features/E2-active_session_management.feature) | Gestión de sesión activa y renovación de credenciales JWT | E1 | 📝 Spec lista (backend) |
+| [E1](./features/E1-register_and_login.feature) | Registro e inicio de sesión de usuario | — | ✅ Implementado — backend congelado en v1.0.0; UI de cuenta en cliente (`LoginUser`, `RegisterUser`, #38) |
+| [E2](./features/E2-active_session_management.feature) | Gestión de sesión activa y renovación de credenciales JWT | E1 | ⚠️ Parcial — persistencia de token/email y logout en 401 (`CapacitorTokenProvider`, `LogoutUser`, badge #43); sin flujo explícito de renovación (refresh) de JWT |
 
 ### Grupo F — Backend / API REST
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| [F1](./features/F1-api_users_auth.feature) | API de autenticación de usuarios (registro, login, logout con JWT) | — | 📝 Spec lista (backend) |
-| [F2](./features/F2-level-api-distribution.feature) | API de distribución y actualización remota de definiciones de niveles | Contrato C2 | 📝 Spec lista (backend) |
-| [F3](./features/F3-recepcion-consulta-progreso.feature) | API de recepción y consulta del progreso del jugador | F1 | 📝 Spec lista (backend) |
-| F4 | Sistema de clasificación por nivel (leaderboard) | F1, F3 | ❌ Pendiente (sin spec) |
+| [F1](./features/F1-api_users_auth.feature) | API de autenticación de usuarios (registro, login, logout con JWT) | — | ✅ Implementado — backend congelado en v1.0.0; consumido por `FetchAuthApiClient` |
+| [F2](./features/F2-level-api-distribution.feature) | API de distribución y actualización remota de definiciones de niveles | Contrato C2 | ✅ Implementado — backend congelado en v1.0.0; consumido por `FetchLevelApiClient` con fallback offline |
+| [F3](./features/F3-recepcion-consulta-progreso.feature) | API de recepción y consulta del progreso del jugador | F1 | ✅ Implementado — backend congelado en v1.0.0; consumido por `FetchProgressApiClient` (`/api/v1/progress`) |
+| F4 | Sistema de clasificación por nivel (leaderboard) | F1, F3 | ✅ Implementado — `FetchLeaderboardApiClient`, `GetLevelLeaderboard`, `LeaderboardOverlay` (#46) |
 
 ### Grupo G — Características de producto
 
 | # | Feature | Depende de | Estado |
 |---|---|---|---|
-| [G1](./features/G1-audio-sfx-musica.feature) | Sistema de reproducción de audio, efectos sonoros y música de fondo | B2 | 📝 Spec lista |
-| [G2](./features/G2-internacionalizacion.feature) | Soporte de internacionalización y cambio de idioma (ES/EN) | C4 | 📝 Spec lista |
-| [G3](./features/G3-temporizador-nivel.feature) | Temporizador visual por nivel (mm:ss, pausa, IClock) | C1 | 📝 Spec lista (solo Presentation; integración con score pendiente de P23) |
+| [G1](./features/G1-audio-sfx-musica.feature) | Sistema de reproducción de audio, efectos sonoros y música de fondo | B2 | ✅ Implementado — SFX y música por dificultad, con preferencia de silencio (`CapacitorAudioPreferences`, `useGameAudio`, #37) |
+| [G2](./features/G2-internacionalizacion.feature) | Soporte de internacionalización y cambio de idioma (ES/EN) | C4 | ✅ Implementado — catálogos ES/EN con test de paridad, cambio en caliente, selector en ajustes (#35) |
+| [G3](./features/G3-temporizador-nivel.feature) | Temporizador visual por nivel (mm:ss, pausa, IClock) | C1 | ⚠️ Parcial — temporizador de Presentation implementado (`useLevelTimer`, `LevelTimerDisplay`, #36); integración con el score pendiente (P23) |
 
 ### Grupo H — Herramientas internas
 
@@ -270,4 +383,4 @@ pnpm build
 
 ## Licencia
 
-Proyecto privado. Todos los derechos reservados.
+MIT — ver [`LICENSE`](./LICENSE).

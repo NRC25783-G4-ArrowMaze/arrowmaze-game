@@ -3,6 +3,14 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
 import { initSqliteWebStore } from './infrastructure/persistence/sqlite/initWebSqlite'
+import { I18nProvider } from './presentation/i18n/I18nProvider'
+import { CapacitorLanguagePreference } from './infrastructure/i18n/CapacitorLanguagePreference'
+import { AudioProvider } from './presentation/audio/AudioProvider'
+import { ThemeProvider } from './presentation/theming/ThemeProvider'
+import { CapacitorThemePreference } from './infrastructure/theme/CapacitorThemePreference'
+
+const languagePreference = new CapacitorLanguagePreference()
+const themePreference = new CapacitorThemePreference()
 
 // El web store de SQLite debe estar listo antes de que el bootstrap de la App
 // abra la conexión (en nativo es un no-op).
@@ -15,7 +23,13 @@ initSqliteWebStore()
   .finally(() => {
     createRoot(document.getElementById('root')!).render(
       <StrictMode>
-        <App />
+        <ThemeProvider preferenceProvider={themePreference}>
+          <I18nProvider preferenceProvider={languagePreference}>
+            <AudioProvider>
+              <App />
+            </AudioProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </StrictMode>,
     )
   })

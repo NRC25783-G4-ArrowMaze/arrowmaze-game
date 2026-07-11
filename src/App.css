@@ -4,9 +4,33 @@
 
 .app {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+  background: linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%);
+}
+
+/* Playtest del FORGE: el GameView se reutiliza dentro de un modal, no a pantalla
+   completa. Sin estos overrides, `.app` (min-height:100dvh) y `.board-frame`
+   (width relativo a 100dvh) se dimensionan contra el viewport y el tablero se
+   desborda del modal, quedando fuera de vista. Aquí se acota todo al contenedor
+   del modal. */
+.forge-playtest {
+  height: 100%;
+  overflow: auto;
+}
+
+.forge-playtest .app {
+  min-height: 0;
+  height: 100%;
+}
+
+.forge-playtest .board-frame {
+  width: min(100%, 56vh, 480px);
+}
+
+.forge-playtest .app-main {
+  padding: clamp(8px, 1.5vh, 16px) clamp(8px, 2vw, 16px);
 }
 
 .app-header {
@@ -14,17 +38,17 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 16px 24px;
-  background: white;
-  border-bottom: 3px solid #e0e4e8;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  padding: clamp(10px, 1.5vh, 16px) clamp(12px, 3vw, 32px);
+  background: var(--surface);
+  border-bottom: 3px solid var(--border-soft);
+  box-shadow: var(--shadow-sm);
 }
 
 .app-header h1 {
   margin: 0 auto 0 0; /* empuja acciones y stats a la derecha */
-  font-size: 28px;
+  font-size: clamp(20px, 1.4rem + 0.8vw, 30px);
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text);
   letter-spacing: -0.5px;
 }
 
@@ -35,9 +59,18 @@
   gap: 8px;
 }
 
+/* Botón compacto del header con icono (⚙️ ajustes, 👤 cuenta). El icono va en
+   un span aria-hidden; la semántica la dan el texto o el aria-label. */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4em 0.8em;
+}
+
 .app-stats {
   display: flex;
-  gap: 24px;
+  gap: clamp(12px, 2vw, 28px);
   align-items: center;
 }
 
@@ -48,27 +81,27 @@
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: clamp(10px, 0.55rem + 0.3vw, 12px);
   font-weight: 600;
-  color: #666;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
-  font-size: 36px;
+  font-size: clamp(26px, 1.4rem + 1.2vw, 40px);
   font-weight: 800;
-  color: #3b82f6;
+  color: var(--primary);
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
 
 .stat-status {
-  font-size: 14px;
+  font-size: clamp(12px, 0.7rem + 0.2vw, 14px);
   font-weight: 500;
-  color: #666;
+  color: var(--text-muted);
   padding: 8px 12px;
-  background: #f0f4f8;
+  background: var(--surface-muted);
   border-radius: 6px;
   min-width: 100px;
   text-align: center;
@@ -76,12 +109,12 @@
 
 .stat-status--won {
   color: var(--success);
-  background: #f0fdf4;
+  background: var(--success-bg);
 }
 
 .stat-status--lost {
   color: var(--danger);
-  background: #fef2f2;
+  background: var(--danger-bg);
 }
 
 .app-main {
@@ -89,18 +122,57 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 32px 20px;
+  padding: clamp(12px, 2.5vh, 32px) clamp(8px, 2.5vw, 24px);
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
 /* Board Container */
 /* ─────────────────────────────────────────────────────────────────── */
 
-.app-main > div {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+/* El lado del cuadrado lo fija width (aspect-ratio 1/1): 100% en móvil,
+   la altura visible menos el chrome (header + paddings) en landscape/desktop
+   bajo, y 760px de tope en pantallas grandes. */
+.board-frame {
+  width: min(100%, calc(100vh - 190px), 760px);
+  width: min(100%, calc(100dvh - 190px), 760px);
+  box-shadow: var(--shadow-md);
   border-radius: 12px;
   overflow: hidden;
-  background: white;
+  /* Mismo token que el lienzo SVG: las esquinas redondeadas no desentonan. */
+  background: var(--board-bg);
+}
+
+/* ─────────────────────────────────────────────────────────────────── */
+/* Overlays modales */
+/* ─────────────────────────────────────────────────────────────────── */
+
+/* Escala de z-index: 100 overlays modales, 200 Toast (visible sobre modal).
+   OJO: position:fixed ancla al viewport solo mientras ningún ancestro cree
+   containing block (transform/filter/perspective/will-change/contain). */
+.overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 3vw, 32px);
+  background: var(--backdrop);
+}
+
+.overlay-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: min(440px, 100%);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: clamp(20px, 4vw, 32px);
+  text-align: center;
 }
 
 /* ─────────────────────────────────────────────────────────────────── */
@@ -118,37 +190,41 @@
   }
 }
 
-/* ─────────────────────────────────────────────────────────────────── */
-/* Responsive */
-/* ─────────────────────────────────────────────────────────────────── */
+/* ── Tutorial guiado: manito con sombra + anillo pulsante sobre la celda ── */
 
-@media (max-width: 768px) {
-  .app-header {
-    padding: 12px 12px;
-    gap: 8px;
+/* Anillo que se expande y se desvanece, como una onda de "toca aquí". */
+@keyframes tutorial-ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.9;
   }
+  70%,
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
 
-  .app-header h1 {
-    font-size: 20px;
-  }
+.tutorial-hint-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tutorial-ring 1.4s ease-out infinite;
+}
 
-  .app-stats {
-    gap: 12px;
+/* La manito baja y sube: el gesto de dar un toque. */
+@keyframes tutorial-tap {
+  0%,
+  100% {
+    transform: translateY(0);
   }
+  50% {
+    transform: translateY(8%);
+  }
+}
 
-  .stat-value {
-    font-size: 28px;
-  }
-
-  .stat-label {
-    font-size: 10px;
-  }
-
-  .stat-status {
-    font-size: 12px;
-  }
-
-  .app-main {
-    padding: 12px 8px;
-  }
+.tutorial-hint-hand {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tutorial-tap 1s ease-in-out infinite;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
 }

@@ -9,12 +9,24 @@ import { useBoardInput } from '../input/useBoardInput';
 import type { Scene } from '../game/scene';
 import { type LocalProgressModule } from '../../infrastructure/factories/LocalProgressModuleFactory';
 import { Score } from '../../domain/value-objects/Score';
+import { useTranslation } from '../i18n/I18nContext';
+import { useLevelTimer } from '../game/useLevelTimer';
+import { LevelTimerDisplay } from './LevelTimerDisplay';
+import { useAudioContext } from '../audio/AudioContext';
+import { useGameAudio } from '../game/useGameAudio';
+import { useTutorial } from '../game/useTutorial';
 
 const BOARD_SIZE = 560;
 
 interface GameViewProps {
   scene: Scene;
   progressModule: LocalProgressModule | null;
+  /**
+   * Pide una sincronización de progreso al composition root (scheduler con
+   * gate de sesión y single-flight). GameView no llama al sync directo: la
+   * política (¿hay sesión?, ¿hay uno en vuelo?) vive en App.
+   */
+  requestSync?: () => void;
   /** Si se provee, muestra un botón para volver al mapa de selección (C3). */
   onBack?: () => void;
   /**
@@ -22,6 +34,8 @@ interface GameViewProps {
    * nivel del mapa sin pasar por la selección.
    */
   onNextLevel?: () => void;
+  /** Dificultad semántica del nivel (easy/medium/hard/veryHard) para la música (G1). */
+  difficulty?: string;
 }
 
 /**
@@ -37,8 +51,28 @@ interface GameViewProps {
  *      colisión o salida, reproyectando la forma real del dominio en cada paso.
  *   3. El input queda bloqueado mientras el slide está en vuelo.
  */
-export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBack, onNextLevel }) => {
+export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, requestSync, onBack, onNextLevel, difficulty }) => {
+  const { t } = useTranslation();
   const game = useGameController(scene);
+
+  // Timer visual (G3): cuenta tiempo activo (IN_PROGRESS y flujo ACTIVE); se
+  // congela en PAUSED/WON/LOST y se reinicia cuando restart reemplaza el
+  // controller. Proyección de presentación: no toca el dominio ni el score.
+  const timerRunning = game.status === 'IN_PROGRESS' && game.flowState === 'ACTIVE';
+  const timeSeconds = useLevelTimer(timerRunning, game.controller);
+
+  // Audio (G1): proyección de solo lectura del estado del juego → SFX por
+  // outcome, música en loop por dificultad, controles/mute desde Ajustes.
+  const { engine, unlocked, prefs } = useAudioContext();
+  useGameAudio({
+    status: game.status,
+    flowState: game.flowState,
+    difficulty,
+    tickOutcome: game.tickOutcome,
+    prefs,
+    unlocked,
+    engine,
+  });
 
   // Marca de inicio del nivel: el tiempo se mide en presentación
   // (el motor no modela tiempo de partida).
@@ -64,16 +98,23 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
         .execute(scene.id, Score.createSimpleScore(game.score), movesUsed, timeElapsedSeconds)
         .then(() => {
           console.log(`[GameView] Progreso local guardado para el nivel ${scene.id}`);
-          // Intentamos subir el récord de inmediato tras ganar, si hay internet.
+          // Pide el sync al composition root: el scheduler decide (gate de
+          // sesión + single-flight). Sin sesión, es un no-op silencioso.
           if (!offlineMode) {
-            return progressModule.syncProgress.execute();
+            requestSync?.();
           }
         })
         .catch((error: unknown) => {
-          console.error('[GameView] Error guardando o sincronizando el récord:', error);
+          console.error('[GameView] Error guardando el récord:', error);
         });
     }
-  }, [game.status, game.score, game.movesRemaining, progressModule, scene]);
+  }, [game.status, game.score, game.movesRemaining, progressModule, requestSync, scene]);
+
+  // Tutorial guiado del primer nivel (solo la primera vez): la manito señala la
+  // flecha del paso actual mientras el tablero acepta toques.
+  const boardInteractive =
+    game.status === 'IN_PROGRESS' && !game.inFlight && game.flowState === 'ACTIVE';
+  const { hintCell, notifyMove } = useTutorial(scene, boardInteractive);
 
   const onPointerDown = useBoardInput({
     width: BOARD_SIZE,
@@ -81,30 +122,32 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
     layout,
     // Bloqueo: input deshabilitado en estado terminal, con un slide en vuelo,
     // o cuando el tope de la pila de flujo no es ACTIVE (C1: PAUSED/SETTINGS).
-    enabled: game.status === 'IN_PROGRESS' && !game.inFlight && game.flowState === 'ACTIVE',
+    enabled: boardInteractive,
     resolveArrowIdAt: (col, row) => game.controller.resolveArrowIdAt(col, row),
-    onPlayMove: (command) => game.playMove(command),
+    onPlayMove: (command) => {
+      // Avanza el tutorial cuando se juega la flecha guiada (no-op fuera del nivel-tutorial).
+      notifyMove(command.arrowId);
+      game.playMove(command);
+    },
   });
 
   return (
     <div className="app">
       <header className="app-header">
-        <h1>Arrow Maze</h1>
+        <h1>{t('app.title')}</h1>
         <div className="app-actions">
-          {onBack && (
-            <button onClick={onBack}>← Volver</button>
-          )}
           {game.status === 'IN_PROGRESS' && (
             <button onClick={game.pause} disabled={game.inFlight}>
-              ⏸ Pausa
+              {t('game.pause')}
             </button>
           )}
         </div>
         <div className="app-stats">
-          <div className="stat-moves">
-            <span className="stat-label">Movimientos</span>
+          <div className="stat-moves" aria-label={t('game.movesLeft', { count: game.movesRemaining })}>
+            <span className="stat-label">{t('game.moves')}</span>
             <span className="stat-value">{game.movesRemaining}</span>
           </div>
+          <LevelTimerDisplay seconds={timeSeconds} />
           <div
             className={
               game.status === 'WON'
@@ -115,21 +158,20 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             }
           >
             {game.status === 'IN_PROGRESS'
-              ? '▶ En juego'
+              ? t('game.status.inProgress')
               : game.status === 'WON'
-                ? '✓ Victoria'
-                : '✗ Derrota'}
+                ? t('game.status.won')
+                : t('game.status.lost')}
           </div>
         </div>
       </header>
       <main className="app-main">
+        {/* El sizing fluido vive en .board-frame (App.css); BOARD_SIZE queda
+            como tamaño lógico del viewBox del SVG. */}
         <div
+          className="board-frame"
           style={{
             position: 'relative',
-            // Fluido: ocupa el ancho disponible (cuadrado) con tope en desktop.
-            // BOARD_SIZE queda como tamaño lógico del viewBox del SVG.
-            width: '100%',
-            maxWidth: BOARD_SIZE,
             aspectRatio: '1 / 1',
           }}
         >
@@ -141,10 +183,12 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, onBac
             collision={game.collision ?? undefined}
             vanishing={game.vanishing ?? undefined}
             headDisintegrating={game.headDisintegrating ?? undefined}
+            hintCell={hintCell ?? undefined}
           />
           <GameOverlay
             status={game.status}
             score={game.score}
+            timeSeconds={timeSeconds}
             onNextLevel={onNextLevel}
             onBackToMap={onBack}
           />

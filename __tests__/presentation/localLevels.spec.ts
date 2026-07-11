@@ -19,6 +19,9 @@ const SOLVE_ORDERS: Record<string, string[]> = {
   'level-initial': ['blue', 'orange', 'green'],
   // Teselado de sample-level-2: primero los que escapan por el borde S.
   'level-intermediate-a': ['cyan', 'rose', 'orange', 'magenta', 'violet', 'green', 'amber', 'blue'],
+  // NOTA: 'heart-preview' (corazón de 13 flechas del FORGE, último nivel) NO se
+  // lista aquí a propósito — es un nivel-vitrina con forma de icono cuyo orden de
+  // resolución no está cerrado. El test de "carga sin errores" sí lo cubre.
   // Oleadas por fila: el bloque del lado de escape libera a sus vecinos.
   'level-intermediate-b': [
     'top-right', 'top-mid', 'top-left',

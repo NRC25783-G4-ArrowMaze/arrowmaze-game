@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { GameController } from './GameController';
 import type { Scene } from './scene';
 import type { GameStatus } from '../../domain/entities/GameSession';
+import type { AdvanceOutcome } from '../../domain/value-objects/AdvanceResult';
 import type { GameFlowState } from '../../application/dtos/GameFlowDTOs';
 import { GameFlowController } from '../../application/services/GameFlowController';
 import type { BoardViewModel } from '../viewModel';
@@ -62,6 +63,16 @@ export interface HeadDisintegratingSignal {
   nonce: number;
 }
 
+/**
+ * Signal del outcome del último tick (patrón "caller" de B2) para que la
+ * presentación —p. ej. el audio (G1)— observe qué resolvió el motor sin tocar
+ * el dominio. El nonce cambia en cada tick para re-disparar aunque se repita.
+ */
+export interface TickOutcomeSignal {
+  outcome: AdvanceOutcome;
+  nonce: number;
+}
+
 /** Estado y acciones del juego expuestos a la capa de React. */
 export interface GameControllerState {
   /** Instancia estable del controlador (para consultas como resolveArrowIdAt). */
@@ -79,6 +90,8 @@ export interface GameControllerState {
   vanishing: VanishSignal | null;
   /** Cabeza desintegrándose justo antes del burst. Null si no hay. */
   headDisintegrating: HeadDisintegratingSignal | null;
+  /** Outcome del último tick (para audio G1). Null si aún no hubo ninguno. */
+  tickOutcome: TickOutcomeSignal | null;
   /** Inicia un slide: avanza la flecha tick-a-tick hasta colisión o salida. */
   playMove: (command: PlayMoveCommand) => void;
   /** Tope de la pila de flujo (C1). Solo con 'ACTIVE' el tablero recibe input. */
@@ -129,6 +142,8 @@ export function useGameController(scene: Scene): GameControllerState {
   const [vanishing, setVanishing] = useState<VanishSignal | null>(null);
   const [headDisintegrating, setHeadDisintegrating] =
     useState<HeadDisintegratingSignal | null>(null);
+  const [tickOutcome, setTickOutcome] = useState<TickOutcomeSignal | null>(null);
+  const tickOutcomeNonce = useRef(0);
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const glideBackTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -264,6 +279,12 @@ export function useGameController(scene: Scene): GameControllerState {
         const outcome = controller.advanceTick(command.arrowId);
         setVersion((v) => v + 1); // reproyecta la forma real de este tick
 
+        // Surfacea el outcome para la presentación (audio G1); nonce siempre nuevo.
+        if (outcome !== null) {
+          tickOutcomeNonce.current += 1;
+          setTickOutcome({ outcome, nonce: tickOutcomeNonce.current });
+        }
+
         if (outcome === 'advanced') {
           if (isReturn) {
             recordShape(); // graba la nueva posición para el regreso
@@ -363,6 +384,7 @@ export function useGameController(scene: Scene): GameControllerState {
     setCollision(null);
     setVanishing(null);
     setHeadDisintegrating(null);
+    setTickOutcome(null);
     setInFlight(false);
     setVersion((v) => v + 1);
   }, [flow, scene]);
@@ -377,6 +399,7 @@ export function useGameController(scene: Scene): GameControllerState {
     collision,
     vanishing,
     headDisintegrating,
+    tickOutcome,
     playMove,
     flowState,
     pause,

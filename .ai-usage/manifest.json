@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-07T00:00:00Z",
+    "lastUpdated": "2026-07-10T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -1780,11 +1780,1161 @@
           "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
         ],
         "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
+      },
+      {
+        "id": "2026-07-07-002",
+        "date": "2026-07-07",
+        "title": "Servicio de Inicio de Sesión (LoginUser) — Autenticación del Cliente Móvil",
+        "file": "2026-07-07-login-service.md",
+        "tool": "Gemini",
+        "model": "Gemini (versión no especificada)",
+        "author": "@SantiagoChirinos",
+        "phase": "implementation",
+        "feature": "login-service",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 1,
+          "tests_added": 3
+        },
+        "areas": [
+          "authentication",
+          "clean-architecture",
+          "application-layer",
+          "infrastructure-adapter",
+          "ports-and-adapters",
+          "testing"
+        ],
+        "validation": {
+          "tests": "passed — 3 tests nuevos en LoginUser.spec.ts (éxito, credenciales inválidas, error de red)",
+          "type_check": "passed — ajuste de IAuthTokenProvider tras error TS2551 (setToken/removeToken)"
+        },
+        "decisions": [
+          "Autenticación tratada como obtención de credenciales a nivel de infraestructura/aplicación; no se modela entidad de usuario en el cliente para esta etapa",
+          "LoginUser no captura errores de negocio ni de red: los propaga para que la capa de presentación (React) los maneje",
+          "DTO de respuesta simplificado a { token }, delegando la validación de éxito al código de estado HTTP"
+        ],
+        "notes": "Añade el caso de uso LoginUser, el adaptador FetchAuthApiClient y el contrato IAuthApiClient, extendiendo IAuthTokenProvider con setToken/removeToken. Aún no conectado a la UI (App.tsx conserva el TODO pendiente de redirección a Login)."
+      },
+      {
+        "id": "2026-07-08-001",
+        "date": "2026-07-08",
+        "title": "Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF",
+        "file": "2026-07-08-pr30-login-service-followup.md",
+        "tool": "Antigravity (Gemini)",
+        "model": "Claude Opus 4.6 (Thinking)",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "login-service",
+        "linked_session": "2026-07-07-002",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 7,
+          "tests_added": 4
+        },
+        "areas": [
+          "bugfix",
+          "infrastructure-adapter",
+          "testing",
+          "code-style",
+          "documentation"
+        ],
+        "validation": {
+          "tests": "passed — 35 suites / 324 tests (4 nuevos de FetchAuthApiClient)",
+          "type_check": "passed — tsc --noEmit limpio",
+          "diff_review": "passed — solo archivos esperados modificados"
+        },
+        "decisions": [
+          "Guard de NetworkError replica patrón de FetchLevelApiClient para consistencia inter-adaptadores",
+          "Test del caso 200-sin-token verifica que el Error genérico se re-envuelve como NetworkError"
+        ],
+        "notes": "Resolución de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
+      },
+      {
+        "id": "2026-07-08-002",
+        "date": "2026-07-08",
+        "title": "Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2)",
+        "file": "2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-avance-siguiente-nivel-progreso-perdido",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 1,
+          "commits": 2
+        },
+        "areas": [
+          "bugfix",
+          "level-select",
+          "local-progress",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio"
+        },
+        "decisions": [
+          "handleNextLevel falla cerrado (vuelve al mapa) si no puede verificar el desbloqueo, en vez de avanzar a ciegas",
+          "Fix aplicado sobre una rama basada en dev (base real del flujo del equipo)",
+          "Causa raíz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
+        ],
+        "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo botón funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md."
+      },
+      {
+        "id": "2026-07-08-003",
+        "date": "2026-07-08",
+        "title": "Quitar el botón \"Volver\" redundante del header de partida",
+        "file": "2026-07-08-fix-boton-volver-header-redundante.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "claude-sonnet-5",
+        "author": "@Jrgil20",
+        "phase": "maintenance",
+        "feature": "fix-boton-volver-header-redundante",
+        "linked_session": "2026-07-08-002",
+        "status": "completed",
+        "deliverables": {
+          "files_modified": 1,
+          "commits": 1
+        },
+        "areas": [
+          "bugfix",
+          "ui-cleanup",
+          "navigation"
+        ],
+        "validation": {
+          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed — tsc --noEmit limpio",
+          "lint": "passed — eslint sin hallazgos en el archivo modificado"
+        },
+        "decisions": [
+          "Quitar el botón Volver del header de GameView por quedar duplicado con Salir (PauseOverlay) y Volver al mapa (GameOverlay)",
+          "Conservar el botón de Pausa en el header, sin equivalente en otro lugar durante la partida en curso"
+        ],
+        "notes": "Continuación directa de la sesión 2026-07-08-002 (fix de avance de nivel)."
+      },
+      {
+        "id": "2026-07-08-004",
+        "date": "2026-07-08",
+        "title": "Fix del bug de ruta del login en PR #30 (/api/v1/auth/login) + corrección de su test",
+        "file": "2026-07-08-fix-ruta-login-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "review",
+        "feature": "login-service",
+        "linked_session": "2026-07-08-001",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 2,
+          "tests_added": 0
+        },
+        "areas": [
+          "pr-review",
+          "bugfix",
+          "infrastructure-adapter",
+          "api-client",
+          "auth"
+        ],
+        "validation": {
+          "tests": "passed — 35 suites / 324 tests (7/7 en el módulo login)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "diff_review": "passed — solo 2 archivos del fix (ruido de Git LFS en android/*.png excluido)"
+        },
+        "decisions": [
+          "Resguardar el trabajo local en backup/pr30-fix-local y resetear a origin antes de re-aplicar el fix, evitando divergencia y conflictos con el push paralelo de Santiago",
+          "Ruta verificada contra el backend real (arrowmaze-backend src/index.ts, app.use('/api/v1/auth'))",
+          "Corregir la aserción del test de Santiago (fijaba /api/auth/login) para que proteja de la regresión en vez de codificarla"
+        ],
+        "notes": "El follow-up de Santiago (2026-07-08-001) cerró 3 hallazgos menores pero omitió el bug de ruta (404) y su test aseguraba la URL incorrecta. Como revisor se re-aplicó el fix de ruta sobre su versión y se corrigió la aserción; suite en verde."
+      },
+      {
+        "id": "2026-07-08-005",
+        "date": "2026-07-08",
+        "title": "G2: Internacionalización ES/EN (SDD)",
+        "file": "2026-07-08-g2-internacionalizacion.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "G2-internacionalizacion",
+        "linked_session": "features/G2-internacionalizacion.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 10,
+          "files_modified": 10,
+          "files_renamed": 1,
+          "tests_added": 21
+        },
+        "areas": [
+          "presentation-layer",
+          "i18n",
+          "react-context",
+          "hooks",
+          "application-port",
+          "infrastructure-adapter",
+          "spec-driven",
+          "gherkin-bdd"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "ports": [
+              "ILanguagePreferenceProvider"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": [
+              "CapacitorLanguagePreference (@capacitor/preferences)"
+            ]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "i18n/catalogs/es.ts",
+              "i18n/catalogs/en.ts",
+              "i18n/I18nContext.ts",
+              "i18n/I18nProvider.tsx"
+            ],
+            "modified": [
+              "i18n/i18n.ts (motor: translate+fallback+interpolación+resolución)",
+              "GameOverlay",
+              "GameView",
+              "PauseOverlay",
+              "SettingsOverlay (+ selector de idioma)",
+              "LevelSelectScreen",
+              "LevelNodeCard",
+              "App.tsx",
+              "main.tsx"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 40 suites / 351 tests (base dev 36/330 → +4 suites, +21 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos nuevos/modificados — queda 1 error preexistente en LevelSelectScreen (set-state-in-effect), ajeno a G2"
+        },
+        "decisions": [
+          "i18n exclusivamente en presentación (invariante del spec): cero cambios en domain y application/services; único puerto nuevo en application/ports + impl en infrastructure",
+          "Test de paridad de claves ES/EN primero (sello QA del Background); fallback a EN (D4); interpolación {param}",
+          "Resolución D1/D2: preferencia guardada > locale (es* → ES, resto → EN), con puerto persistido patrón IAuthTokenProvider",
+          "Cambio en caliente (D3) con Context + hook useTranslation; probado end-to-end (re-render sin perder estado + persistencia)",
+          "c3.* → levelSelect.*; LEVEL_METADATA.difficulty a clave semántica; nombres de nivel NO se traducen (P24)",
+          "Trade-off de tests: patrón puro incompatible con hooks → render() solo en los 4 specs con contexto i18n; lógica pura como función pura"
+        ],
+        "notes": "Implementación SDD de G2 con parada obligatoria en la tabla de inventario antes de tocar código. FORGE fuera de alcance (follow-up H1). Fuente: features/G2-internacionalizacion.feature (idéntico a project-core main, verificado por el autor)."
+      },
+      {
+        "id": "2026-07-08-006",
+        "date": "2026-07-08",
+        "title": "G3: Temporizador de nivel (SDD)",
+        "file": "2026-07-08-g3-temporizador-nivel.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "G3-temporizador-nivel",
+        "linked_session": "features/G3-temporizador-nivel.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 8,
+          "files_modified": 5,
+          "tests_added": 19
+        },
+        "areas": [
+          "presentation-layer",
+          "timer",
+          "clock-port",
+          "react-hooks",
+          "application-port",
+          "infrastructure-adapter",
+          "i18n",
+          "spec-driven",
+          "gherkin-bdd"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "ports": [
+              "IClock"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": [
+              "SystemClock (Date.now)"
+            ]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "game/levelTimer.ts (LevelTimer + formatDuration)",
+              "game/useLevelTimer.ts",
+              "components/LevelTimerDisplay.tsx"
+            ],
+            "modified": [
+              "components/GameView.tsx (display en header)",
+              "components/GameOverlay.tsx (tiempo final junto al score)",
+              "i18n/catalogs/es.ts",
+              "i18n/catalogs/en.ts"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 43 suites / 370 tests (base dev 40/351 → +3 suites, +19 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos G3 (eslint-disable puntual react-hooks/set-state-in-effect en useLevelTimer, patrón del repo)"
+        },
+        "decisions": [
+          "Timer como proyección de presentación: cuenta hacia arriba mm:ss, nunca causa derrota, no toca dominio ni score (P23 fuera)",
+          "Puerto IClock inyectable (D3): SystemClock en infra, FakeClock en tests; el tiempo pausado NO se acumula (bug clásico cubierto)",
+          "Congela en PAUSED y detiene en WON/LOST conservando el valor; restart → 00:00; tiempo final visible en el overlay",
+          "El Date.now() preexistente de la marca de tiempo del score queda INTACTO (P23 fuera, persistencia bajo investigación); follow-up documentado",
+          "Trade-off de tests: lógica pura con FakeClock; render() para componentes con contexto i18n"
+        ],
+        "notes": "SDD con parada obligatoria en la tabla de diseño antes de tocar código. Claves i18n nuevas (game.time, game.timeElapsed, overlay.time) en ambos catálogos. Follow-ups: cerrar P23 (tiempo→score, enmienda A5) y migrar la marca de tiempo del score a IClock cuando termine la investigación de persistencia."
+      },
+      {
+        "id": "2026-07-09-001",
+        "date": "2026-07-09",
+        "title": "G1: Audio (SFX + música) (SDD)",
+        "file": "2026-07-09-g1-audio-sfx-musica.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "G1-audio-sfx-musica",
+        "linked_session": "features/G1-audio-sfx-musica.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 20,
+          "files_modified": 8,
+          "tests_added": 26,
+          "assets_added": 8
+        },
+        "areas": [
+          "presentation-layer",
+          "audio",
+          "sfx",
+          "music",
+          "application-port",
+          "infrastructure-adapter",
+          "react-context",
+          "i18n",
+          "assets-lfs",
+          "spec-driven"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "ports": [
+              "IAudioPreferences"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": [
+              "CapacitorAudioPreferences (@capacitor/preferences)"
+            ]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "audio/audioPolicy.ts (puro)",
+              "audio/AudioEngine.ts",
+              "audio/audioCredits.ts",
+              "audio/AudioContext.ts",
+              "audio/AudioProvider.tsx",
+              "game/useGameAudio.ts"
+            ],
+            "modified": [
+              "game/useGameController.ts (+signal tickOutcome)",
+              "components/GameView.tsx (monta audio + prop difficulty)",
+              "components/SettingsOverlay.tsx (controles + créditos)",
+              "App.tsx (difficulty desde LEVEL_METADATA)",
+              "main.tsx (AudioProvider)",
+              "i18n/catalogs/es.ts",
+              "i18n/catalogs/en.ts"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 47 suites / 396 tests (base dev 43/370 → +4 suites, +26 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos G1",
+          "assets": "8 mp3 royalty-free (~3.6MB, P22 <10MB) versionados en Git LFS"
+        },
+        "decisions": [
+          "Audio como proyección de SOLO LECTURA: cero cambios en domain/application-services; el audio observa, nunca escribe",
+          "SFX por outcome del motor (destroyed→exited); prioridad exited>blocked>advanced para no encimar SFX por tick",
+          "Música por dificultad (pool de 3): veryHard→hard, desconocida→easy; solo en gameplay, pausa sin reiniciar",
+          "Puerto IAudioPreferences + impl Capacitor; mute global + volúmenes independientes; autoplay tras 1ª interacción (D4)",
+          "Robustez: asset ausente / play() rechazado = no-op silencioso (try/catch en el engine), el juego jamás se rompe",
+          "signal tickOutcome en useGameController = extensión solo de presentación; créditos desde LICENCIAS.txt (contenido, no i18n)"
+        ],
+        "notes": "Rama apilada sobre G3 (PR #36); el PR de G1 se abre tras mergear #36 con rebase --onto origin/dev. Base de assets '/audio' (Vite raíz + Capacitor); prefijar con BASE_URL si el build usa base no-raíz (follow-up menor). Assets nombrados corto (easy/medium/hard.mp3)."
+      },
+      {
+        "id": "2026-07-09-002",
+        "date": "2026-07-09",
+        "title": "E: UI de Cuenta (login/registro/logout) (SDD)",
+        "file": "2026-07-09-e-ui-cuenta.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "E-ui-cuenta",
+        "linked_session": "features/E1-register_and_login.feature + features/E2-active_session_management.feature",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 8,
+          "files_modified": 8,
+          "tests_added": 42,
+          "assets_added": 0
+        },
+        "areas": [
+          "application-service",
+          "application-port",
+          "auth",
+          "infrastructure-adapter",
+          "presentation-layer",
+          "overlay",
+          "i18n",
+          "validation",
+          "spec-driven"
+        ],
+        "layers": {
+          "application": {
+            "status": "extended",
+            "created": [
+              "services/credentialPolicy.ts (puro)",
+              "services/RegisterUser.ts",
+              "services/LogoutUser.ts"
+            ],
+            "modified": [
+              "ports/IAuthApiClient.ts (+register, +logout)",
+              "errors/AuthErrors.ts (ValidationError, EmailAlreadyInUseError)"
+            ]
+          },
+          "infrastructure": {
+            "status": "extended",
+            "adapters": [
+              "FetchAuthApiClient (+register /api/v1/auth/register, +logout /api/v1/auth/logout Bearer)"
+            ]
+          },
+          "presentation": {
+            "status": "extended",
+            "created": [
+              "components/AccountOverlay.tsx"
+            ],
+            "modified": [
+              "App.tsx (composition root auth + botón Cuenta + estado de sesión)",
+              "i18n/catalogs/es.ts (account.*)",
+              "i18n/catalogs/en.ts (account.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 51 suites / 438 tests (base G1 47/396 → +4 suites, +42 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed en archivos nuevos/modificados (deuda de lint preexistente fuera de alcance)",
+          "security": "el password nunca se persiste ni se loguea; la sesión es el token (sin datos personales nuevos)"
+        },
+        "decisions": [
+          "Validadores puros en application/services/credentialPolicy (política E1 literal), consumidos por RegisterUser y por el overlay; LoginUser intacto",
+          "Contrato F1 gana: register devuelve 201 sin token ⇒ sin auto-login; post-registro vuelve a login con mensaje de éxito",
+          "LogoutUser fail-open local: removeToken() en finally aunque la red falle (el JTI expira solo en 7 días)",
+          "Anti-enumeración E1: credenciales inválidas y usuario inexistente comparten un único mensaje i18n",
+          "Errores mapeados a i18n por TIPO (ValidationError.field, EmailAlreadyInUseError, InvalidCredentialsError, NetworkError); nunca el mensaje crudo",
+          "AccountOverlay indistinguible de PauseOverlay/SettingsOverlay (btn-primary, paleta del repo); botón Cuenta en App, LevelSelectScreen intacto"
+        ],
+        "notes": "Rama apilada sobre G1 (PR #37); el PR de E se abre tras mergear #37 con rebase --onto origin/dev feature/g1-audio-sfx-musica feature/e-ui-cuenta. Spec del adapter asserta URL+method+Bearer+status (red de seguridad #30). Pendiente acumulado el docs: de gen-uml + árbol de arquitectura."
+      },
+      {
+        "id": "2026-07-09-003",
+        "date": "2026-07-09",
+        "title": "Fix: ruta del adapter de progreso a /api/v1/progress",
+        "file": "2026-07-09-fix-ruta-progress-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "bugfix",
+        "feature": "fix/ruta-progress-v1",
+        "linked_session": "bug de QA de la feature E; misma clase que el #33 (contrato HTTP)",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 1,
+          "tests_added": 4,
+          "assets_added": 0
+        },
+        "areas": [
+          "infrastructure-adapter",
+          "bugfix",
+          "http-contract",
+          "sync-d2"
+        ],
+        "layers": {
+          "infrastructure": {
+            "status": "fixed",
+            "modified": [
+              "api/FetchProgressApiClient.ts (/api/progress → /api/v1/progress en pushProgress y fetchUserProgress)"
+            ],
+            "created": [
+              "__tests__/infrastructure/FetchProgressApiClient.spec.ts (red de seguridad: URL+method+Bearer)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 48 suites / 400 tests (dev-base 47/396 → +1 suite, +4 tests; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "sin cambios de estilo relevantes"
+        },
+        "decisions": [
+          "Ruta corregida en AMBOS métodos (upload POST + download GET); verificada contra el backend (ProgressRoutes monta POST / y GET / bajo /api/v1/progress)",
+          "Red de seguridad: spec de adapter que fija la URL exacta con /v1, el método y el header Bearer, con fetch mockeado (lección #33)",
+          "Alcance estricto: solo adapter + spec + ai-usage; sin tocar dominio/aplicación/presentación ni la rama E",
+          "Id 2026-07-09-003: se salta el -002 reservado por la rama E (sin mergear) para evitar colisión al integrar"
+        ],
+        "notes": "Rama fix/ruta-progress-v1 nace de dev; PR hacia dev (no abierto). El sync D2 daba 404 silencioso porque el adapter apuntaba a /api/progress."
+      },
+      {
+        "id": "2026-07-09-004",
+        "date": "2026-07-09",
+        "title": "Reducir el glifo de las flechas al 55% con escala unificada (ARROW_SCALE + ARROW_GLYPH)",
+        "file": "2026-07-09-fix-tamano-flechas.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "style",
+        "feature": "fix/tamano-flechas",
+        "linked_session": "apila sobre la feature E; precede a fix/animacion-flechas",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 3,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "svg-glyph",
+          "visual-tuning",
+          "board"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "modified": [
+              "theme.ts (nueva ARROW_SCALE=0.55 + objeto ARROW_GLYPH con los 4 ratios finales)",
+              "components/ArrowComponent.tsx (consume ARROW_GLYPH; sin factores sueltos)",
+              "components/ArrowHeadDisintegrate.tsx (fractura de la punta usa ARROW_GLYPH; nace al 55%)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 442 tests / 52 suites, 0 regresiones",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "sin cambios de estilo relevantes"
+        },
+        "decisions": [
+          "Escala aplicada en la DEFINICION (theme): ARROW_GLYPH expone los 4 ratios ya multiplicados por ARROW_SCALE; los componentes no acumulan multiplicaciones",
+          "El hit-area NO se toca: el input resuelve por celda (screenToCell), independiente del glifo; encoger la flecha no reduce la zona tocable",
+          "ArrowHeadDisintegrate apunta a ARROW_GLYPH (tamaño, no timing) para que la desintegracion nazca al 55% y no suelte fragmentos al 100%",
+          "Valor final 0.55 calibrado visualmente en caliente (0.75 -> 0.6 -> 0.5 -> 0.55)",
+          "Alcance estricto a presentacion; dominio y aplicacion intactos"
+        ],
+        "notes": "Rama fix/tamano-flechas nace de dev; PR hacia dev (no abierto). Animaciones de choque se recalibran en la rama siguiente (fix/animacion-flechas)."
+      },
+      {
+        "id": "2026-07-09-005",
+        "date": "2026-07-09",
+        "title": "Animacion de flechas: glide sobre riel persistente, orientacion en reposo, salida voladora, recalibracion del choque",
+        "file": "2026-07-09-animacion-flechas.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "fix+feature",
+        "feature": "fix/animacion-flechas",
+        "linked_session": "apilada sobre fix/tamano-flechas; el glifo al 55% dejo al descubierto la deformacion del choque",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 5,
+          "files_modified": 2,
+          "tests_added": 43,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "animation",
+          "svg-rail",
+          "board",
+          "exit-overlay"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "rendering/railGlide.ts (riel persistente + offset continuo + extension de salida)",
+              "rendering/arrowGlyphPath.ts (primitivas de dibujo compartidas)",
+              "rendering/glideConfig.ts (diales GLIDE_SPEED / EXIT_*)",
+              "components/ArrowExit.tsx (overlay de salida voladora)"
+            ],
+            "modified": [
+              "components/ArrowComponent.tsx (glide sobre riel + orientacion en reposo + recalibracion del choque)",
+              "components/BoardComponent.tsx (deteccion de salida, overlays, clipPath, gating de burst)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 485 tests / 57 suites (base 442/52 -> +43 tests, +5 suites; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Glide reescrito a riel PERSISTENTE parametrizado por un escalar arcOffset que un rAF persigue a velocidad constante (elimina diagonales en giros y el freno entre ticks; absorbe la Fase B)",
+          "La orientacion de la cabeza en reposo la dicta el dominio (exitDir), no el riel (fix del volteo de la flecha de 1 celda)",
+          "Salida voladora como OVERLAY fuera de la flecha viva (patron ArrowBurst), riel extendido con nodos virtuales, fade y clipPath al tablero; burst/disintegrate gateados (no borrados)",
+          "Recalibracion del choque (DEFORM/RECOIL) al glifo al 55%",
+          "Guard/try-catch en todo el riel: lo cosmetico jamas lanza; domain/application/TICK_MS intactos",
+          "Cinco commits atomicos (Conventional Commits); rama apilada, rebase --onto pendiente al mergear #40"
+        ],
+        "notes": "Rama fix/animacion-flechas apilada sobre fix/tamano-flechas; PR no abierto. Id 2026-07-09-005."
+      },
+      {
+        "id": "2026-07-10-001",
+        "date": "2026-07-10",
+        "title": "Badge de usuario logueado en el header (alias del email, sobrevive F5)",
+        "file": "2026-07-10-badge-usuario.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/badge-usuario",
+        "linked_session": "base de la doble mision; feat/leaderboards-cliente se apila encima",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 7,
+          "tests_added": 19,
+          "assets_added": 0
+        },
+        "areas": [
+          "auth",
+          "presentation",
+          "session-identity",
+          "i18n"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "modified": [
+              "ports/IAuthTokenProvider.ts (+get/set/removeEmail)",
+              "services/LoginUser.ts (persiste email tras login)",
+              "services/LogoutUser.ts (borra email en finally, fail-open)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "modified": [
+              "auth/CapacitorTokenProvider.ts (clave auth_session_email, getEmail fail-safe)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "account/aliasFromEmail.ts (funcion pura)",
+              "components/AccountButton.tsx (badge)"
+            ],
+            "modified": [
+              "components/AccountOverlay.tsx (onAuthChanged con email)",
+              "App.tsx (userEmail, F5, 401 limpia email)",
+              "i18n/catalogs/es.ts + en.ts (+account.ariaLoggedIn)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 504 tests / 60 suites (base dev 485/57 -> +19 tests, +3 suites; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Extender IAuthTokenProvider (opcion a): email y token comparten ciclo de vida y store; cero cambios de constructor en LoginUser/LogoutUser",
+          "Email persistido SOLO tras login exitoso; jamas tecleando/registrando ni en logs; borrado siempre en logout incl. fail-open",
+          "aliasFromEmail puro: trim, parte local tal cual (sin lowercase), sin @ cadena completa, vacio -> (el boton decide el fallback)",
+          "Alias = contenido (no se traduce); aria-label con clave i18n en ambos catalogos",
+          "Migracion: token sin email guardado -> label generico sin crash (test)"
+        ],
+        "notes": "Rama feat/badge-usuario nace de dev; PR hacia dev de inmediato. feat/leaderboards-cliente se apila encima. Id 2026-07-10-001."
+      },
+      {
+        "id": "2026-07-10-002",
+        "date": "2026-07-10",
+        "title": "Follow-ups de #42 (animacion) + saneo de lint de dev (#45) en el PR #44",
+        "file": "2026-07-10-pr44-followups-42-lint-45.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "Juan David",
+        "phase": "fix+refactor+perf",
+        "feature": "fix/followups-animacion-flechas",
+        "linked_session": "sobre PR #42 (2026-07-09-005); resuelve tambien el issue #45 de lint pre-existente en dev",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 9,
+          "tests_added": 4,
+          "assets_added": 0
+        },
+        "areas": [
+          "presentation",
+          "animation",
+          "svg-rail",
+          "board",
+          "exit-overlay",
+          "domain",
+          "infrastructure",
+          "forge",
+          "tooling"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [],
+            "modified": [
+              "components/BoardComponent.tsx (guard wasLeavingBoard anti fly-off fantasma + clipPath con useId)",
+              "components/ArrowExit.tsx (onDone fuera del updater de setArcOffset)",
+              "rendering/railGlide.ts (cumulativeArcs una vez por frame, param arcs opcional)",
+              "game/LevelSelectScreen.tsx (useMemo en vez de setState-in-effect)",
+              "forge/ForgeApp.tsx (as ToolMode) + forge/components/ValidationPanel.tsx (useMemo por identidad de scene)"
+            ]
+          },
+          "domain": {
+            "status": "modified",
+            "modified": [
+              "services/LevelSelectionProjection.ts (interfaz local LevelMapNode, sin dependencia de application)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "modified": [
+              "api/ForgeApiClient.ts (LevelDataDTO desde application)",
+              "factories/LocalProgressModuleFactory.ts (cause encadenada) + tsconfig.json (lib ES2022)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 489 tests / 57 suites (base 485; +4 tests)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 problemas (antes: 6 — 5 errores + 1 warning)"
+        },
+        "decisions": [
+          "Fix de la salida fantasma: guard geometrico wasLeavingBoard + restriccion a flechas de 1 celda (las de >=2 ya se deduplican via shrink)",
+          "Violaciones de capas resueltas por dependency-inversion (interfaz local en dominio) y apuntando al DTO de application (minimo blast radius), sin mover tipos",
+          "ValidationPanel: [scene] corrige ademas un stale latente de las deps por .length",
+          "lib de type-check subida a ES2022 como companion del { cause } (el build de app ya es ES2023)",
+          "Un commit atomico por problema (Conventional Commits, en espanol); 10 commits en el PR #44"
+        ],
+        "notes": "Rama fix/followups-animacion-flechas -> PR #44 (base dev). Issue #45 resuelto en el mismo PR. Id 2026-07-10-002 (re-id tras merge de dev con badge #43, que ya usaba 2026-07-10-001)."
+      },
+      {
+        "id": "2026-07-10-003",
+        "date": "2026-07-10",
+        "title": "Leaderboards en el cliente: clasificacion por nivel (trofeo en cards, overlay 5 estados)",
+        "file": "2026-07-10-leaderboards-cliente.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context) + Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/leaderboards-cliente",
+        "linked_session": "apilada sobre feat/badge-usuario; sinergia no-logueado -> AccountOverlay",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 9,
+          "files_modified": 5,
+          "tests_added": 23,
+          "assets_added": 0
+        },
+        "areas": [
+          "leaderboards",
+          "presentation",
+          "application",
+          "infrastructure-adapter",
+          "i18n",
+          "http-contract"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "created": [
+              "dtos/LeaderboardDTOs.ts",
+              "ports/ILeaderboardApiClient.ts (+LevelNotRegisteredError)",
+              "services/GetLevelLeaderboard.ts"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "created": [
+              "api/FetchLeaderboardApiClient.ts (GET /api/v1/leaderboards/:levelId, Bearer, mapeo 401/404/500)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "components/LeaderboardOverlay.tsx (5 estados)"
+            ],
+            "modified": [
+              "game/LevelNodeCard.tsx (trofeo en todas las cards)",
+              "game/LevelSelectScreen.tsx",
+              "App.tsx (composition root + estado)",
+              "i18n/catalogs es+en (seccion leaderboard.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites post-rebase sobre dev con #44 (0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados",
+          "e2e": "backend real: 200 vacio en nivel sin records; 404 en nivel no registrado; QA visual de los 4 flujos aprobado"
+        },
+        "decisions": [
+          "Contrato verificado contra el backend real: vacio = 200 topPlayers:[] (no 404); 404 solo si el nivel no existe en el registro",
+          "El adapter distingue 404 (LevelNotRegisteredError) del vacio; la equivalencia visual 404≡vacio la decide el overlay (+console.warn) por el gap del seed",
+          "Trofeo en TODAS las cards incl. bloqueadas (informacion social) con stopPropagation y aria-label",
+          "currentRecord null -> hint sutil (leaderboard.noRecord); achievedAt oculto en v1; tiempo reutiliza formatDuration (G3)",
+          "No logueado / 401 en vuelo -> CTA que cierra el leaderboard y abre AccountOverlay",
+          "Renumerada de 2026-07-10-002 a -003 al integrar el PR #44 (que tomo el -002) durante el rebase"
+        ],
+        "notes": "Rama apilada; rebases --onto tras #43 y #44. Id 2026-07-10-003."
+      },
+      {
+        "id": "2026-07-10-004",
+        "date": "2026-07-10",
+        "title": "Toast de sesion: bienvenida al login y cierre automatico del overlay (simetria en logout)",
+        "file": "2026-07-10-login-bienvenida.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/login-bienvenida",
+        "linked_session": "cadena badge -> leaderboards -> bienvenida; usa aliasFromEmail y onAuthChanged(true, email) de la mision 1",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 3,
+          "tests_added": 5,
+          "assets_added": 0
+        },
+        "areas": [
+          "auth-ux",
+          "presentation",
+          "toast",
+          "i18n",
+          "a11y"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "components/Toast.tsx (bottom-center, aria-live, diales TOAST_DURATION_MS/TOAST_EXIT_MS, click-para-cerrar)"
+            ],
+            "modified": [
+              "App.tsx (handleAuthChanged cierra el overlay en ambos sentidos + un toast a la vez)",
+              "i18n/catalogs es+en (account.welcome, account.loggedOut)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 536 tests / 65 suites (base 531/64 -> +5; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados",
+          "qa": "visual aprobado: cierre automatico login/logout, alias en el toast, click-para-cerrar, reemplazo sin colas"
+        },
+        "decisions": [
+          "AccountOverlay intacto: el contrato onAuthChanged(true, email) de la mision 1 basto; cierre + toast viven en el composition root",
+          "Simetria en logout: overlay se cierra solo + toast Sesion cerrada",
+          "UN toast a la vez (remount por nonce), bottom-center, aria-live polite, timers con cleanup",
+          "Cherry-pick de f823061 descartado con evidencia (git reporto cero cambios: el contenido ya vive en dev via squash del #43); se declara en la descripcion del PR"
+        ],
+        "notes": "Rama nace del tip post-rebase de leaderboards (e253871); tras el merge del #46 (squash 061577a) se rebasa --onto dev y su PR sale de inmediato. Id 2026-07-10-004."
+      },
+      {
+        "id": "2026-07-10-005",
+        "date": "2026-07-10",
+        "title": "Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md)",
+        "file": "2026-07-10-verification-checklist-v1.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-leaderboards-cliente",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 3,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "verification",
+          "auditing"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "doc/VERIFICATION_CHECKLIST.md (12 categorías, roadmap priorizado)"
+            ],
+            "modified": [
+              "README.md (tabla de features grupos C-G)",
+              "arrowmaze-project-core/docs/FEATURES.md (repo externo)",
+              "arrowmaze-project-core/docs/BORRADOR-features-pendientes.md (repo externo, marcado cerrado)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites (evidencia citada dentro de la checklist)",
+          "type_check": "no aplica (cambios solo de documentación)",
+          "lint": "no aplica",
+          "e2e": "verificación cruzada en código (grep de wiring real en App.tsx, SyncProgress.ts, GameFlowController.ts, GetLevelLeaderboard.ts) antes de marcar cada feature como implementada, en vez de confiar en la documentación previa"
+        },
+        "decisions": [
+          "Fase 1 acotada por el usuario a solo generar la checklist, sin CI/LICENSE/CHANGELOG todavía",
+          "Rama nueva docs/verification-checklist-v1 desde dev (no dev directo, no release/)",
+          "Priorizar corregir la documentación desfasada (README + FEATURES.md) antes de seguir con infraestructura de release, a pedido explícito del usuario",
+          "C1/C3/D1/D2/F4/G1/G2 confirmados como implementados con evidencia de código; P20 y P21 marcados como resueltos",
+          "BORRADOR-features-pendientes.md no reescrito por completo — marcado 🔒 CERRADO y preservado como contexto histórico"
+        ],
+        "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
+      },
+      {
+        "id": "2026-07-10-006",
+        "date": "2026-07-10",
+        "title": "LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README",
+        "file": "2026-07-10-release-scaffolding-gof-solid.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 3,
+          "files_modified": 4,
+          "tests_added": 0,
+          "assets_added": 1
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "design-patterns",
+          "solid",
+          "diagrams"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              "LICENSE (MIT)",
+              "CHANGELOG.md (Keep a Changelog, v0.1.0 -> v1.0.0)",
+              "doc/classes.svg (exportado localmente con plantuml.jar vendorizado)"
+            ],
+            "modified": [
+              "package.json (version -> 1.0.0)",
+              "android/app/build.gradle (versionName/versionCode -> 1.0.0/4)",
+              "README.md (secciones GoF, SOLID, Diagrama de clases, Licencia)",
+              "doc/VERIFICATION_CHECKLIST.md (secciones 6/10/12 y roadmap actualizados)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 531 tests / 64 suites con arrowmaze-game@1.0.0",
+          "type_check": "no aplica (cambios de documentación/config)",
+          "lint": "no aplica",
+          "e2e": "verificacion del SVG generado (120 clases/interfaces renderizadas, sin errores de sintaxis PlantUML); CHANGELOG.md contrastado contra git log --oneline por rango de tags"
+        },
+        "decisions": [
+          "MIT confirmado explícitamente por el usuario antes de crear LICENSE",
+          "CHANGELOG.md generado tras explicar su propósito (Keep a Changelog) porque el usuario no tenía claro para qué servía",
+          "Segunda fuente de versión descubierta en el camino (android/app/build.gradle) y corregida junto con package.json, siguiendo el patrón del backend (swagger.ts)",
+          "Diagrama exportado con el plantuml.jar ya vendorizado por node-plantuml, sin depender de internet"
+        ],
+        "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
+      },
+      {
+        "id": "2026-07-10-007",
+        "date": "2026-07-10",
+        "title": "Push y apertura del PR #48 (checklist + scaffolding de release)",
+        "file": "2026-07-10-pr48-checklist-release-scaffolding.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8 (1M context)",
+        "author": "Juan David",
+        "phase": "docs",
+        "feature": "docs/verification-checklist-v1",
+        "linked_session": "2026-07-10-verification-checklist-v1, 2026-07-10-release-scaffolding-gof-solid",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 0,
+          "tests_added": 0,
+          "assets_added": 0
+        },
+        "areas": [
+          "documentation",
+          "release-readiness",
+          "git-workflow"
+        ],
+        "layers": {
+          "docs": {
+            "status": "created",
+            "created": [
+              ".ai-usage/2026-07-10-pr48-checklist-release-scaffolding.md"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "no aplica (solo git push + gh pr create)",
+          "type_check": "no aplica",
+          "lint": "no aplica",
+          "e2e": "git log --oneline dev..docs/verification-checklist-v1 confirmado antes de abrir el PR; URL de PR #48 devuelta por gh como confirmación"
+        },
+        "decisions": [
+          "PR #48 abierto contra dev (no main), confirmado explícitamente por el usuario",
+          "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
+        ],
+        "notes": "PR #48 abierto sin mergear, pendiente de revisión. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tomó el id -004 durante este merge con dev."
+      },
+      {
+        "id": "2026-07-10-008",
+        "date": "2026-07-10",
+        "title": "Higiene del sync: scheduler single-flight con gate de sesion",
+        "file": "2026-07-10-higiene-sync.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "fix",
+        "feature": "fix/higiene-sync",
+        "linked_session": "diagnostico QA multi-cuenta; paso 2 de la cola sync -> D1.5 -> modo oscuro",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 2,
+          "tests_added": 7,
+          "assets_added": 0
+        },
+        "areas": [
+          "sync",
+          "presentation",
+          "composition-root",
+          "offline-first"
+        ],
+        "layers": {
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "sync/createSyncScheduler.ts (single-flight + coalescing + gate; createSessionSyncControl)"
+            ],
+            "modified": [
+              "App.tsx (login y victoria via scheduler; requestSync a GameView; 401 apaga el gate)",
+              "components/GameView.tsx (prop requestSync; sin llamada directa a syncProgress)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 544 tests / 66 suites (base 537/65 -> +7; 0 regresiones)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "0 en los archivos tocados"
+        },
+        "decisions": [
+          "Gate sin sesion = NO-OP silencioso (ni info ni warn)",
+          "Single-flight + coalescing: N pedidos durante un vuelo colapsan en UNA re-ejecucion; el gate se re-verifica antes del re-run",
+          "Fallos -> console.warn; el scheduler nunca se atasca",
+          "SyncProgress/adapter/dominio intactos; el sync del bootstrap queda fuera por alcance (residual anotado)",
+          "DEUDA DOCUMENTADA: progreso local = dispositivo, no cuenta (tabla sin usuario) — la resuelve D1.5 (paso 3)"
+        ],
+        "notes": "Correccion de hechos: el disparo tras ganar ya existia (GameView, D2); esta mision es higiene, no el fix del sintoma de QA. Id 2026-07-10-008 (renumerado de -005 al integrar #48/#49/#51 durante el rebase)."
+      },
+      {
+        "id": "2026-07-10-009",
+        "date": "2026-07-10",
+        "title": "Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente y toggle en el header",
+        "file": "2026-07-10-modo-oscuro.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "feat/modo-oscuro",
+        "linked_session": "2026-07-10-higiene-sync; paso adelantado en la cola sync -> D1.5 -> modo-oscuro",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 7,
+          "files_modified": 16,
+          "tests_added": 15,
+          "assets_added": 0
+        },
+        "areas": [
+          "theming",
+          "presentation",
+          "accessibility",
+          "i18n",
+          "infrastructure"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "created": [
+              "ports/IThemePreference.ts (calca de ILanguagePreferenceProvider)"
+            ]
+          },
+          "infrastructure": {
+            "status": "modified",
+            "created": [
+              "theme/CapacitorThemePreference.ts (key ui_theme_preference)"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "created": [
+              "theming/{themeMode,ThemeContext,ThemeProvider} (resolucion guardada > prefers-color-scheme > claro; data-theme en <html>, cambio en caliente)",
+              "components/ThemeToggleButton.tsx (header, emoji sol/luna = estado actual, aria-label i18n dinamico)"
+            ],
+            "modified": [
+              "index.css (19 tokens nuevos + bloque dark + color-scheme), App.css, theme.ts del SVG (var(--board-bg)/var(--board-dot))",
+              "overlays Account/Game/Pause/Settings/Leaderboard, Toast, LevelNodeCard, LevelSelectScreen, GameController (60+ colores inline a tokens; deuda del review del #38 saldada)",
+              "SettingsOverlay (seccion Tema), App.tsx (toggle en header), main.tsx (wiring), catalogos es/en (settings.theme.* + theme.toggle.*)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 559 tests / 70 suites (base 544/66 -> +15; 0 regresiones; paridad i18n cubre las claves nuevas)",
+          "type_check": "passed — tsc --noEmit exit 0",
+          "lint": "passed — eslint . limpio",
+          "qa": "PENDIENTE QA visual del usuario: el focal del mapa cambia sutilmente de verde en claro (#4CAF50 -> --success #16a34a, consolidacion aprobada)"
+        },
+        "decisions": [
+          "Nomenclatura: se conservan los tokens existentes (--text/--text-muted/--primary, capa original de Jesus en /preview) — continuidad de equipo sobre renombre",
+          "DECISION CONSCIENTE — 2 opciones sin 'sistema': elegir manualmente un tema desactiva el seguimiento de prefers-color-scheme para siempre (sin 'volver a auto'); precedente del selector de idioma",
+          "Forge (H1) y /preview fuera del v1; /preview (pagina de Jesus) intocada y citada como referencia",
+          "Regla B1: colores de flechas = dato del nivel, NO migran; contraste verificado sobre --board-bg oscuro (peor caso blue #3b82f6 ~3:1)",
+          "Glifos del toggle: emoji directo — patron que el #49 establecio para los iconos del header (⚙️/👤), nitido en ambos temas sin assets",
+          "Fix emergente cazado por el spec del provider: la carga async de la preferencia pisaba una eleccion previa del usuario (ref userChose: la eleccion explicita gana)"
+        ],
+        "notes": "Rama feat/modo-oscuro desde 76f5571 (tip de fix/higiene-sync rebasado sobre dev post-#51 en el Paso A de esta sesion). Falta espejar G4-modo-oscuro.feature en arrowmaze-project-core. Id 2026-07-10-009."
       }
     ],
     "statistics": {
-      "totalReports": 31,
-      "lastUpdated": "2026-07-06T00:00:00Z",
+      "totalReports": 53,
+      "lastUpdated": "2026-07-10T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -1797,25 +2947,27 @@
       "modelsUsed": [
         "Claude Fable 5",
         "Claude Haiku 4.5",
+        "Claude Opus 4.6 (Thinking)",
         "Claude Opus 4.8",
         "Claude Sonnet 4.6 (Thinking)",
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)",
-        "Gemini (versión no especificada)"
+        "Gemini (versión no especificada)",
+        "Claude Sonnet 5"
       ],
-      "totalLinesGenerated": 8440,
-      "totalFilesCreated": 123,
+      "totalLinesGenerated": 8530,
+      "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 249,
-      "totalTestSuites": 24,
+      "totalTestsPassing": 559,
+      "totalTestSuites": 70,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-06-001",
-      "summary": "Sincronización de especificaciones con arrowmaze-project-core como fuente única"
+      "id": "2026-07-10-009",
+      "summary": "Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente y toggle en el header"
     }
   }
 }

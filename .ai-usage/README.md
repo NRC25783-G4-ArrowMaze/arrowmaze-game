@@ -36,6 +36,26 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-03 | Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta | [`2026-07-03-pulido-visual-animaciones.md`](./2026-07-03-pulido-visual-animaciones.md) | Claude Fable 5 |
 | 2026-07-03 | Auditoría del repo: reglas sincronizadas y tooling corregido | [`2026-07-03-analisis-repo-sync-reglas-tooling.md`](./2026-07-03-analisis-repo-sync-reglas-tooling.md) | Claude Fable 5 |
 | 2026-07-04 | Resolución de conflictos PR #16 + matriz de decisiones de merge | [`2026-07-04-resolucion-conflictos-pr16.md`](./2026-07-04-resolucion-conflictos-pr16.md) | Claude Fable 5 + Haiku 4.5 |
+| 2026-07-08 | Follow-up fixes del PR #30 (login-service): NetworkError guard, test infra, nits EOF | [`2026-07-08-pr30-login-service-followup.md`](./2026-07-08-pr30-login-service-followup.md) | Claude Opus 4.6 (Thinking) |
+| 2026-07-08 | Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2) | [`2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md`](./2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md) | Claude Sonnet 5 |
+| 2026-07-08 | Quitar el botón "Volver" redundante del header de partida | [`2026-07-08-fix-boton-volver-header-redundante.md`](./2026-07-08-fix-boton-volver-header-redundante.md) | Claude Sonnet 5 |
+| 2026-07-08 | Fix del bug de ruta del login en PR #30 (`/api/v1/auth/login`) + corrección de su test | [`2026-07-08-fix-ruta-login-v1.md`](./2026-07-08-fix-ruta-login-v1.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-08 | G2: Internacionalización ES/EN (catálogos, motor, cambio en caliente, selector) | [`2026-07-08-g2-internacionalizacion.md`](./2026-07-08-g2-internacionalizacion.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-08 | G3: Temporizador de nivel (IClock inyectable, mm:ss, congela en pausa) | [`2026-07-08-g3-temporizador-nivel.md`](./2026-07-08-g3-temporizador-nivel.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | G1: Audio (SFX por outcome + música por dificultad, mute/volúmenes, créditos) | [`2026-07-09-g1-audio-sfx-musica.md`](./2026-07-09-g1-audio-sfx-musica.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | E: UI de Cuenta (login/registro/logout, validación E1, overlay + i18n) | [`2026-07-09-e-ui-cuenta.md`](./2026-07-09-e-ui-cuenta.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | Fix: ruta del adapter de progreso a `/api/v1/progress` (sync D2 daba 404) | [`2026-07-09-fix-ruta-progress-v1.md`](./2026-07-09-fix-ruta-progress-v1.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | Reducir el glifo de las flechas al 55% con escala unificada (`ARROW_SCALE` + `ARROW_GLYPH`) | [`2026-07-09-fix-tamano-flechas.md`](./2026-07-09-fix-tamano-flechas.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-09 | Animación de flechas: glide sobre riel persistente, orientación en reposo, salida voladora, recalibración del choque | [`2026-07-09-animacion-flechas.md`](./2026-07-09-animacion-flechas.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-10 | Badge de usuario logueado en el header (alias del email, sobrevive F5) | [`2026-07-10-badge-usuario.md`](./2026-07-10-badge-usuario.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-10 | Follow-ups de #42 (salida fantasma, `useId`, `onDone`, perf del riel) + saneo de lint de `dev` (#45) en el PR #44 | [`2026-07-10-pr44-followups-42-lint-45.md`](./2026-07-10-pr44-followups-42-lint-45.md) | Claude Opus 4.8 |
+| 2026-07-10 | Leaderboards en el cliente: clasificación por nivel (🏆 en cards, overlay 5 estados) | [`2026-07-10-leaderboards-cliente.md`](./2026-07-10-leaderboards-cliente.md) | Claude Opus 4.8 (1M context) + Fable 5 |
+| 2026-07-10 | Toast de sesión: bienvenida al login y cierre automático del overlay (simetría en logout) | [`2026-07-10-login-bienvenida.md`](./2026-07-10-login-bienvenida.md) | Claude Fable 5 |
+| 2026-07-10 | Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md) | [`2026-07-10-verification-checklist-v1.md`](./2026-07-10-verification-checklist-v1.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-10 | LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README | [`2026-07-10-release-scaffolding-gof-solid.md`](./2026-07-10-release-scaffolding-gof-solid.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-10 | Push y apertura del PR #48 (checklist + scaffolding de release) | [`2026-07-10-pr48-checklist-release-scaffolding.md`](./2026-07-10-pr48-checklist-release-scaffolding.md) | Claude Opus 4.8 (1M context) |
+| 2026-07-10 | Higiene del sync: scheduler single-flight con gate de sesión (login+victoria coordinados) | [`2026-07-10-higiene-sync.md`](./2026-07-10-higiene-sync.md) | Claude Fable 5 |
+| 2026-07-10 | Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente, toggle ☀️/🌙 en header + Ajustes | [`2026-07-10-modo-oscuro.md`](./2026-07-10-modo-oscuro.md) | Claude Fable 5 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
@@ -61,9 +81,9 @@ Cada entrada en este registro sigue el formato estándar:
 
 ## Estadísticas
 
-- **Total de reportes:** 30
-- **Última actualización:** 2026-07-04
-- **Suite de tests (actual):** 249/249 ✅ en 24 suites (preview-only sin tests; resolubilidad verificada con solver headless + runtime)
+- **Total de reportes:** 53
+- **Última actualización:** 2026-07-10
+- **Suite de tests (actual):** 559/559 ✅ en 70 suites
 - **Requisito crítico:** scoring 100% RAM-resident (sin persistencia agregada)
 - **Detalle por herramienta/modelo:** ver `manifest.json` (`aiUsageRegistry.statistics`) como fuente estructurada de verdad.
 

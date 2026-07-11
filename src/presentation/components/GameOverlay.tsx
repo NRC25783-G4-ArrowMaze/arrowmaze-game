@@ -1,5 +1,7 @@
 import React from 'react';
 import type { GameStatus } from '../../domain/entities/GameSession';
+import { useTranslation } from '../i18n/I18nContext';
+import { formatDuration } from '../game/levelTimer';
 
 /** Props del overlay de fin de juego. */
 export interface GameOverlayProps {
@@ -7,6 +9,8 @@ export interface GameOverlayProps {
   status: GameStatus;
   /** Puntaje final (presente solo al ganar). */
   score: number | null;
+  /** Tiempo activo final del nivel en segundos (G3). Se muestra junto al score. */
+  timeSeconds?: number;
   /**
    * Avanza directo al siguiente nivel del mapa (C3). Solo se ofrece al ganar
    * y si el caller lo provee (tras el último nivel no hay siguiente).
@@ -28,9 +32,12 @@ export interface GameOverlayProps {
 export const GameOverlay: React.FC<GameOverlayProps> = ({
   status,
   score,
+  timeSeconds,
   onNextLevel,
   onBackToMap,
 }) => {
+  const { t } = useTranslation();
+
   if (status === 'IN_PROGRESS') {
     return null;
   }
@@ -41,48 +48,44 @@ export const GameOverlay: React.FC<GameOverlayProps> = ({
     <div
       data-testid="game-overlay"
       role="alertdialog"
-      aria-label={won ? 'Ganaste' : 'Perdiste'}
-      style={{
-        position: 'absolute',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        background: 'rgba(255, 255, 255, 0.82)',
-        borderRadius: '12px',
-        textAlign: 'center',
-      }}
+      aria-label={won ? t('overlay.aria.won') : t('overlay.aria.lost')}
+      className="overlay-backdrop"
     >
-      <div
-        style={{
-          fontSize: '2rem',
-          fontWeight: 700,
-          color: won ? '#16a34a' : '#dc2626',
-        }}
-      >
-        {won ? '¡Ganaste!' : 'Perdiste'}
-      </div>
-      {won && score !== null && (
-        <div style={{ fontSize: '1rem', color: '#374151' }}>
-          Puntaje: {score}
-        </div>
-      )}
-      {won && onNextLevel !== undefined && (
-        <button
-          className="btn-primary"
-          onClick={onNextLevel}
-          style={{ minWidth: '200px', marginTop: '8px' }}
+      <div className="overlay-card">
+        <div
+          style={{
+            fontSize: '2rem',
+            fontWeight: 700,
+            color: won ? 'var(--success)' : 'var(--danger)',
+          }}
         >
-          Siguiente nivel →
-        </button>
-      )}
-      {onBackToMap !== undefined && (
-        <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
-          Volver al mapa
-        </button>
-      )}
+          {won ? t('overlay.victory.title') : t('overlay.defeat.title')}
+        </div>
+        {won && score !== null && (
+          <div style={{ fontSize: '1rem', color: 'var(--text)' }}>
+            {t('common.score', { score })}
+          </div>
+        )}
+        {timeSeconds !== undefined && (
+          <div data-testid="overlay-time" style={{ fontSize: '1rem', color: 'var(--text)' }}>
+            {t('overlay.time', { time: formatDuration(timeSeconds) })}
+          </div>
+        )}
+        {won && onNextLevel !== undefined && (
+          <button
+            className="btn-primary"
+            onClick={onNextLevel}
+            style={{ minWidth: '200px', marginTop: '8px' }}
+          >
+            {t('overlay.victory.nextLevel')}
+          </button>
+        )}
+        {onBackToMap !== undefined && (
+          <button onClick={onBackToMap} style={{ minWidth: '200px' }}>
+            {t('overlay.backToMap')}
+          </button>
+        )}
+      </div>
     </div>
   );
 };

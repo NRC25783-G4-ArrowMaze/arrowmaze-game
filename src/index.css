@@ -1,8 +1,9 @@
 /* ─────────────────────────────────────────────────────────────────── */
-/* Tokens de diseño — tema claro FIJO                                  */
-/* La app está diseñada en claro (cards blancas, fondos suaves); se    */
-/* ignora el modo oscuro del sistema para evitar herencias ilegibles   */
-/* (texto blanco sobre superficies claras). Dark mode = feature futura. */
+/* Tokens de diseño — claro (:root) y oscuro ([data-theme="dark"])     */
+/* ThemeProvider estampa data-theme en <html>; el cambio es en caliente */
+/* (solo CSS, sin re-render). El tablero SVG consume --board-* vía      */
+/* var() en fill/stroke. prefers-color-scheme NO se consulta aquí: la   */
+/* resolución vive en resolveInitialTheme (guardada > sistema > claro). */
 /* ─────────────────────────────────────────────────────────────────── */
 
 :root {
@@ -10,16 +11,70 @@
 
   --text: #1f2937;
   --text-muted: #6b7280;
+  --text-disabled: #9ca3af;
   --bg: #f5f7fa;
+  --bg-grad-a: #f5f7fa;
+  --bg-grad-b: #e8ecf1;
   --surface: #ffffff;
+  --surface-muted: #f0f4f8;
+  --surface-active: #eff6ff;
   --border: #d1d5db;
+  --border-soft: #e0e4e8;
   --primary: #3b82f6;
   --primary-dark: #2563eb;
+  --on-primary: #ffffff;
   --success: #16a34a;
+  --success-bg: #f0fdf4;
   --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --highlight: #fef9c3;
+  --gold: #ffd700;
+  --backdrop: rgba(17, 24, 39, 0.45);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.25);
+  --inverse-surface: #1f2937;
+  --inverse-text: #ffffff;
+  --board-bg: #ffffff;
+  --board-dot: #d3d7e0;
 
   color: var(--text);
   background-color: var(--bg);
+}
+
+/* color-scheme: dark oscurece gratis los controles nativos (checkbox,
+   range, scrollbars) del overlay de Ajustes. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --text: #e5e7eb;
+  --text-muted: #94a3b8;
+  --text-disabled: #64748b;
+  --bg: #0f172a;
+  --bg-grad-a: #0f172a;
+  --bg-grad-b: #1e293b;
+  --surface: #1e293b;
+  --surface-muted: #273449;
+  --surface-active: #1e3a5f;
+  --border: #374151;
+  --border-soft: #2b3648;
+  --primary: #60a5fa;
+  --primary-dark: #3b82f6;
+  --on-primary: #0f172a;
+  --success: #4ade80;
+  --success-bg: rgba(74, 222, 128, 0.12);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.12);
+  --highlight: rgba(250, 204, 21, 0.15);
+  --gold: #facc15;
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.6);
+  --inverse-surface: #334155;
+  --inverse-text: #f1f5f9;
+  --board-bg: #16213a;
+  --board-dot: #3d4a66;
 }
 
 a {
@@ -49,7 +104,7 @@ button:hover {
   border-color: var(--primary);
 }
 button:active {
-  background-color: #eff6ff;
+  background-color: var(--surface-active);
 }
 button:disabled {
   opacity: 0.5;
@@ -65,7 +120,7 @@ button:focus-visible {
 .btn-primary {
   background-color: var(--primary);
   border-color: var(--primary);
-  color: #ffffff;
+  color: var(--on-primary);
 }
 .btn-primary:hover {
   background-color: var(--primary-dark);

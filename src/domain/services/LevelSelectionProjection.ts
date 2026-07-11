@@ -1,5 +1,15 @@
-import type { LevelMapDTO } from '../../application/dtos/LevelMapDTOs';
 import type { LevelProgress } from '../entities/LevelProgress';
+
+/**
+ * Forma mínima de un nodo del mapa que la proyección necesita. Se declara en el
+ * dominio (en vez de importar el DTO de la capa application) para no depender de
+ * capas externas; cualquier `LevelMapDTO` la satisface estructuralmente.
+ */
+export interface LevelMapNode {
+  levelId: string;
+  prerequisites: string[];
+  starThresholds?: [number, number];
+}
 
 export interface DerivedNode {
   levelId: string;
@@ -15,7 +25,7 @@ export class LevelSelectionProjection {
    * Deriva el estado de cada nodo del mapa a partir del catálogo y el progreso local.
    * Determinista y puro — sin efectos secundarios.
    */
-  static project(levelMap: LevelMapDTO, progress: LevelProgress[]): DerivedNode[] {
+  static project(levelMap: LevelMapNode[], progress: LevelProgress[]): DerivedNode[] {
     const progressMap = new Map(progress.map(p => [p.levelId, p]));
     const levelIdSet = new Set(levelMap.map(n => n.levelId));
 
