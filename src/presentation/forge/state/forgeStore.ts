@@ -134,7 +134,16 @@ export const useForgeStore = create<ForgeState>((set) => {
       commit((scene) => ({ ...scene, ...updates }))
     },
     loadScene: (newScene) => {
-      set({ scene: newScene, history: { past: [], future: [] } })
+      // Ajusta el lienzo al tamaño real del nivel cargado para que no se recorte
+      // (los niveles grandes como el corazón llegan más allá de 8×8). Mínimo 8×8.
+      const maxCol = newScene.cells.reduce((m, c) => Math.max(m, c.col), 0)
+      const maxRow = newScene.cells.reduce((m, c) => Math.max(m, c.row), 0)
+      set({
+        scene: newScene,
+        gridCols: Math.max(8, maxCol + 1),
+        gridRows: Math.max(8, maxRow + 1),
+        history: { past: [], future: [] },
+      })
     },
 
     // Undo/Redo
