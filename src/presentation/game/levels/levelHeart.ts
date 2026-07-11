@@ -3,10 +3,10 @@ import type { LevelDataDTO } from '../scene';
 /**
  * level-heart — "Corazón" (último nivel).
  *
- * Mapa-grafo con forma de corazón (75 celdas, 13 flechas) diseñado en el editor
- * FORGE por el autor y exportado como LevelDataDTO. Cada flecha es una serpiente
- * que apunta hacia afuera del contorno; el nivel se resuelve pelando el corazón
- * desde las flechas que ya pueden escapar (ver localLevels.spec para el orden).
+ * Mapa-grafo con forma de corazón diseñado en el editor FORGE y exportado como
+ * LevelDataDTO. Actualizado desde el backend (fuente de verdad) tras corregir
+ * las flechas que hacían el nivel imposible. Cada flecha es una serpiente que
+ * escapa por su trayectoria; el nivel se resuelve pelando el corazón.
  */
 export const LEVEL_HEART: LevelDataDTO = {
   "id": "heart-preview",
@@ -1092,22 +1092,6 @@ export const LEVEL_HEART: LevelDataDTO = {
       ]
     },
     {
-      "id": "arrow-3",
-      "head": {
-        "cellId": "8,4",
-        "exitPort": 3
-      },
-      "body": [
-        "7,4",
-        "7,3",
-        "7,2",
-        "8,2",
-        "8,1",
-        "9,1",
-        "10,1"
-      ]
-    },
-    {
       "id": "arrow-4",
       "head": {
         "cellId": "2,4",
@@ -1215,7 +1199,34 @@ export const LEVEL_HEART: LevelDataDTO = {
       ]
     },
     {
-      "id": "arrow-12",
+      "id": "arrow-13",
+      "head": {
+        "cellId": "10,3",
+        "exitPort": 0
+      },
+      "body": [
+        "10,2",
+        "9,2",
+        "9,3"
+      ]
+    },
+    {
+      "id": "arrow-14",
+      "head": {
+        "cellId": "7,4",
+        "exitPort": 0
+      },
+      "body": [
+        "7,3",
+        "7,2",
+        "8,2",
+        "8,1",
+        "9,1",
+        "10,1"
+      ]
+    },
+    {
+      "id": "arrow-15",
       "head": {
         "cellId": "11,2",
         "exitPort": 2
@@ -1227,19 +1238,8 @@ export const LEVEL_HEART: LevelDataDTO = {
         "10,5",
         "10,4",
         "9,4",
-        "9,3",
+        "8,4",
         "8,3"
-      ]
-    },
-    {
-      "id": "arrow-13",
-      "head": {
-        "cellId": "10,3",
-        "exitPort": 0
-      },
-      "body": [
-        "10,2",
-        "9,2"
       ]
     }
   ]
