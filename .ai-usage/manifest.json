@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-10T00:00:00Z",
+    "lastUpdated": "2026-07-11T00:00:00Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -2930,11 +2930,61 @@
           "Fix emergente cazado por el spec del provider: la carga async de la preferencia pisaba una eleccion previa del usuario (ref userChose: la eleccion explicita gana)"
         ],
         "notes": "Rama feat/modo-oscuro desde 76f5571 (tip de fix/higiene-sync rebasado sobre dev post-#51 en el Paso A de esta sesion). Falta espejar G4-modo-oscuro.feature en arrowmaze-project-core. Id 2026-07-10-009."
+      },
+      {
+        "id": "2026-07-11-001",
+        "date": "2026-07-11",
+        "title": "Selector \"comportamiento al chocar\" (return/stay) en el FORGE + round-trip del DTO",
+        "file": "2026-07-11-forge-comportamiento-colision.md",
+        "tool": "Claude Code (claude.ai/code)",
+        "model": "Claude Opus 4.8",
+        "author": "Juan David",
+        "phase": "feature",
+        "feature": "fix/forge-comportamiento-colision",
+        "linked_session": "reutiliza collisionBehavior de GameController; par backend fix/nivel-comportamiento-colision (PR #21)",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 3,
+          "tests_added": 0
+        },
+        "areas": [
+          "forge",
+          "presentation",
+          "level-dto",
+          "serialization"
+        ],
+        "layers": {
+          "application": {
+            "status": "modified",
+            "modified": [
+              "dtos/LevelDataDTOs.ts (campo espejo collisionBehavior?: 'stay'|'return')"
+            ]
+          },
+          "presentation": {
+            "status": "modified",
+            "modified": [
+              "game/scene.ts (collisionBehavior en LevelDataDTO; toLevelDataDTO/sceneFromLevelData hacen round-trip de collisionBehavior, name y difficulty)",
+              "forge/components/LevelPropertiesPanel.tsx (nuevo <select> 'Comportamiento al chocar', patron del selector de Dificultad)"
+            ]
+          }
+        },
+        "validation": {
+          "tests": "passed — 561/561 en 71 suites, 0 regresiones",
+          "type_check": "passed — tsc --noEmit exit 0"
+        },
+        "decisions": [
+          "NO tocar dominio (restriccion dura del humano): el 'regreso al origen' es 100% presentacion (useGameController glide-back + snapshot/restore); Arrow.advance() solo hace no-op en blocked",
+          "Exponer collisionBehavior como propiedad de nivel via <select> (default efectivo return)",
+          "Cerrar el round-trip del DTO: toLevelDataDTO/sceneFromLevelData descartaban collisionBehavior, name y difficulty; el humano amplio el alcance para arreglar los tres",
+          "Descartada la peticion previa de rotar la punta con R por requerir cambios de dominio"
+        ],
+        "notes": "Rama fix/forge-comportamiento-colision desde origin/dev, PR #67 hacia dev. Par backend PR #21. Ejecutado en modo plan con aprobacion explicita. Id 2026-07-11-001."
       }
     ],
     "statistics": {
-      "totalReports": 53,
-      "lastUpdated": "2026-07-10T00:00:00Z",
+      "totalReports": 54,
+      "lastUpdated": "2026-07-11T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
         "Antigravity (Gemini / Claude)",
@@ -2959,15 +3009,15 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 559,
-      "totalTestSuites": 70,
+      "totalTestsPassing": 561,
+      "totalTestSuites": 71,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones"
     },
     "lastEntry": {
-      "id": "2026-07-10-009",
-      "summary": "Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente y toggle en el header"
+      "id": "2026-07-11-001",
+      "summary": "Selector 'comportamiento al chocar' (return/stay) en el FORGE + round-trip del DTO"
     }
   }
 }
