@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:apk": "tsc -b && vite build --mode offline",
+    "build:apk": "tsc -b && vite build --mode offline && pnpm exec cap sync android && cd android && ./gradlew assembleDebug",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs",

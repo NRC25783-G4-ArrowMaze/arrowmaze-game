@@ -4,6 +4,7 @@
 
 - **Git LFS** instalado y configurado (`sudo apt install git-lfs && git lfs install`)
 - **Android Studio** con SDK 36 instalado
+- **JDK 21 completo** instalado (`openjdk-21-jdk`, no solo la JVM/runtime)
 - **pnpm** como package manager
 
 ## Pasos
@@ -28,7 +29,9 @@ y excluye el FORGE del bundle:
 pnpm run build:apk
 ```
 
-Esto genera los assets en `dist/`.
+Este comando ya ejecuta el flujo completo: build offline, `cap sync android` y
+`assembleDebug`, por lo que deja los assets en `dist/` y el APK en
+`android/app/build/outputs/apk/debug/`.
 
 ### 3. Sincronizar con el proyecto nativo
 
@@ -73,6 +76,12 @@ pnpm dlx cap open android       # abrir en Android Studio
 - Desinstalar la app del dispositivo antes de instalar una nueva versión
   (evita conflictos con BD SQLite restaurada por backup).
 - Verificar que `capacitor.config.ts` tiene `androidIsEncryption: false`.
+
+### Gradle dice que falta `JAVA_COMPILER`
+
+- El sistema tiene Java pero no `javac`.
+- Instalar el paquete completo del JDK 21, por ejemplo: `sudo apt install openjdk-21-jdk`.
+- Confirmar con `javac -version` antes de volver a correr `pnpm run build:apk`.
 
 ### Audio no suena
 
