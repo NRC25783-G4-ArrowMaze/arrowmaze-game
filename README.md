@@ -44,6 +44,13 @@ El proyecto sigue **Clean Architecture** en 4 capas. La dependencia fluye de afu
 presentation ──► infrastructure ──► application ──► domain
 ```
 
+![Diagrama de capas CLEAN de Arrow Maze — cuatro anillos concéntricos con la Regla de Dependencia hacia el centro](./doc/clean-layers.svg)
+
+> Fuente editable: [`clean-layers.puml`](./clean-layers.puml) · render: [`doc/clean-layers.svg`](./doc/clean-layers.svg).
+> Cada caja es un archivo real de `src/`. Diagrama compartido con
+> [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core/blob/main/docs/diagrams/clean-layers.svg),
+> donde vive la fuente de verdad de la arquitectura.
+
 ```
 src/
 ├── domain/               # Lógica pura. Sin dependencias externas.
