@@ -78,6 +78,52 @@ function toArrowDTO(p: ArrowPathSpec): LevelArrowDTO {
 }
 
 /**
+ * Ensambla un LevelDataDTO sobre una forma ARBITRARIA de celdas (no
+ * necesariamente rectangular, p. ej. rombo o anillo): las conexiones se crean
+ * solo entre celdas ortogonalmente adyacentes presentes en la forma, así el
+ * contorno de la forma actúa como sumidero (igual que el borde de la rejilla).
+ */
+export function buildShapedLevelData(
+  id: string,
+  allowedMoves: number,
+  shape: GridCell[],
+  paths: ArrowPathSpec[],
+): LevelDataDTO {
+  const present = new Set(shape.map(idOf));
+  const occupied = new Set<string>();
+  for (const p of paths) {
+    for (const c of p.cells) {
+      const key = idOf(c);
+      if (!present.has(key)) {
+        throw new Error(`la flecha "${p.id}" pisa ${key}, fuera de la forma`);
+      }
+      if (occupied.has(key)) {
+        throw new Error(`celda ${key} ocupada por dos flechas (incluye "${p.id}")`);
+      }
+      occupied.add(key);
+    }
+  }
+
+  const connections: LevelConnectionDTO[] = [];
+  for (const [col, row] of shape) {
+    if (present.has(`${col + 1},${row}`)) {
+      connections.push({ fromCell: `${col},${row}`, fromPort: 1, toCell: `${col + 1},${row}`, toPort: 3 });
+    }
+    if (present.has(`${col},${row + 1}`)) {
+      connections.push({ fromCell: `${col},${row}`, fromPort: 2, toCell: `${col},${row + 1}`, toPort: 0 });
+    }
+  }
+
+  return {
+    id,
+    allowedMoves,
+    cells: shape.map((c) => ({ id: idOf(c), portCount: 4 })),
+    connections,
+    arrows: paths.map(toArrowDTO),
+  };
+}
+
+/**
  * Ensambla un LevelDataDTO de rejilla cols×rows validando que los caminos no
  * se solapen entre sí ni se salgan del tablero.
  */
