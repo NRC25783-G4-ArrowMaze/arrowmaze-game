@@ -6,7 +6,7 @@ import type { LevelMapDTO } from '../../application/dtos/LevelMapDTOs';
  * El primer nivel (`level-initial`) es el TUTORIAL guiado. El mapa preview con
  * forma de corazón (`heart-preview`) es el ÚLTIMO nivel. Cada nodo desbloquea al
  * siguiente en cadena (sin ramas):
- * initial → A → B → advanced → expert → heart.
+ * initial → A → B → advanced → expert → mapas 6-15 → heart.
  *
  * `pathHint` no gobierna el layout (LevelSelectScreen dibuja un grid por el orden
  * del array); se conserva por compatibilidad del contrato C3.
@@ -42,10 +42,72 @@ export const LEVEL_MAP: LevelMapDTO = [
     pathHint: { x: 50, y: 74 },
     starThresholds: [3500, 4500],
   },
+  // Mapas 6-15: 5 medios (6-10) y 5 difíciles (11-15); borradores para el
+  // FORGE registrados también en el seed del backend (misma definición).
+  {
+    levelId: 'mapa-06',
+    prerequisites: ['level-expert'],
+    pathHint: { x: 50, y: 76 },
+    starThresholds: [2500, 3500],
+  },
+  {
+    levelId: 'mapa-07',
+    prerequisites: ['mapa-06'],
+    pathHint: { x: 50, y: 78 },
+    starThresholds: [2500, 3500],
+  },
+  {
+    levelId: 'mapa-08',
+    prerequisites: ['mapa-07'],
+    pathHint: { x: 50, y: 80 },
+    starThresholds: [2500, 3500],
+  },
+  {
+    levelId: 'mapa-09',
+    prerequisites: ['mapa-08'],
+    pathHint: { x: 50, y: 82 },
+    starThresholds: [2500, 3500],
+  },
+  {
+    levelId: 'mapa-10',
+    prerequisites: ['mapa-09'],
+    pathHint: { x: 50, y: 84 },
+    starThresholds: [2500, 3500],
+  },
+  {
+    levelId: 'mapa-11',
+    prerequisites: ['mapa-10'],
+    pathHint: { x: 50, y: 86 },
+    starThresholds: [3500, 4500],
+  },
+  {
+    levelId: 'mapa-12',
+    prerequisites: ['mapa-11'],
+    pathHint: { x: 50, y: 88 },
+    starThresholds: [3500, 4500],
+  },
+  {
+    levelId: 'mapa-13',
+    prerequisites: ['mapa-12'],
+    pathHint: { x: 50, y: 90 },
+    starThresholds: [3500, 4500],
+  },
+  {
+    levelId: 'mapa-14',
+    prerequisites: ['mapa-13'],
+    pathHint: { x: 50, y: 92 },
+    starThresholds: [3500, 4500],
+  },
+  {
+    levelId: 'mapa-15',
+    prerequisites: ['mapa-14'],
+    pathHint: { x: 50, y: 94 },
+    starThresholds: [3500, 4500],
+  },
   {
     levelId: 'heart-preview',
-    prerequisites: ['level-expert'],
-    pathHint: { x: 50, y: 90 },
+    prerequisites: ['mapa-15'],
+    pathHint: { x: 50, y: 96 },
     starThresholds: [2000, 3000],
   },
 ];

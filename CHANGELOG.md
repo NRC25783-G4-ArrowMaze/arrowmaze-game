@@ -3,6 +3,24 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/).
 Versionado según [SemVer](https://semver.org/lang/es/).
 
+## [1.1.0] — 2026-07-12
+
+Ampliación de contenido y del editor de mapas sobre el release estable 1.0.0.
+
+### Added
+- **Mapas 6-15**: 5 niveles medios y 5 difíciles de tamaño progresivo (#69)
+- **Forge**: selector de comportamiento al chocar (return/stay) por nivel (#67)
+- Builder de niveles sobre formas no rectangulares
+
+### Fixed
+- **Forge**: auto-ajuste del lienzo al tamaño del nivel cargado
+- Flechas del nivel Corazón que lo hacían imposible de resolver
+
+### Changed
+- README: diagrama de capas CLEAN embebido en la sección Arquitectura (#71)
+
+---
+
 ## [1.0.0] — 2026-07-11
 
 Primer release estable: motor de juego completo, persistencia local con

@@ -1,0 +1,94 @@
+@startuml clean-layers
+' Diagrama de capas CLEAN de Arrow Maze — fiel al código del cliente
+' (arrowmaze-game v1.0.0, carpetas reales de src/). Las capas se representan
+' como anillos anidados: estar contenido = estar más al centro. Todas las
+' flechas de dependencia apuntan hacia adentro (Regla de Dependencia).
+
+title <b>Arrow Maze — Capas CLEAN</b>\ncliente arrowmaze-game v1.0.0 · las flechas de dependencia apuntan siempre hacia el centro
+
+skinparam backgroundColor #FFFFFF
+skinparam defaultFontName Urbanist
+skinparam rectangle {
+  BorderColor #333333
+  FontSize 13
+}
+skinparam component {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+skinparam interface {
+  BackgroundColor #FFFFFF
+  BorderColor #555555
+}
+skinparam ArrowColor #333333
+skinparam NoteBackgroundColor #FFF9E6
+skinparam NoteBorderColor #C8871A
+
+rectangle "<b>FRAMEWORKS & DRIVERS</b>  ·  React 19 · Capacitor · SQLite · fetch/HTTP" as L1 #D4E6F1 {
+
+  component "LevelSelectScreen /\nGameView (SVG) / overlays\n<i>src/presentation</i>" as UI
+  component "CapacitorSqliteDriver\n<i>src/infrastructure/persistence/sqlite</i>" as Driver
+
+  rectangle "<b>INTERFACE ADAPTERS</b>  ·  src/infrastructure + controladores de src/presentation" as L2 #D5F5E3 {
+
+    component "GameController /\nuseGameController\n<i>src/presentation/game</i>" as Ctrl
+    component "SqliteProgressRepository\n<i>src/infrastructure/persistence</i>" as SqliteRepo <<adapter>>
+    component "FetchLevelApiClient ·\nFetchProgressApiClient ·\nFetchAuthApiClient ·\nFetchLeaderboardApiClient\n<i>src/infrastructure/api</i>" as FetchClients <<adapter>>
+    component "InMemoryLevelRepository\n<i>src/infrastructure/repositories</i>" as InMemRepo <<adapter>>
+    component "LocalProgressModuleFactory\n<i>src/infrastructure/factories</i>" as Factory <<Factory Method>>
+
+    rectangle "<b>APPLICATION</b>  ·  casos de uso y puertos  ·  src/application" as L3 #FCF3CF {
+
+      component "PlayMoveUseCase\n(envuelve a AdvanceArrowUseCase)" as PlayMove
+      component "AdvanceArrowUseCase ·\nSlideArrowUseCase ·\nPlaceArrowUseCase ·\nBuildBoardUseCase" as MotorUC
+      component "LevelLoader ·\nGetLocalProgress ·\nSaveLocalProgress ·\nSyncProgress" as DataUC
+      component "GameFlowController\n<i>src/application/services</i>" as Flow <<State>>
+
+      interface "ILocalProgressRepository" as IProgress
+      interface "ILevelApiClient ·\nIProgressApiClient ·\nIAuthApiClient" as IClients
+      interface "IClock · IAudioPreferences ·\nIThemePreference · …\n<i>14 puertos en src/application/ports</i>" as IMisc
+
+      rectangle "<b>DOMAIN</b>  ·  entidades puras, sin dependencias  ·  src/domain" as L4 #FADBD8 {
+        component "<b>GameSession</b>\n(agregado raíz · GameStatus)" as Session
+        component "Board · Cell ·\nArrow · ArrowSegment" as BoardEnt
+        component "Score · Port ·\nAdvanceResult (VOs)" as VOs
+        component "PathChecker ·\nTopologyValidator\n<i>src/domain/services</i>" as DomSvc
+        interface "ILevelRepository\n<i>puerto de dominio</i>" as ILevelRepo
+      }
+    }
+  }
+}
+
+component "arrowmaze-backend\n(API REST Express)\n<i>sistema externo</i>" as API #EEEEEE
+
+' ── Regla de Dependencia: todas las flechas apuntan hacia adentro ──
+UI --> Ctrl : renderiza / eventos
+Ctrl --> PlayMove : ejecuta
+Ctrl --> Flow : pausa / ajustes
+Driver --> SqliteRepo : provee conexión
+
+PlayMove --> MotorUC : orquesta (SRP)
+MotorUC --> Session
+MotorUC --> BoardEnt
+PlayMove --> VOs : produce Score
+DataUC --> ILevelRepo : lee niveles
+Flow --> Session : consulta GameStatus
+DataUC --> IProgress
+DataUC --> IClients
+Session --> DomSvc
+
+' ── Adaptadores implementan los puertos (hacia adentro) ──
+SqliteRepo .up.|> IProgress : implements
+FetchClients .up.|> IClients : implements
+InMemRepo .up.|> ILevelRepo : implements
+Factory --> IProgress : ensambla módulo D1
+FetchClients --> API : HTTP /api/v1
+
+note bottom of L4
+  El <b>Dominio no importa nada</b>: ni React, ni SQLite, ni fetch.
+  Los puertos (interfaces ○) se declaran en Application/Domain
+  y los adaptadores externos los implementan — la dependencia
+  se invierte y siempre cruza los anillos <b>hacia el centro</b>.
+end note
+
+@enduml
