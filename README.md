@@ -1,5 +1,13 @@
 # Arrow Maze — Client
 
+![CI](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-game/actions/workflows/ci.yml/badge.svg?branch=main)
+![Tests](https://img.shields.io/badge/tests-561%2F561%20passing-brightgreen?logo=jest)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Capacitor](https://img.shields.io/badge/Capacitor-Android-119EFF?logo=capacitor&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 > Implementación del cliente (React + TypeScript + Vite + Capacitor) para el juego de puzzle de flechas. Especificaciones y decisiones centralizadas en [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core).
 
 ---
@@ -20,6 +28,24 @@
 **Arrow Maze** es un juego de puzzle donde el jugador coloca y dirige flechas sobre un tablero representado como un grafo pasivo de nodos conectados por puertos. Las flechas son entidades activas (listas enlazadas) que se desplazan autónomamente por el grafo siguiendo la topología de conexiones.
 
 El cliente está construido como una aplicación web con soporte móvil nativo vía **Capacitor**.
+
+---
+
+## Demo
+
+| Selección de niveles | Partida en curso |
+|---|---|
+| ![Mapa de selección de niveles con progreso y trofeos](./doc/screenshots/select-niveles.png) | ![Tablero SVG con flechas durante una partida](./doc/screenshots/partida.png) |
+
+| Pausa | Ajustes (idioma · tema · audio) |
+|---|---|
+| ![Overlay de pausa](./doc/screenshots/pausa.png) | ![Overlay de ajustes con i18n, tema y audio](./doc/screenshots/ajustes.png) |
+
+| Tema oscuro | Móvil (360×640) |
+|---|---|
+| ![Partida con tema oscuro](./doc/screenshots/partida-tema-oscuro.png) | <img src="./doc/screenshots/movil-partida.png" alt="Partida en viewport móvil" width="280"> |
+
+> Capturas tomadas de la `v1.0.0` corriendo en local (Vite dev server). Más viewports en [`doc/screenshots/`](./doc/screenshots/).
 
 ---
 
@@ -371,7 +397,8 @@ pnpm build
 | [`doc/readme_plan.md`](./doc/readme_plan.md) | Roadmap maestro de los 13 features |
 | [`doc/plantuml-generation.md`](./doc/plantuml-generation.md) | Guía de generación de diagramas UML |
 | [`classes.puml`](./classes.puml) | Diagrama de clases PlantUML actualizado |
-| [`.ai-usage/README.md`](./.ai-usage/README.md) | Registro de uso de IA en el proyecto |
+| [`AI_USAGE.md`](./AI_USAGE.md) | Resumen del uso de IA: herramientas, alcance, alucinaciones corregidas y reflexión |
+| [`.ai-usage/README.md`](./.ai-usage/README.md) | Registro modular de uso de IA (un reporte por sesión) |
 | [`CLAUDE.md`](./CLAUDE.md) | Reglas y convenciones para Claude Code |
 
 ---
