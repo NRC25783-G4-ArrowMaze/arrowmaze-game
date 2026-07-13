@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { BoardComponent } from './BoardComponent';
+import { BoardComponent3D } from './BoardComponent3D';
 import { GameOverlay } from './GameOverlay';
 import { PauseOverlay } from './PauseOverlay';
 import { SettingsOverlay } from './SettingsOverlay';
@@ -83,6 +84,25 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
   }, []);
 
   const is3D = scene.mapMode === '3d';
+  // MODO CUBO: renderer three.js en lugar del SVG (misma fuente de datos:
+  // game.viewModel). Los niveles 2D/3D siguen con el SVG intacto.
+  const isCube = scene.mapMode === 'cube';
+  // Prólogo de victoria del cubo: la explosión corre ~1.5s ANTES de mostrar
+  // el overlay WON. El timeout garantiza que el overlay SIEMPRE llega
+  // (la celebración jamás bloquea el flujo real de victoria).
+  const [cubeCelebrationDone, setCubeCelebrationDone] = useState(false);
+  const cubeWon = isCube && game.status === 'WON';
+  useEffect(() => {
+    if (!cubeWon) {
+      return;
+    }
+    const timer = setTimeout(() => setCubeCelebrationDone(true), 1500);
+    return () => {
+      clearTimeout(timer);
+      setCubeCelebrationDone(false); // reset al salir de WON (restart/siguiente)
+    };
+  }, [cubeWon]);
+  const overlayStatus = cubeWon && !cubeCelebrationDone ? 'IN_PROGRESS' : game.status;
   const [activeLayer, setActiveLayer] = useState(0);
   const maxLayer = useMemo(
     () => scene.cells.reduce((m, c) => Math.max(m, c.layer ?? 0), 0),
@@ -204,19 +224,34 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
             aspectRatio: '1 / 1',
           }}
         >
-          <BoardComponent
-            board={game.viewModel}
-            width={BOARD_SIZE}
-            height={BOARD_SIZE}
-            onPointerDown={onPointerDown}
-            collision={game.collision ?? undefined}
-            vanishing={game.vanishing ?? undefined}
-            headDisintegrating={game.headDisintegrating ?? undefined}
-            hintCell={hintCell ?? undefined}
-            activeLayer={is3D ? activeLayer : undefined}
-          />
+          {isCube ? (
+            <BoardComponent3D
+              scene={scene}
+              board={game.viewModel}
+              interactive={boardInteractive}
+              onArrowTap={(arrowId) => {
+                notifyMove(arrowId);
+                game.playMove({ arrowId });
+              }}
+              vanishing={game.vanishing ?? undefined}
+              collision={game.collision ?? undefined}
+              won={game.status === 'WON'}
+            />
+          ) : (
+            <BoardComponent
+              board={game.viewModel}
+              width={BOARD_SIZE}
+              height={BOARD_SIZE}
+              onPointerDown={onPointerDown}
+              collision={game.collision ?? undefined}
+              vanishing={game.vanishing ?? undefined}
+              headDisintegrating={game.headDisintegrating ?? undefined}
+              hintCell={hintCell ?? undefined}
+              activeLayer={is3D ? activeLayer : undefined}
+            />
+          )}
           <GameOverlay
-            status={game.status}
+            status={overlayStatus}
             score={game.score}
             timeSeconds={timeSeconds}
             onNextLevel={onNextLevel}
