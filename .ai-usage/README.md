@@ -58,6 +58,7 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-10 | Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente, toggle ☀️/🌙 en header + Ajustes | [`2026-07-10-modo-oscuro.md`](./2026-07-10-modo-oscuro.md) | Claude Fable 5 |
 | 2026-07-13 | Planning: Vista 3D en Cascada para el Forge | [`2026-07-13-forge-3d-view-planning.md`](./2026-07-13-forge-3d-view-planning.md) | Claude Sonnet 4.2 |
 | 2026-07-13 | Implementation: Vista 3D en Cascada para el Forge | [`2026-07-13-forge-3d-view-implementation.md`](./2026-07-13-forge-3d-view-implementation.md) | Claude Sonnet 4.2 |
+| 2026-07-13 | Implementation: MODO CUBO — tablero 3D sobre la superficie de un cubo (riel 3D, arte Rubik + universo interior, Singularidad) | [`2026-07-13-modo-cubo-implementacion.md`](./2026-07-13-modo-cubo-implementacion.md) | Claude Fable 5 |
 
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
