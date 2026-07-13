@@ -111,7 +111,7 @@ export const LEVEL_MAP: LevelMapDTO = [
     starThresholds: [2000, 3000],
   },
   {
-    levelId: 'level-cube',
+    levelId: 'cube',
     prerequisites: ['heart-preview'],
     pathHint: { x: 50, y: 98 },
     starThresholds: [1500, 2000],
@@ -123,7 +123,7 @@ export const LEVEL_MAP: LevelMapDTO = [
   // las estrellas SÍ se pueden ganar.
   {
     levelId: 'singularidad',
-    prerequisites: ['level-cube'],
+    prerequisites: ['cube'],
     pathHint: { x: 50, y: 100 },
     starThresholds: [1253, 1400],
   },

@@ -52,7 +52,7 @@ export const LOCAL_LEVELS: Record<string, Scene> = {
   // 'heart-preview' (registrado en el backend → leaderboards sin 404).
   'heart-preview': sceneFromLevelData(LEVEL_HEART),
   // CUBE — nivel 3D con paginación Z
-  'level-cube': sceneFromLevelData(LEVEL_CUBE),
+  'cube': sceneFromLevelData(LEVEL_CUBE),
   // SINGULARIDAD — el gran final: primer nivel del MODO CUBO en el mapa
   // (post-Corazón). Pendiente registrarlo en el backend (ver doc de hallazgos).
   'singularidad': LEVEL_SINGULARIDAD,

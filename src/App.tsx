@@ -46,7 +46,7 @@ const LEVEL_METADATA: Record<string, { difficulty: string }> = {
   'level-intermediate-b': { difficulty: 'easy' },
   'level-advanced': { difficulty: 'easy' },
   'level-expert': { difficulty: 'easy' },
-  'level-cube': { difficulty: 'hard' },
+  'cube': { difficulty: 'hard' },
   // El gran final (MODO CUBO): con la música hard de G1, como merece.
   'singularidad': { difficulty: 'hard' },
 };

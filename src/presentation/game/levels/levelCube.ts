@@ -1,7 +1,7 @@
 import type { LevelDataDTO } from '../../../application/dtos/LevelDataDTOs';
 
 export const LEVEL_CUBE: LevelDataDTO = {
-  "id": "level-cube",
+  "id": "cube",
   "name": "Cube",
   "difficulty": "hard",
   "allowedMoves": 12,

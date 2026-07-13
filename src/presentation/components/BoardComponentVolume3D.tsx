@@ -53,16 +53,11 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
 
     // ── Celdas: Cubos de cristal ──
     const glassGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8);
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
+    const glassMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      transmission: 0.9,
-      opacity: 1,
-      metalness: 0.1,
-      roughness: 0.2,
-      ior: 1.5,
-      thickness: 0.5,
+      opacity: 0.15,
       transparent: true,
-      side: THREE.FrontSide,
+      depthWrite: false,
     });
 
     const tilesGroup = new THREE.Group();
@@ -103,6 +98,7 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
         metalness: 0.1,
       });
       const tube = new THREE.Mesh(tubeGeom, tubeMat);
+      tube.userData.arrowId = arrow.id;
       arrowGroup.add(tube);
 
       // Hit targets esféricos en cada nodo de la flecha
@@ -116,10 +112,19 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
       
       // Cabeza de flecha visual en la punta (primer punto es la cabeza en viewModel)
       const headPos = arrow.points[0];
-      const headGeom = new THREE.SphereGeometry(0.22, 16, 16);
+      const headGeom = new THREE.ConeGeometry(0.25, 0.6, 16);
+      headGeom.rotateX(Math.PI / 2);
       const headMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, emissive: arrow.color, emissiveIntensity: 0.5 });
       const headMesh = new THREE.Mesh(headGeom, headMat);
+      headMesh.userData.arrowId = arrow.id;
       headMesh.position.set(headPos.x, headPos.y, headPos.z);
+      
+      if (arrow.points.length > 1) {
+        const nextPos = arrow.points[1];
+        const dir = new THREE.Vector3(headPos.x - nextPos.x, headPos.y - nextPos.y, headPos.z - nextPos.z).normalize();
+        const target = new THREE.Vector3(headPos.x + dir.x, headPos.y + dir.y, headPos.z + dir.z);
+        headMesh.lookAt(target);
+      }
       arrowGroup.add(headMesh);
     }
     scene3.add(arrowGroup);
@@ -141,6 +146,8 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
       pivot.rotation.x = currentPitch;
     };
     updateCamera();
+    
+    let hoveredArrowId: string | null = null;
 
     const handlePointerDown = (e: PointerEvent) => {
       if (!interactiveRef.current) return;
@@ -155,6 +162,23 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
         currentPitch += ev.dy * 0.01;
         currentPitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, currentPitch));
         updateCamera();
+      } else if (!gesture.isDragging && interactiveRef.current) {
+        // Raycast for hover
+        const rect = container.getBoundingClientRect();
+        const ndcX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        const ndcY = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), camera);
+
+        const intersects = raycaster.intersectObjects(hitMeshes.map(h => h.mesh), false);
+        if (intersects.length > 0) {
+          const hit = intersects[0];
+          const found = hitMeshes.find(h => h.mesh === hit.object);
+          hoveredArrowId = found ? found.arrowId : null;
+          container.style.cursor = 'pointer';
+        } else {
+          hoveredArrowId = null;
+          container.style.cursor = 'default';
+        }
       }
     };
 
@@ -181,12 +205,20 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
 
     const handlePointerCancel = () => {
       gesture.cancel();
+      hoveredArrowId = null;
+      container.style.cursor = 'default';
+    };
+
+    const handlePointerLeave = () => {
+      hoveredArrowId = null;
+      container.style.cursor = 'default';
     };
 
     container.addEventListener('pointerdown', handlePointerDown);
     container.addEventListener('pointermove', handlePointerMove);
     container.addEventListener('pointerup', handlePointerUp);
     container.addEventListener('pointercancel', handlePointerCancel);
+    container.addEventListener('pointerleave', handlePointerLeave);
 
     // ── Loop ──
     let frameId: number;
@@ -204,8 +236,18 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
       // Animación suave de los tubos
       const time = performance.now() * 0.001;
       arrowGroup.children.forEach((child, idx) => {
-        if (child instanceof THREE.Mesh && child.geometry instanceof THREE.TubeGeometry) {
-          (child.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.5 + 0.3 * Math.sin(time * 3 + idx);
+        if (child instanceof THREE.Mesh) {
+          const arrowId = child.userData.arrowId;
+          if (!arrowId) return;
+          
+          const mat = child.material as THREE.MeshStandardMaterial;
+          const isHovered = arrowId === hoveredArrowId;
+          
+          if (child.geometry instanceof THREE.TubeGeometry) {
+            mat.emissiveIntensity = (isHovered ? 1.5 : 0.5) + (isHovered ? 0.0 : 0.3 * Math.sin(time * 3 + idx));
+          } else if (child.geometry instanceof THREE.ConeGeometry) {
+            mat.emissiveIntensity = isHovered ? 1.5 : 0.5;
+          }
         }
       });
 
@@ -219,6 +261,7 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
       container.removeEventListener('pointermove', handlePointerMove);
       container.removeEventListener('pointerup', handlePointerUp);
       container.removeEventListener('pointercancel', handlePointerCancel);
+      container.removeEventListener('pointerleave', handlePointerLeave);
       renderer.dispose();
       container.removeChild(renderer.domElement);
     };
