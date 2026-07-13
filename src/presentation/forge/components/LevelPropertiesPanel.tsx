@@ -5,6 +5,7 @@ interface LevelPropertiesPanelProps {
   scene: Scene
   gridCols: number
   gridRows: number
+  maxLayer: number
   onSceneUpdate: (updates: Partial<Scene>) => void
   onGridUpdate: (cols: number, rows: number) => void
 }
@@ -13,6 +14,7 @@ export const LevelPropertiesPanel: React.FC<LevelPropertiesPanelProps> = ({
   scene,
   gridCols,
   gridRows,
+  maxLayer,
   onSceneUpdate,
   onGridUpdate,
 }) => {
@@ -34,6 +36,10 @@ export const LevelPropertiesPanel: React.FC<LevelPropertiesPanelProps> = ({
 
   const handleCollisionChange = (newBehavior: string) => {
     onSceneUpdate({ collisionBehavior: newBehavior as CollisionBehavior })
+  }
+
+  const handleMapModeChange = (newMode: string) => {
+    onSceneUpdate({ mapMode: newMode as '2d' | '3d' })
   }
 
   const handleGridColsChange = (newCols: number) => {
@@ -169,6 +175,37 @@ export const LevelPropertiesPanel: React.FC<LevelPropertiesPanelProps> = ({
           <option value="stay">Se queda en el sitio (stay)</option>
         </select>
       </div>
+
+      {/* Modo del nivel */}
+      <div style={{ marginBottom: '10px' }}>
+        <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>
+          Modo de nivel
+        </label>
+        <select
+          value={scene.mapMode ?? '2d'}
+          onChange={(e) => handleMapModeChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '6px',
+            fontSize: '12px',
+            border: '1px solid #ccc',
+            borderRadius: '3px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <option value="2d">2D (plano)</option>
+          <option value="3d">3D (capas Z)</option>
+        </select>
+      </div>
+
+      {/* Info de capas Z (solo en modo 3D, readonly) */}
+      {scene.mapMode === '3d' && (
+        <div style={{ marginBottom: '10px', padding: '6px 8px', backgroundColor: '#ede9fe', borderRadius: '4px' }}>
+          <span style={{ fontSize: '12px', color: '#7c3aed', fontWeight: 'bold' }}>
+            Capas Z: {maxLayer + 1} (0 … {maxLayer})
+          </span>
+        </div>
+      )}
 
       {/* Grid size */}
       <div style={{ marginBottom: '10px' }}>

@@ -21,6 +21,10 @@ export interface ForgeState {
   selectedArrowId: string | null
   pendingConnect: PendingConnect | null
 
+  // Navegación de capas 3D
+  activeLayer: number
+  maxLayer: number
+
   // Historial (undo/redo)
   history: { past: Scene[]; future: Scene[] }
 
@@ -35,9 +39,10 @@ export interface ForgeState {
   selectArrow: (arrowId: string | null) => void
   setPendingConnect: (pending: PendingConnect | null) => void
   setSession: (token: string | null, email: string | null) => void
+  setActiveLayer: (layer: number) => void
 
   // Mutations (pasan por commit para historial)
-  addCell: (col: number, row: number) => void
+  addCell: (col: number, row: number, layer?: number, portCount?: number) => void
   removeCell: (cellId: string) => void
   connectPorts: (cellIdA: string, portA: number, cellIdB: string, portB: number) => void
   disconnectPort: (cellId: string, port: number) => void
@@ -81,6 +86,8 @@ export const useForgeStore = create<ForgeState>((set) => {
     tool: 'select',
     selectedArrowId: null,
     pendingConnect: null,
+    activeLayer: 0,
+    maxLayer: 0,
     history: { past: [], future: [] },
     session: { token: null, email: null },
 
@@ -92,13 +99,22 @@ export const useForgeStore = create<ForgeState>((set) => {
     selectArrow: (arrowId) => set({ selectedArrowId: arrowId }),
     setPendingConnect: (pending) => set({ pendingConnect: pending }),
     setSession: (token, email) => set({ session: { token, email } }),
+    setActiveLayer: (layer) => set({ activeLayer: layer }),
 
     // Mutaciones (usando sceneOps)
-    addCell: (col, row) => {
-      commit((scene) => sceneOps.addCell(scene, col, row))
+    addCell: (col, row, layer = 0, portCount = 4) => {
+      commit((scene) => sceneOps.addCell(scene, col, row, layer, portCount))
+      // Recalcular maxLayer tras agregar la celda
+      set((s) => ({
+        maxLayer: s.scene.cells.reduce((m, c) => Math.max(m, c.layer ?? 0), 0),
+      }))
     },
     removeCell: (cellId) => {
       commit((scene) => sceneOps.removeCell(scene, cellId))
+      // Recalcular maxLayer: puede haber bajado si se eliminó la última celda de una capa
+      set((s) => ({
+        maxLayer: s.scene.cells.reduce((m, c) => Math.max(m, c.layer ?? 0), 0),
+      }))
     },
     connectPorts: (cellIdA, portA, cellIdB, portB) => {
       commit((scene) => {
@@ -138,10 +154,13 @@ export const useForgeStore = create<ForgeState>((set) => {
       // (los niveles grandes como el corazón llegan más allá de 8×8). Mínimo 8×8.
       const maxCol = newScene.cells.reduce((m, c) => Math.max(m, c.col), 0)
       const maxRow = newScene.cells.reduce((m, c) => Math.max(m, c.row), 0)
+      const maxLayer = newScene.cells.reduce((m, c) => Math.max(m, c.layer ?? 0), 0)
       set({
         scene: newScene,
         gridCols: Math.max(8, maxCol + 1),
         gridRows: Math.max(8, maxRow + 1),
+        maxLayer,
+        activeLayer: 0,   // siempre arrancar en capa 0 al cargar
         history: { past: [], future: [] },
       })
     },

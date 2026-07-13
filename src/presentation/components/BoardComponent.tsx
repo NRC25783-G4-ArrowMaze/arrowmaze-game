@@ -98,6 +98,11 @@ export interface BoardComponentProps {
    * un anillo pulsante sobre su centro. Ausente → sin guía.
    */
   hintCell?: { col: number; row: number };
+  /**
+   * Capa Z activa en niveles 3D. Si se define, solo se renderizan las celdas
+   * de esa capa, y las flechas cuya cabeza esté en dicha capa.
+   */
+  activeLayer?: number;
 }
 
 /**
@@ -119,6 +124,7 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   vanishing,
   headDisintegrating,
   hintCell,
+  activeLayer,
 }) => {
   const { cells, arrows } = board;
 
@@ -225,7 +231,10 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
   // Puntos SOLO en los nodos reales del tablero (grafo), no en un rectángulo de
   // fondo: un mapa disperso (p. ej. el corazón) no debe mostrar celdas fantasma.
   // Los niveles de rejilla completa se ven igual: sus celdas llenan el bounding box.
-  const dotPositions = cells;
+  // En modo 3D, filtramos por la capa activa.
+  const dotPositions = activeLayer !== undefined
+    ? cells.filter((c) => (c.layer ?? 0) === activeLayer)
+    : cells;
 
   // Origen del estallido de desaparición (cabeza de la flecha destruida), si lo hay.
   const burstOrigin =
@@ -273,6 +282,13 @@ export const BoardComponent: React.FC<BoardComponentProps> = ({
         {arrows.map((arrow) => {
           if (exitingIds.has(arrow.id)) {
             return null;
+          }
+          if (activeLayer !== undefined) {
+            const headCellId = arrow.cellIds[0];
+            const headCell = cells.find((c) => c.id === headCellId);
+            if (headCell && (headCell.layer ?? 0) !== activeLayer) {
+              return null;
+            }
           }
           const centers = arrow.cellIds
             .map((id) => centerById.get(id))
