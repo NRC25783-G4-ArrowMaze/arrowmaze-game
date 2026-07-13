@@ -23,7 +23,7 @@ export interface LevelDataDTO {
   id: string
   name?: string
   difficulty?: string
-  mapMode?: '2d' | '3d'  // Modo del nivel. Ausente = '2d'.
+  mapMode?: '2d' | '3d' | 'cube'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: LevelCellDTO[]
   connections?: LevelConnectionDTO[]
@@ -44,7 +44,7 @@ export interface Scene {
   id: string
   name?: string
   difficulty?: string
-  mapMode?: '2d' | '3d'  // Modo del nivel. Ausente = '2d'.
+  mapMode?: '2d' | '3d' | 'cube'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: SceneCell[]
   connections: LevelConnectionDTO[]
