@@ -90,6 +90,7 @@ export const es: Catalog = {
       'level-initial': 'Tutorial',
       'level-intermediate-a': 'Desafío A',
       'heart-preview': 'Corazón',
+      'singularidad': 'Singularidad',
       'level-intermediate-b': 'Desafío B',
       'level-advanced': 'Avanzado',
       'level-expert': 'Experto',
