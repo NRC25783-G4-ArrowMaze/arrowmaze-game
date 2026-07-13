@@ -320,8 +320,14 @@ export const BoardComponentVolume3D: React.FC<BoardComponentVolume3DProps> = ({
 
           const arrowModel = currentModel.arrows.find(a => a.id === id);
           if (arrowModel) {
-            const { dCol, dRow, dLayer } = portDelta3D(arrowModel.exitDir);
-            const dir = new THREE.Vector3(dCol, -dLayer, dRow).normalize();
+            let dir = new THREE.Vector3();
+            if (pts.length > 1) {
+              const prevPos = pts[pts.length - 2];
+              dir.subVectors(headPos, prevPos).normalize();
+            } else {
+              const { dCol, dRow, dLayer } = portDelta3D(arrowModel.exitDir);
+              dir.set(dCol, -dLayer, dRow).normalize();
+            }
             const target = new THREE.Vector3().copy(headPos).add(dir);
             if (state.headMesh.parent) {
               state.headMesh.parent.localToWorld(target);

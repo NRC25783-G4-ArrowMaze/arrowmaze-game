@@ -61,7 +61,6 @@ export function buildVolumeRenderModel(
         points.push(center);
       }
     }
-    points.reverse(); // El índice 0 debe ser la cola, el último la cabeza para railGlide
     if (points.length > 0) {
       renderArrows.push({
         id: arrow.id,
