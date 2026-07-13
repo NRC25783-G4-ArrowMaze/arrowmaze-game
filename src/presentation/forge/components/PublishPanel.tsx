@@ -3,6 +3,7 @@ import type { Scene } from '../../game/scene'
 import { toLevelDataDTO, sceneFromLevelData } from '../../game/scene'
 import { ForgeApiClient, type LevelMetadata } from '../../../infrastructure/api/ForgeApiClient'
 import { isAdminToken } from '../state/tokenRole'
+import { LEVEL_3D_SAMPLE } from '../../game/levels/levelMapa3dSample'
 
 interface PublishPanelProps {
   scene: Scene
@@ -212,6 +213,22 @@ export const PublishPanel: React.FC<PublishPanelProps> = ({
           }}
         >
           📋 Copiar para seed
+        </button>
+        <button
+          onClick={() => onLoadScene(LEVEL_3D_SAMPLE)}
+          disabled={loading}
+          style={{
+            padding: '10px',
+            backgroundColor: '#10b981',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '3px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: '12px',
+            opacity: loading ? 0.6 : 1,
+          }}
+        >
+          🧩 Cargar Muestra 3D
         </button>
       </div>
 
