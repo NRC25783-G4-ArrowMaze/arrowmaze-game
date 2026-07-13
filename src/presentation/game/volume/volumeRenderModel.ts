@@ -14,6 +14,7 @@ export interface VolumeRenderArrow {
   color: string;
   /** Centros de las celdas ocupadas, desde la cabeza hasta la cola */
   points: Vec3[];
+  exitDir: number;
 }
 
 export interface VolumeRenderModel {
@@ -40,7 +41,7 @@ export function cellToVolumePos(col: number, row: number, layer: number): Vec3 {
 
 export function buildVolumeRenderModel(
   cells: ReadonlyArray<{ id: string; col: number; row: number; layer?: number }>,
-  arrows: ReadonlyArray<{ id: string; color: string; cellIds: string[] }>
+  arrows: ReadonlyArray<{ id: string; color: string; cellIds: string[]; exitDir: number }>
 ): VolumeRenderModel {
   const cellMap = new Map<string, Vec3>();
   const tiles: VolumeRenderTile[] = [];
@@ -60,11 +61,13 @@ export function buildVolumeRenderModel(
         points.push(center);
       }
     }
+    points.reverse(); // El índice 0 debe ser la cola, el último la cabeza para railGlide
     if (points.length > 0) {
       renderArrows.push({
         id: arrow.id,
         color: arrow.color,
         points,
+        exitDir: arrow.exitDir,
       });
     }
   }

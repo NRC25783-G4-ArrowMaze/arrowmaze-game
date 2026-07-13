@@ -134,3 +134,16 @@ export function portDelta(port: number): GridDelta {
 export function isInterLayerPort(port: number): boolean {
   return port === 4 || port === 5
 }
+
+export function portDelta3D(port: number): { dCol: number, dRow: number, dLayer: number } {
+  switch (port) {
+    case 0: return { dCol: 0, dRow: -1, dLayer: 0 } // Y-
+    case 1: return { dCol: 1, dRow: 0, dLayer: 0 }  // X+
+    case 2: return { dCol: 0, dRow: 1, dLayer: 0 }  // Y+
+    case 3: return { dCol: -1, dRow: 0, dLayer: 0 } // X-
+    case 4: return { dCol: 0, dRow: 0, dLayer: 1 }  // Z+
+    case 5: return { dCol: 0, dRow: 0, dLayer: -1 } // Z-
+    default:
+      throw new RangeError(`portDelta3D: índice de puerto ${port} fuera de rango [0, 5]`)
+  }
+}

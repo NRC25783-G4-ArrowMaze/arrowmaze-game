@@ -1,7 +1,7 @@
 import type { LevelDataDTO } from '../../../application/dtos/LevelDataDTOs';
 
 export const LEVEL_CUBE: LevelDataDTO = {
-  "id": "cube",
+  "id": "level-cube",
   "name": "Cube",
   "difficulty": "hard",
   "allowedMoves": 12,
@@ -445,90 +445,90 @@ export const LEVEL_CUBE: LevelDataDTO = {
   ],
   "arrows": [
     {
-      "id": "blue",
+      "id": "magenta",
       "head": {
-        "cellId": "0,0_Z0",
-        "exitPort": 4
+        "cellId": "1,0_Z0",
+        "exitPort": 3
       },
       "body": [
-        "1,0_Z0"
+        "0,0_Z0",
+        "0,0_Z1"
       ]
     },
     {
-      "id": "green",
+      "id": "amber",
       "head": {
         "cellId": "0,1_Z2",
-        "exitPort": 2
+        "exitPort": 0
       },
       "body": [
         "0,0_Z2",
-        "0,0_Z1"
+        "1,0_Z2"
       ]
     },
     {
       "id": "orange",
       "head": {
-        "cellId": "1,2_Z2",
-        "exitPort": 1
+        "cellId": "2,0_Z1",
+        "exitPort": 4
       },
       "body": [
-        "0,2_Z2",
-        "0,2_Z1"
-      ]
-    },
-    {
-      "id": "magenta",
-      "head": {
-        "cellId": "2,2_Z1",
-        "exitPort": 5
-      },
-      "body": [
-        "2,2_Z2",
+        "2,0_Z2",
         "2,1_Z2"
       ]
     },
     {
       "id": "violet",
       "head": {
-        "cellId": "2,1_Z0",
-        "exitPort": 0
+        "cellId": "2,2_Z0",
+        "exitPort": 3
       },
       "body": [
-        "2,2_Z0",
-        "1,2_Z0"
+        "1,2_Z0",
+        "1,1_Z0"
+      ]
+    },
+    {
+      "id": "green",
+      "head": {
+        "cellId": "2,0_Z0",
+        "exitPort": 2
+      },
+      "body": [
+        "2,1_Z0",
+        "2,1_Z1"
       ]
     },
     {
       "id": "cyan",
       "head": {
-        "cellId": "1,0_Z1",
-        "exitPort": 4
+        "cellId": "0,2_Z1",
+        "exitPort": 0
       },
       "body": [
-        "2,0_Z1",
-        "2,0_Z0"
+        "0,1_Z1",
+        "1,1_Z1"
       ]
     },
     {
-      "id": "amber",
+      "id": "blue",
       "head": {
-        "cellId": "1,1_Z2",
-        "exitPort": 5
+        "cellId": "1,2_Z1",
+        "exitPort": 1
       },
       "body": [
-        "1,0_Z2",
-        "2,0_Z2"
+        "2,2_Z1",
+        "2,2_Z2"
       ]
     },
     {
       "id": "rose",
       "head": {
-        "cellId": "1,1_Z1",
-        "exitPort": 3
+        "cellId": "0,2_Z2",
+        "exitPort": 1
       },
       "body": [
-        "1,1_Z0",
-        "0,1_Z0"
+        "1,2_Z2"
       ]
     }
   ]
