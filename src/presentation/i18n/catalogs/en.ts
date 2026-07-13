@@ -91,6 +91,7 @@ export const en: Catalog = {
       'level-intermediate-a': 'Challenge A',
       'heart-preview': 'Heart',
       'singularidad': 'Singularity',
+      'cube': 'Cube',
       'level-intermediate-b': 'Challenge B',
       'level-advanced': 'Advanced',
       'level-expert': 'Expert',
