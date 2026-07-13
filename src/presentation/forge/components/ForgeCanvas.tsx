@@ -29,10 +29,18 @@ const GHOST_DOT_COLOR = '#ddd'
 const GHOST_DOT_RADIUS_RATIO = 0.12
 // Celdas: tiles claros (el tablero). Las flechas se dibujan encima con color.
 const CELL_TILE_RATIO = 0.72 // lado del tile como fracción de cellSize
-const CELL_TILE_FILL = '#e8e8e8'
 const CELL_TILE_STROKE = '#bbb'
 const CELL_TILE_STROKE_SELECTED = '#ff6b6b'
 const INTERLAYER_COLOR = '#a855f7'  // violeta para conexiones inter-capa
+
+const LAYER_COLORS = [
+  '#e8e8e8', // 0: base
+  '#e0f2fe', // 1: azul claro
+  '#dcfce7', // 2: verde claro
+  '#fef08a', // 3: amarillo claro
+  '#fce7f3', // 4: rosa claro
+  '#f3e8ff', // 5: morado claro
+]
 
 const layerVisualOffset = (layer: number, activeLayer: number): Point => ({
   x: (layer - activeLayer) * 50,
@@ -226,13 +234,13 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
         const is3DCell = cell.portCount === 6
 
         return (
-          <g key={`cell-${cell.id}`} style={{ pointerEvents: isActive ? 'auto' : 'none', opacity: isActive ? 1.0 : 0.4 }}>
+          <g key={`cell-${cell.id}`} style={{ pointerEvents: isActive ? 'auto' : 'none', opacity: isActive ? 1.0 : 0.25 }}>
             <rect
               x={center.x - tileSize / 2}
               y={center.y - tileSize / 2}
               width={tileSize}
               height={tileSize}
-              fill={CELL_TILE_FILL}
+              fill={LAYER_COLORS[Math.abs(layer) % LAYER_COLORS.length]}
               stroke={isConnectPending ? CELL_TILE_STROKE_SELECTED : CELL_TILE_STROKE}
               strokeWidth={isConnectPending ? 3 : 1.5}
               rx={4}
@@ -300,7 +308,7 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
           } else {
              const isActive = (fromCell.layer ?? 0) === activeLayer && (toCell.layer ?? 0) === activeLayer
              return (
-               <g key={`connection-${idx}`} opacity={isActive ? 1.0 : 0.4}>
+               <g key={`connection-${idx}`} opacity={isActive ? 1.0 : 0.25}>
                  <line
                    x1={fromPortPoint.x} y1={fromPortPoint.y}
                    x2={toPortPoint.x} y2={toPortPoint.y}
@@ -354,7 +362,7 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
             const portLabel = port === 4 ? '▲' : port === 5 ? '▼' : null
 
             return (
-              <g key={`port-${cell.id}-${port}`} style={{ opacity: isActive || isIL ? 1.0 : 0.4 }}>
+              <g key={`port-${cell.id}-${port}`} style={{ opacity: isActive || isIL ? 1.0 : 0.25 }}>
                 <circle
                   cx={pt.x}
                   cy={pt.y}
@@ -446,7 +454,7 @@ export const ForgeCanvas: React.FC<ForgeCanvasProps> = ({
             const exitMarkY = headCenter.y + exitDir.dRow * (nodeRadius + 4)
 
             return (
-              <g key={`arrow-${arrow.id}`} pointerEvents="none" style={{ opacity: isActive ? 1.0 : 0.4 }}>
+              <g key={`arrow-${arrow.id}`} pointerEvents="none" style={{ opacity: isActive ? 1.0 : 0.25 }}>
                 {isSelected &&
                   centers.map((p, i) => (
                     <circle
