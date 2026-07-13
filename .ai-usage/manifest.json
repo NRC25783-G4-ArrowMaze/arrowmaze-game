@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-13T21:01:39.300461Z",
+    "lastUpdated": "2026-07-13T21:37:03.290965Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -3064,6 +3064,60 @@
           "tests": "passed",
           "structure": "passed"
         }
+      },
+      {
+        "id": "2026-07-13-arrow-3d-topology-fix-planning",
+        "date": "2026-07-13",
+        "title": "Planning: Fix Arrow.ts exitDir calculation for 3D Topology (6 ports)",
+        "file": "2026-07-13-arrow-3d-topology-fix-planning.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "arrow-cinematics-3d",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 0,
+          "tests_passing": 0
+        },
+        "areas": [
+          "planning",
+          "domain",
+          "arrow-cinematics"
+        ],
+        "validation": {
+          "tests": "pending",
+          "structure": "passed"
+        }
+      },
+      {
+        "id": "2026-07-13-arrow-3d-topology-fix-implementation",
+        "date": "2026-07-13",
+        "title": "Implementation: Fix Arrow.ts exitDir calculation for 3D Topology",
+        "file": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "arrow-cinematics-3d",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-planning.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 2,
+          "tests_passing": 12
+        },
+        "areas": [
+          "implementation",
+          "domain",
+          "arrow-cinematics"
+        ],
+        "validation": {
+          "tests": "passed",
+          "structure": "passed"
+        }
       }
     ],
     "statistics": {
@@ -3099,7 +3153,7 @@
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones",
       "totalEntries": 57,
-      "total_reports": 59
+      "total_reports": 61
     },
     "lastEntry": {
       "id": "2026-07-13-003",

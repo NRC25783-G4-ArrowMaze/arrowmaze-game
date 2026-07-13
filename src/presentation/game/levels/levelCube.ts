@@ -4,7 +4,7 @@ export const LEVEL_CUBE: LevelDataDTO = {
   "id": "level-cube",
   "name": "Cube",
   "difficulty": "hard",
-  "allowedMoves": 15,
+  "allowedMoves": 12,
   "mapMode": "3d",
   "collisionBehavior": "return",
   "cells": [
@@ -527,47 +527,98 @@ export const LEVEL_CUBE: LevelDataDTO = {
   "arrows": [
     {
       "id": "blue",
+      "color": "#3b82f6",
       "head": {
-        "cellId": "1,1_Z0",
+        "cellId": "0,0_Z0",
         "exitPort": 4
       },
       "body": [
-        "1,1_Z1"
+        "1,0_Z0"
       ]
-    },
-    {
-      "id": "red",
-      "head": {
-        "cellId": "0,0_Z2",
-        "exitPort": 1
-      },
-      "body": []
     },
     {
       "id": "green",
+      "color": "#22c55e",
       "head": {
-        "cellId": "2,2_Z0",
-        "exitPort": 0
+        "cellId": "0,1_Z2",
+        "exitPort": 2
       },
       "body": [
-        "2,2_Z1"
+        "0,0_Z2",
+        "0,0_Z1"
       ]
     },
     {
-      "id": "yellow",
+      "id": "orange",
+      "color": "#f97316",
       "head": {
-        "cellId": "0,2_Z2",
-        "exitPort": 5
+        "cellId": "1,2_Z2",
+        "exitPort": 1
       },
-      "body": []
+      "body": [
+        "0,2_Z2",
+        "0,2_Z1"
+      ]
     },
     {
-      "id": "purple",
+      "id": "magenta",
+      "color": "#ec4899",
       "head": {
-        "cellId": "2,0_Z1",
-        "exitPort": 2
+        "cellId": "2,2_Z1",
+        "exitPort": 5
       },
-      "body": []
+      "body": [
+        "2,2_Z2",
+        "2,1_Z2"
+      ]
+    },
+    {
+      "id": "violet",
+      "color": "#8b5cf6",
+      "head": {
+        "cellId": "2,1_Z0",
+        "exitPort": 0
+      },
+      "body": [
+        "2,2_Z0",
+        "1,2_Z0"
+      ]
+    },
+    {
+      "id": "cyan",
+      "color": "#06b6d4",
+      "head": {
+        "cellId": "1,0_Z1",
+        "exitPort": 4
+      },
+      "body": [
+        "2,0_Z1",
+        "2,0_Z0"
+      ]
+    },
+    {
+      "id": "amber",
+      "color": "#f59e0b",
+      "head": {
+        "cellId": "1,1_Z2",
+        "exitPort": 5
+      },
+      "body": [
+        "1,0_Z2",
+        "2,0_Z2"
+      ]
+    },
+    {
+      "id": "rose",
+      "color": "#fb7185",
+      "head": {
+        "cellId": "1,1_Z1",
+        "exitPort": 3
+      },
+      "body": [
+        "1,1_Z0",
+        "0,1_Z0"
+      ]
     }
   ]
 };

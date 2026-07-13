@@ -503,3 +503,89 @@ describe('Bloque 3 — Cálculo cinemático durante el vuelo (in-flight)', () =>
   });
 
 });
+
+// ══════════════════════════════════════════════
+// BLOQUE 4 — CÁLCULO DE PUERTO OPUESTO EN TOPOLOGÍAS 3D (6 PUERTOS)
+// ══════════════════════════════════════════════
+
+describe('Bloque 4 — Cálculo de puerto opuesto en topologías 3D (6 puertos)', () => {
+  test('Scenario: Tail calcula correctamente su salida (exitDir) en 6 puertos', () => {
+    const board = new Board('board-3d');
+    // Creamos 3 celdas: C1, C2, C3 alineadas en X+
+    const C1 = new Cell('C1', 6);
+    const C2 = new Cell('C2', 6);
+    const C3 = new Cell('C3', 6);
+    board.addCell(C1);
+    board.addCell(C2);
+    board.addCell(C3);
+
+    // Conexiones lineales en X (1 <-> 3)
+    board.connectPorts(C1, 1, C2, 3);
+    board.connectPorts(C2, 1, C3, 3);
+
+    // Arrow de 2 segmentos:
+    // Head (trailing) en C1 (apunta a C2 vía port 1)
+    // Tail (tip) en C2
+    const arrow = new Arrow(C1, 1);
+    arrow.extend(C2);
+
+    // El Tail en C2 fue extendido desde C1.
+    // La conexión de C1 a C2 es vía port 1.
+    // El puerto en C2 que conecta de vuelta a C1 es el 3 (X-).
+    // Por tanto, el entryPort del tail es 3.
+    const tail = arrow.head.next as Segment;
+    expect(tail.entryPort).toBe(3);
+
+    // Al avanzar, Head(C1) va a C2. Tail(C2) debe ir a C3.
+    // Para que Tail vaya a C3, su exitDir debe ser 1 (X+).
+    // Con la matemática antigua portCount/2: (3+3)%6 = 0 (Y-), incorrecto.
+    // Con _getOppositePort(3): opuesto de 3 es 1 (X+), correcto!
+    const result = arrow.advance();
+    expect(result.outcome).toBe('advanced');
+    
+    // Verificamos que el Tail ahora está en C3 y Head en C2
+    expect(arrow.head.cell).toBe(C2);
+    expect(arrow.head.next!.cell).toBe(C3);
+  });
+
+  test('Scenario: Head heredando momentum calcula su exitPort correctamente en 6 puertos', () => {
+    const board = new Board('board-3d');
+    const C1 = new Cell('C1', 6);
+    const C2 = new Cell('C2', 6);
+    board.addCell(C1);
+    board.addCell(C2);
+
+    // Conexión en Z (4 <-> 5)
+    board.connectPorts(C1, 4, C2, 5);
+
+    // Arrow de 2 segmentos: Head en C2 (apunta a null vía port 1), Tail en C1.
+    const arrow = new Arrow(C2, 1);
+    arrow.extend(C1);
+
+    // Al avanzar, Head intenta ir a null (y si estuviera sola, se destruiría, 
+    // pero como tiene un tail, el tail empuja? NO. Si Head target = null, se destruye TODA la flecha.
+    // Para probar el momentum (shrunk to 1 segment), necesitamos que el tail se purgue, 
+    // pero la Head aterrice en una celda válida.
+    
+    // Conectamos un sumidero al tail.
+    // Tail está en C1, entryPort=4. Opuesto de 4 es 5.
+    // Dejamos C1[5] como null (sumidero).
+    // Head en C2 necesita avanzar a C3.
+    const C3 = new Cell('C3', 6);
+    board.addCell(C3);
+    board.connectPorts(C2, 4, C3, 5);
+    arrow.head.exitPort = 4; // Head apunta a C3
+
+    // Tick 1: Head (C2) -> C3. Tail (C1) -> null (purgado).
+    // La flecha se reduce a 1 segmento (Head en C3).
+    // Como entró a C3 desde C2 vía el puerto 4, C3 recibe por puerto 5.
+    // El momentum de Head debería ser el opuesto de 5 -> 4.
+    const result = arrow.advance();
+    expect(result.outcome).toBe('advanced');
+    
+    expect(arrow.length).toBe(1);
+    expect(arrow.head.cell).toBe(C3);
+    // Verificamos que el momentum (exitPort) es 4, y no 2 (5+3=8%6=2)
+    expect(arrow.head.exitPort).toBe(4);
+  });
+});
