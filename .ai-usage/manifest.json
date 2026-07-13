@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-13T21:37:03.290965Z",
+    "lastUpdated": "2026-07-13T23:19:13.146927Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -3118,6 +3118,34 @@
           "tests": "passed",
           "structure": "passed"
         }
+      },
+      {
+        "id": "2026-07-13-3d-glide-engine",
+        "date": "2026-07-13",
+        "title": "3D Glide Engine Implementation & Level Redesign",
+        "file": "2026-07-13-3d-glide-engine.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "3d-glide-engine",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 5,
+          "tests_passing": 1
+        },
+        "areas": [
+          "implementation",
+          "presentation",
+          "3d-engine",
+          "level-design"
+        ],
+        "validation": {
+          "tests": "passed",
+          "structure": "passed"
+        }
       }
     ],
     "statistics": {
@@ -3153,7 +3181,7 @@
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones",
       "totalEntries": 57,
-      "total_reports": 61
+      "total_reports": 62
     },
     "lastEntry": {
       "id": "2026-07-13-003",
