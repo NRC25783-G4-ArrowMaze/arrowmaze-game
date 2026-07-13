@@ -23,7 +23,7 @@ export interface LevelDataDTO {
   id: string
   name?: string
   difficulty?: string
-  mapMode?: '2d' | '3d' | 'cube'  // Modo del nivel. Ausente = '2d'.
+  mapMode?: '2d' | '3d' | 'cube' | 'volume'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: LevelCellDTO[]
   connections?: LevelConnectionDTO[]
@@ -44,7 +44,7 @@ export interface Scene {
   id: string
   name?: string
   difficulty?: string
-  mapMode?: '2d' | '3d' | 'cube'  // Modo del nivel. Ausente = '2d'.
+  mapMode?: '2d' | '3d' | 'cube' | 'volume'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: SceneCell[]
   connections: LevelConnectionDTO[]
@@ -116,13 +116,17 @@ export function sceneFromLevelData(
       : {}),
     allowedMoves: dto.allowedMoves,
     cells: dto.cells.map((c) => {
-      const coordsPart = c.id.split('_')[0];
-      const [col, row] = coordsPart.split(',').map(Number)
+      // Soportar ids como "1,2" o "1,2_Z1"
+      const parts = c.id.split('_Z');
+      const coordsPart = parts[0];
+      const [col, row] = coordsPart.split(',').map(Number);
       if (!Number.isFinite(col) || !Number.isFinite(row)) {
-        throw new Error(`id de celda sin posición "col,row": "${c.id}"`)
+        throw new Error(`id de celda sin posición "col,row": "${c.id}"`);
       }
+      const parsedLayer = parts.length > 1 ? Number(parts[1]) : undefined;
+      
       // layer defaultea a 0 para retrocompat con niveles 2D sin ese campo.
-      return { id: c.id, col, row, portCount: c.portCount, layer: c.layer ?? 0 }
+      return { id: c.id, col, row, portCount: c.portCount, layer: parsedLayer ?? (c as any).layer ?? 0 };
     }),
     connections: dto.connections ?? [],
     arrows: dto.arrows.map((a, i) => ({

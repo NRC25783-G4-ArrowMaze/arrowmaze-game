@@ -7,7 +7,7 @@ describe('LEVEL_CUBE — Nivel 3x3x3 con paginación Z', () => {
     const scene = sceneFromLevelData(LEVEL_CUBE);
     expect(scene.cells).toHaveLength(27);
     expect(scene.arrows).toHaveLength(8);
-    expect(scene.mapMode).toBe('3d');
+    expect(scene.mapMode).toBe('volume');
     expect(scene.collisionBehavior).toBe('return');
   });
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { BoardComponent } from './BoardComponent';
 import { BoardComponent3D } from './BoardComponent3D';
+import { BoardComponentVolume3D } from './BoardComponentVolume3D';
 import { GameOverlay } from './GameOverlay';
 import { PauseOverlay } from './PauseOverlay';
 import { SettingsOverlay } from './SettingsOverlay';
@@ -87,6 +88,7 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
   // MODO CUBO: renderer three.js en lugar del SVG (misma fuente de datos:
   // game.viewModel). Los niveles 2D/3D siguen con el SVG intacto.
   const isCube = scene.mapMode === 'cube';
+  const isVolume = scene.mapMode === 'volume';
   // Prólogo de victoria del cubo: la explosión corre ~1.5s ANTES de mostrar
   // el overlay WON. El timeout garantiza que el overlay SIEMPRE llega
   // (la celebración jamás bloquea el flujo real de victoria).
@@ -236,6 +238,16 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
               vanishing={game.vanishing ?? undefined}
               collision={game.collision ?? undefined}
               won={game.status === 'WON'}
+            />
+          ) : isVolume ? (
+            <BoardComponentVolume3D
+              scene={scene}
+              board={game.viewModel}
+              interactive={boardInteractive}
+              onArrowTap={(arrowId) => {
+                notifyMove(arrowId);
+                game.playMove({ arrowId });
+              }}
             />
           ) : (
             <BoardComponent

@@ -5,196 +5,115 @@ export const LEVEL_CUBE: LevelDataDTO = {
   "name": "Cube",
   "difficulty": "hard",
   "allowedMoves": 12,
-  "mapMode": "3d",
+  "mapMode": "volume",
   "collisionBehavior": "return",
   "cells": [
     {
       "id": "0,0_Z0",
-      "col": 0,
-      "row": 0,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "1,0_Z0",
-      "col": 1,
-      "row": 0,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "2,0_Z0",
-      "col": 2,
-      "row": 0,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "0,1_Z0",
-      "col": 0,
-      "row": 1,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "1,1_Z0",
-      "col": 1,
-      "row": 1,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "2,1_Z0",
-      "col": 2,
-      "row": 1,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "0,2_Z0",
-      "col": 0,
-      "row": 2,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "1,2_Z0",
-      "col": 1,
-      "row": 2,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "2,2_Z0",
-      "col": 2,
-      "row": 2,
-      "layer": 0,
       "portCount": 6
     },
     {
       "id": "0,0_Z1",
-      "col": 0,
-      "row": 0,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "1,0_Z1",
-      "col": 1,
-      "row": 0,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "2,0_Z1",
-      "col": 2,
-      "row": 0,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "0,1_Z1",
-      "col": 0,
-      "row": 1,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "1,1_Z1",
-      "col": 1,
-      "row": 1,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "2,1_Z1",
-      "col": 2,
-      "row": 1,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "0,2_Z1",
-      "col": 0,
-      "row": 2,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "1,2_Z1",
-      "col": 1,
-      "row": 2,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "2,2_Z1",
-      "col": 2,
-      "row": 2,
-      "layer": 1,
       "portCount": 6
     },
     {
       "id": "0,0_Z2",
-      "col": 0,
-      "row": 0,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "1,0_Z2",
-      "col": 1,
-      "row": 0,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "2,0_Z2",
-      "col": 2,
-      "row": 0,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "0,1_Z2",
-      "col": 0,
-      "row": 1,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "1,1_Z2",
-      "col": 1,
-      "row": 1,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "2,1_Z2",
-      "col": 2,
-      "row": 1,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "0,2_Z2",
-      "col": 0,
-      "row": 2,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "1,2_Z2",
-      "col": 1,
-      "row": 2,
-      "layer": 2,
       "portCount": 6
     },
     {
       "id": "2,2_Z2",
-      "col": 2,
-      "row": 2,
-      "layer": 2,
       "portCount": 6
     }
   ],
@@ -527,7 +446,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
   "arrows": [
     {
       "id": "blue",
-      "color": "#3b82f6",
       "head": {
         "cellId": "0,0_Z0",
         "exitPort": 4
@@ -538,7 +456,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "green",
-      "color": "#22c55e",
       "head": {
         "cellId": "0,1_Z2",
         "exitPort": 2
@@ -550,7 +467,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "orange",
-      "color": "#f97316",
       "head": {
         "cellId": "1,2_Z2",
         "exitPort": 1
@@ -562,7 +478,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "magenta",
-      "color": "#ec4899",
       "head": {
         "cellId": "2,2_Z1",
         "exitPort": 5
@@ -574,7 +489,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "violet",
-      "color": "#8b5cf6",
       "head": {
         "cellId": "2,1_Z0",
         "exitPort": 0
@@ -586,7 +500,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "cyan",
-      "color": "#06b6d4",
       "head": {
         "cellId": "1,0_Z1",
         "exitPort": 4
@@ -598,7 +511,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "amber",
-      "color": "#f59e0b",
       "head": {
         "cellId": "1,1_Z2",
         "exitPort": 5
@@ -610,7 +522,6 @@ export const LEVEL_CUBE: LevelDataDTO = {
     },
     {
       "id": "rose",
-      "color": "#fb7185",
       "head": {
         "cellId": "1,1_Z1",
         "exitPort": 3
