@@ -116,7 +116,8 @@ export function sceneFromLevelData(
       : {}),
     allowedMoves: dto.allowedMoves,
     cells: dto.cells.map((c) => {
-      const [col, row] = c.id.split(',').map(Number)
+      const coordsPart = c.id.split('_')[0];
+      const [col, row] = coordsPart.split(',').map(Number)
       if (!Number.isFinite(col) || !Number.isFinite(row)) {
         throw new Error(`id de celda sin posición "col,row": "${c.id}"`)
       }

@@ -110,6 +110,12 @@ export const LEVEL_MAP: LevelMapDTO = [
     pathHint: { x: 50, y: 96 },
     starThresholds: [2000, 3000],
   },
+  {
+    levelId: 'level-cube',
+    prerequisites: ['heart-preview'],
+    pathHint: { x: 50, y: 98 },
+    starThresholds: [1500, 2000],
+  },
   // SINGULARIDAD — el GRAN FINAL: primer nivel del MODO CUBO en el mapa.
   // Umbrales MEDIDOS contra el motor (metodología nueva): el flawless real del
   // SOLVE_ORDER es 1474 puntos (replay verificado en localLevels.spec); los
@@ -117,8 +123,8 @@ export const LEVEL_MAP: LevelMapDTO = [
   // las estrellas SÍ se pueden ganar.
   {
     levelId: 'singularidad',
-    prerequisites: ['heart-preview'],
-    pathHint: { x: 50, y: 98 },
+    prerequisites: ['level-cube'],
+    pathHint: { x: 50, y: 100 },
     starThresholds: [1253, 1400],
   },
 ];
