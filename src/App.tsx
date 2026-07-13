@@ -7,6 +7,7 @@ import type { Scene } from './presentation/game/scene';
 import { FetchLevelApiClient } from './infrastructure/api/FetchLevelApiClient';
 import { LevelSelectScreen } from './presentation/game/LevelSelectScreen';
 import { LOCAL_LEVELS } from './presentation/game/levels/localLevels';
+import { DEV_PREVIEW_LEVELS } from './presentation/game/levels/devPreviewLevels';
 import { LEVEL_MAP } from './presentation/game/levelMap';
 import { LevelSelectionProjection } from './domain/services/LevelSelectionProjection';
 import { LocalProgressModuleFactory, type LocalProgressModule } from './infrastructure/factories/LocalProgressModuleFactory';
@@ -45,6 +46,8 @@ const LEVEL_METADATA: Record<string, { difficulty: string }> = {
   'level-intermediate-b': { difficulty: 'easy' },
   'level-advanced': { difficulty: 'easy' },
   'level-expert': { difficulty: 'easy' },
+  // El gran final (MODO CUBO): con la música hard de G1, como merece.
+  'singularidad': { difficulty: 'hard' },
 };
 
 /**
@@ -165,15 +168,28 @@ const App: React.FC = () => {
       // wasm ausente en web), el juego debe abrir igual — sin guardado, pero
       // jugable. Antes un allSettled conjunto dejaba la app en "Cargando..."
       // para siempre si la factory colgaba.
-      const scenePromise = offlineMode
-        ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
-        : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2);
+      // Atajo de playtest (dev): ?level=<id> abre esa escena directo saltando
+      // el mapa — sirve para previews no publicados (p. ej. cubo-sample) o
+      // cualquier nivel del catálogo local. Sin el parámetro, bootstrap normal.
+      const devLevelId = new URLSearchParams(window.location.search).get('level');
+      const devScene = devLevelId === null
+        ? undefined
+        : DEV_PREVIEW_LEVELS[devLevelId] ?? LOCAL_LEVELS[devLevelId];
 
-      scenePromise
-        // fetchSceneWithFallback nunca rechaza (fallback interno); el catch es
-        // para que un throw inesperado no deje la app colgada.
-        .catch(() => SAMPLE_LEVEL_2)
-        .then((resolved) => { if (isMounted) setScene(resolved); });
+      if (devScene !== undefined) {
+        setScene(devScene);
+        setScreen('PLAYING');
+      } else {
+        const scenePromise = offlineMode
+          ? Promise.resolve<Scene>(LOCAL_LEVELS['level-initial'])
+          : fetchSceneWithFallback(new FetchLevelApiClient(apiBaseUrl), SAMPLE_LEVEL_2.id, SAMPLE_LEVEL_2);
+
+        scenePromise
+          // fetchSceneWithFallback nunca rechaza (fallback interno); el catch es
+          // para que un throw inesperado no deje la app colgada.
+          .catch(() => SAMPLE_LEVEL_2)
+          .then((resolved) => { if (isMounted) setScene(resolved); });
+      }
 
       let module: LocalProgressModule;
       try {

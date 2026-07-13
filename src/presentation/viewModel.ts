@@ -9,9 +9,10 @@
 
 /** Celda con su posición de rejilla para el renderizado. */
 export interface CellView {
-  id: string;
-  col: number;
-  row: number;
+  id: string
+  col: number
+  row: number
+  layer?: number
 }
 
 /** Flecha lista para renderizar: color y celdas ocupadas en orden. */

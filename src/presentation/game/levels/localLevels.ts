@@ -15,6 +15,7 @@ import { LEVEL_MAPA_12 } from './levelMapa12';
 import { LEVEL_MAPA_13 } from './levelMapa13';
 import { LEVEL_MAPA_14 } from './levelMapa14';
 import { LEVEL_MAPA_15 } from './levelMapa15';
+import { LEVEL_SINGULARIDAD } from './levelSingularidad';
 
 /**
  * localLevels — Catálogo de niveles locales del distribuible offline.
@@ -46,7 +47,10 @@ export const LOCAL_LEVELS: Record<string, Scene> = {
   'mapa-13': sceneFromLevelData(LEVEL_MAPA_13),
   'mapa-14': sceneFromLevelData(LEVEL_MAPA_14),
   'mapa-15': sceneFromLevelData(LEVEL_MAPA_15),
-  // Corazón (13 flechas, diseñado en el FORGE) como ÚLTIMO nivel. Su id es
+  // Corazón (13 flechas, diseñado en el FORGE). Su id es
   // 'heart-preview' (registrado en el backend → leaderboards sin 404).
   'heart-preview': sceneFromLevelData(LEVEL_HEART),
+  // SINGULARIDAD — el gran final: primer nivel del MODO CUBO en el mapa
+  // (post-Corazón). Pendiente registrarlo en el backend (ver doc de hallazgos).
+  'singularidad': LEVEL_SINGULARIDAD,
 };

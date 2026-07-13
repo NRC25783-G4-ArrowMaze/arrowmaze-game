@@ -1,5 +1,10 @@
 import { GameController } from '../../src/presentation/game/GameController';
 import { LOCAL_LEVELS } from '../../src/presentation/game/levels/localLevels';
+import {
+  LEVEL_EL_HUECO,
+  EL_HUECO_SOLVE_ORDER,
+} from '../../src/presentation/game/levels/levelElHueco';
+import { SINGULARIDAD_SOLVE_ORDER } from '../../src/presentation/game/levels/levelSingularidad';
 import { LEVEL_MAP } from '../../src/presentation/game/levelMap';
 import type { Scene } from '../../src/presentation/game/scene';
 
@@ -117,6 +122,9 @@ const SOLVE_ORDERS: Record<string, string[]> = {
     'muro6-right', 'muro6-top', 'muro7-left', 'muro7-bottom', 'muro7-right',
     'muro7-top', 'sello-a', 'sello-b', 'sello-e', 'sello-c', 'sello-d',
   ],
+  // SINGULARIDAD (MODO CUBO, gran final): ola 1 vacía los carriles directos
+  // al agujero negro; la ola 2 los recorre desde las caras profundas.
+  'singularidad': SINGULARIDAD_SOLVE_ORDER,
   // Anillo: circulaciones, radiales hacia el hueco, carriles y esquinas.
   'mapa-15': [
     'borde-left', 'borde-bottom', 'borde-right', 'borde-top', 'brocal-left',
@@ -175,5 +183,52 @@ describe('Catálogo de niveles locales (offline)', () => {
       expect(controller.status).toBe('WON');
       expect(controller.score).not.toBeNull();
     });
+  });
+});
+
+describe('SINGULARIDAD — umbrales de estrellas MEDIDOS (metodología: el flawless real del motor)', () => {
+  it('los starThresholds del mapa quedan por debajo del flawless del SOLVE_ORDER y en orden', () => {
+    const controller = new GameController(LOCAL_LEVELS['singularidad']);
+    for (const arrowId of SINGULARIDAD_SOLVE_ORDER) {
+      slide(controller, arrowId);
+    }
+    expect(controller.status).toBe('WON');
+    const flawless = controller.score;
+    expect(flawless).not.toBeNull();
+    // eslint-disable-next-line no-console
+    console.log(`[SINGULARIDAD] score flawless medido: ${flawless}`);
+
+    const node = LEVEL_MAP.find((n) => n.levelId === 'singularidad');
+    expect(node).toBeDefined();
+    const [twoStars, threeStars] = node!.starThresholds;
+    // Umbrales crecientes, ALCANZABLES con el flawless (3ª estrella incluida),
+    // y exigentes (la 2ª no regalada: ≥80% del flawless).
+    expect(twoStars).toBeLessThan(threeStars);
+    expect(threeStars).toBeLessThanOrEqual(flawless!);
+    expect(twoStars).toBeGreaterThanOrEqual(Math.floor(flawless! * 0.8));
+  });
+});
+
+describe('EL HUECO — nivel showcase del MODO CUBO (preview, fuera del mapa C3)', () => {
+  it('carga en el motor real sin errores de topología ni solapes', () => {
+    expect(() => new GameController(LEVEL_EL_HUECO)).not.toThrow();
+  });
+
+  it('la secuencia ganadora cubre exactamente sus flechas dentro del presupuesto', () => {
+    expect(LEVEL_EL_HUECO.arrows.map((a) => a.id).sort()).toEqual(
+      [...EL_HUECO_SOLVE_ORDER].sort(),
+    );
+    expect(EL_HUECO_SOLVE_ORDER.length).toBeLessThanOrEqual(LEVEL_EL_HUECO.allowedMoves);
+  });
+
+  it('es resoluble con un tap por flecha: todas devoradas por el agujero y WON', () => {
+    const controller = new GameController(LEVEL_EL_HUECO);
+    for (const arrowId of EL_HUECO_SOLVE_ORDER) {
+      const outcome = slide(controller, arrowId);
+      // Si esto falla, la secuencia ganadora del showcase está mal diseñada.
+      expect({ arrowId, outcome }).toEqual({ arrowId, outcome: 'destroyed' });
+    }
+    expect(controller.status).toBe('WON');
+    expect(controller.score).not.toBeNull();
   });
 });

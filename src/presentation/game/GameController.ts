@@ -47,8 +47,8 @@ export class GameController {
   private readonly arrowsById: Map<string, Arrow>;
   /** Color de presentación por id de flecha (el dominio no modela color). */
   private readonly colorById: Map<string, string>;
-  /** Posición de rejilla por id de celda (el dominio no modela col/row). */
-  private readonly layoutByCellId: Map<string, { col: number; row: number }>;
+  /** Posición de rejilla por id de celda (el dominio no modela col/row/layer). */
+  private readonly layoutByCellId: Map<string, { col: number; row: number; layer?: number }>;
   /** Id de celda por "col,row" para invertir el toque a una celda del dominio. */
   private readonly cellIdByPosition: Map<string, string>;
 
@@ -72,7 +72,7 @@ export class GameController {
     );
     this.colorById = new Map(scene.arrows.map((a) => [a.id, a.color] as const));
     this.layoutByCellId = new Map(
-      scene.cells.map((c) => [c.id, { col: c.col, row: c.row }] as const),
+      scene.cells.map((c) => [c.id, { col: c.col, row: c.row, layer: c.layer }] as const),
     );
     this.cellIdByPosition = new Map(
       scene.cells.map((c) => [`${c.col},${c.row}`, c.id] as const),
@@ -112,7 +112,7 @@ export class GameController {
   /** Proyecta el estado vivo actual al view-model que consume BoardComponent. */
   viewModel(): BoardViewModel {
     const cells = Array.from(this.layoutByCellId.entries()).map(
-      ([id, { col, row }]) => ({ id, col, row }),
+      ([id, { col, row, layer }]) => ({ id, col, row, layer }),
     );
 
     const arrows = Array.from(this.arrowsById.entries()).map(([id, arrow]) => {

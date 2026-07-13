@@ -17,13 +17,20 @@ export function cellFromId(cellId: string): { col: number; row: number } | null 
   return { col, row }
 }
 
-export function addCell(scene: Scene, col: number, row: number): Scene {
+export function addCell(
+  scene: Scene,
+  col: number,
+  row: number,
+  layer: number = 0,
+  portCount: number = 4,
+): Scene {
   const id = cellIdAt(col, row)
-  // No agregar si ya existe
-  if (scene.cells.some((c) => c.id === id)) {
+  // En niveles 3D el mismo "col,row" puede existir en capas distintas,
+  // por lo que la comprobación de duplicado incluye el layer.
+  if (scene.cells.some((c) => c.id === id && (c.layer ?? 0) === layer)) {
     return scene
   }
-  const newCell: SceneCell = { id, col, row, portCount: 4 }
+  const newCell: SceneCell = { id, col, row, portCount, layer }
   return {
     ...scene,
     cells: [...scene.cells, newCell],
@@ -158,7 +165,12 @@ export function rotateHead(scene: Scene, arrowId: string): Scene {
   // un primer segmento, el exitPort queda determinado por él (ver extendArrow).
   if (arrow.body.length > 0) return scene
 
-  const newExitPort = (arrow.head.exitPort + 1) % 4
+  // Usa el portCount real de la celda para soportar celdas 3D (portCount 6).
+  const headCell = scene.cells.find((c) => c.id === arrow.head.cellId)
+  if (!headCell) return scene
+  const portCount = headCell.portCount
+
+  const newExitPort = (arrow.head.exitPort + 1) % portCount
   const newArrows = scene.arrows.map((a) =>
     a.id === arrowId ? { ...a, head: { ...a.head, exitPort: newExitPort } } : a,
   )

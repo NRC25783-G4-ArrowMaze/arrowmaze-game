@@ -10,7 +10,7 @@ import { isValidScene } from './state/validateScene'
 const TOOL_HINTS: Record<ToolMode, string> = {
   select: 'Clic en una flecha para seleccionarla. R rota su cabeza.',
   cell: 'Clic en un slot vacío para crear celda; clic en celda existente para borrarla.',
-  connect: 'Clic en un puerto (N/E/S/O) de una celda y luego en un puerto de otra. Cualquier par sirve.',
+  connect: 'Clic en un puerto (N/E/S/O) de una celda y luego en un puerto de otra. Celdas 3D tienen ports ▲/▼ (inter-capa).',
   arrowHead: 'Clic en una celda libre para colocar la cabeza de una flecha.',
   extend: 'Selecciona una flecha (clic) y luego clic en una celda conectada resaltada para extenderla.',
   erase: 'Clic en una flecha para eliminarla.',
@@ -35,6 +35,8 @@ const ForgeApp: React.FC = () => {
   const selectedArrowId = useForgeStore((s) => s.selectedArrowId)
   const history = useForgeStore((s) => s.history)
   const session = useForgeStore((s) => s.session)
+  const activeLayer = useForgeStore((s) => s.activeLayer)
+  const maxLayer = useForgeStore((s) => s.maxLayer)
   const setTool = useForgeStore((s) => s.setTool)
   const setGridCols = useForgeStore((s) => s.setGridCols)
   const setGridRows = useForgeStore((s) => s.setGridRows)
@@ -44,6 +46,7 @@ const ForgeApp: React.FC = () => {
   const setLevelProps = useForgeStore((s) => s.setLevelProps)
   const setSession = useForgeStore((s) => s.setSession)
   const loadScene = useForgeStore((s) => s.loadScene)
+  const setActiveLayer = useForgeStore((s) => s.setActiveLayer)
   const undo = useForgeStore((s) => s.undo)
   const redo = useForgeStore((s) => s.redo)
 
@@ -80,7 +83,7 @@ const ForgeApp: React.FC = () => {
     <div style={{ display: 'flex', height: '100vh', gap: '16px', padding: '16px' }}>
       {/* Columna izquierda: toolbar + lienzo */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {/* Toolbar (Fase 2+) */}
+        {/* Toolbar */}
         <div
           style={{
             display: 'flex',
@@ -89,6 +92,7 @@ const ForgeApp: React.FC = () => {
             backgroundColor: '#f0f0f0',
             borderRadius: '4px',
             alignItems: 'center',
+            flexWrap: 'wrap',
           }}
         >
           <label>Herramienta:</label>
@@ -105,6 +109,45 @@ const ForgeApp: React.FC = () => {
             <option value="erase">Erase</option>
           </select>
           <span style={{ fontSize: '12px', color: '#0369a1' }}>{TOOL_HINTS[tool]}</span>
+
+          {/* Barra de capas Z — solo visible en modo 3D */}
+          {scene.mapMode === '3d' && (
+            <div
+              style={{
+                display: 'flex',
+                gap: '6px',
+                alignItems: 'center',
+                padding: '4px 10px',
+                backgroundColor: '#ede9fe',
+                borderRadius: '4px',
+                border: '1px solid #c4b5fd',
+              }}
+            >
+              <button
+                onClick={() => setActiveLayer(activeLayer - 1)}
+                disabled={activeLayer === 0}
+                style={{ padding: '2px 6px', fontSize: '12px' }}
+              >
+                ◄
+              </button>
+              <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#7c3aed', minWidth: '90px', textAlign: 'center' }}>
+                Capa Z: {activeLayer} / {maxLayer}
+              </span>
+              <button
+                onClick={() => setActiveLayer(activeLayer + 1)}
+                disabled={activeLayer === maxLayer}
+                style={{ padding: '2px 6px', fontSize: '12px' }}
+              >
+                ►
+              </button>
+              <button
+                onClick={() => setActiveLayer(maxLayer + 1)}
+                style={{ padding: '2px 6px', fontSize: '11px', marginLeft: '4px', backgroundColor: '#7c3aed', color: '#fff', border: 'none', borderRadius: '3px', cursor: 'pointer' }}
+              >
+                + Capa
+              </button>
+            </div>
+          )}
 
           <button
             onClick={() => setIsPlaytesting(true)}
@@ -135,6 +178,8 @@ const ForgeApp: React.FC = () => {
             gridCols={gridCols}
             gridRows={gridRows}
             selectedArrowId={selectedArrowId}
+            activeLayer={activeLayer}
+            portCountForNew={scene.mapMode === '3d' ? 6 : 4}
           />
         </div>
       </div>
@@ -164,6 +209,7 @@ const ForgeApp: React.FC = () => {
           scene={scene}
           gridCols={gridCols}
           gridRows={gridRows}
+          maxLayer={maxLayer}
           onSceneUpdate={setLevelProps}
           onGridUpdate={(cols, rows) => {
             setGridCols(cols)
