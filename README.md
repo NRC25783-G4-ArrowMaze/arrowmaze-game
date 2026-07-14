@@ -7,6 +7,7 @@
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![Capacitor](https://img.shields.io/badge/Capacitor-Android-119EFF?logo=capacitor&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bdc4ce17-b68a-4194-83cb-60ddd50f532c/deploy-status)](https://app.netlify.com/projects/arrowmazegame/deploys)
 
 > Implementación del cliente (React + TypeScript + Vite + Capacitor) para el juego de puzzle de flechas. Especificaciones y decisiones centralizadas en [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core).
 
