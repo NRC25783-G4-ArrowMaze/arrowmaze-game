@@ -56,6 +56,7 @@ export class AdvanceArrowUseCase {
       // Unexpected domain error (e.g. ArrowCinematicError, corrupted chain).
       // Surface as a failed result so the caller can handle it gracefully.
       const message = err instanceof Error ? err.message : String(err);
+      console.error("AdvanceArrowUseCase ERROR:", message);
       return {
         success: false,
         outcome: 'blocked', // Safe default — no mutation occurred

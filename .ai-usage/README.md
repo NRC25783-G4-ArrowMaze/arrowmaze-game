@@ -56,7 +56,13 @@ Registro centralizado de uso de herramientas de IA en el desarrollo del cliente 
 | 2026-07-10 | Push y apertura del PR #48 (checklist + scaffolding de release) | [`2026-07-10-pr48-checklist-release-scaffolding.md`](./2026-07-10-pr48-checklist-release-scaffolding.md) | Claude Opus 4.8 (1M context) |
 | 2026-07-10 | Higiene del sync: scheduler single-flight con gate de sesión (login+victoria coordinados) | [`2026-07-10-higiene-sync.md`](./2026-07-10-higiene-sync.md) | Claude Fable 5 |
 | 2026-07-10 | Modo oscuro (G4): tokens claro/oscuro, ThemeProvider en caliente, toggle ☀️/🌙 en header + Ajustes | [`2026-07-10-modo-oscuro.md`](./2026-07-10-modo-oscuro.md) | Claude Fable 5 |
-
+| 2026-07-13 | Planning: Vista 3D en Cascada para el Forge | [`2026-07-13-forge-3d-view-planning.md`](./2026-07-13-forge-3d-view-planning.md) | Claude Sonnet 4.2 |
+| 2026-07-13 | Implementation: Vista 3D en Cascada para el Forge | [`2026-07-13-forge-3d-view-implementation.md`](./2026-07-13-forge-3d-view-implementation.md) | Claude Sonnet 4.2 |
+| 2026-07-13 | Implementation: MODO CUBO — tablero 3D sobre la superficie de un cubo (riel 3D, arte Rubik + universo interior, Singularidad) | [`2026-07-13-modo-cubo-implementacion.md`](./2026-07-13-modo-cubo-implementacion.md) | Claude Fable 5 |
+| 2026-07-13 | Planning: Nivel Cube 3D (3x3x3) y controles Z | [`2026-07-13-cube-level-planning.md`](./2026-07-13-cube-level-planning.md) | Claude Sonnet 4.2 |
+| 2026-07-13 | Implementation: Nivel Cube 3D (3x3x3) y controles Z | [`2026-07-13-cube-level-implementation.md`](./2026-07-13-cube-level-implementation.md) | Claude Sonnet 4.2 |
+| 2026-07-13 | Implementation: 3D Glide Engine Implementation & Level Redesign | [`2026-07-13-3d-glide-engine.md`](./2026-07-13-3d-glide-engine.md) | Antigravity (Claude Sonnet) |
+| 2026-07-13 | El Hueco al mapa como gran final (umbrales medidos [1227, 1372]) | [`2026-07-13-el-hueco-al-mapa.md`](./2026-07-13-el-hueco-al-mapa.md) | Claude Fable 5 |
 > ⚠️ **Inconsistencia heredada:** la entrada `2026-06-02-board-graph-architecture.md` figura en `manifest.json` pero su archivo no existe en disco. Conviene restaurar el archivo o retirar la entrada del manifest en una limpieza posterior.
 
 ---

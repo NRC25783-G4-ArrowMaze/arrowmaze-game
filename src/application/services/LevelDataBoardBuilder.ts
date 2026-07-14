@@ -18,10 +18,15 @@ export class LevelDataBoardBuilder implements IBoardBuilder {
       board.addCell(cell);
     }
 
-    // 2. Reconstruir topología de conexiones lógicas
+    // 2. Reconstruir topología de conexiones lógicas.
+    // En niveles no planos ('3d'/'cube') los puertos conectados no son
+    // geométricamente opuestos (capas apiladas, aristas dobladas del cubo):
+    // ahí se omite SOLO la comprobación de opuestos; las invariantes reales
+    // (rango, puertos libres, no auto-conexión) las valida Board.connectPorts.
+    const enforceOppositePorts = data.mapMode === undefined || data.mapMode === '2d';
     if (data.connections && Array.isArray(data.connections)) {
       for (const conn of data.connections) {
-        this.processConnection(board, conn);
+        this.processConnection(board, conn, enforceOppositePorts);
       }
     }
 
@@ -55,7 +60,7 @@ export class LevelDataBoardBuilder implements IBoardBuilder {
     }
   }
 
-  private processConnection(board: Board, conn: LevelConnectionDTO): void {
+  private processConnection(board: Board, conn: LevelConnectionDTO, enforceOppositePorts: boolean): void {
     const fromCell = board.getCell(conn.fromCell);
     const toCell = board.getCell(conn.toCell);
 
@@ -63,8 +68,22 @@ export class LevelDataBoardBuilder implements IBoardBuilder {
     if (!toCell) throw new BoardRegistryError(`referenced cell "${conn.toCell}" not found in registry`);
     if (fromCell.getId() === toCell.getId()) throw new ConnectionError("a cell cannot connect to itself");
 
-    this.validateOppositePorts(fromCell, conn.fromPort, toCell, conn.toPort);
+    if (enforceOppositePorts) {
+      this.validateOppositePorts(fromCell, conn.fromPort, toCell, conn.toPort);
+    } else {
+      this.validateSameGeometry(fromCell, toCell);
+    }
     board.connectPorts(fromCell, conn.fromPort, toCell, conn.toPort);
+  }
+
+  /**
+   * En modos no planos se mantiene la exigencia de geometrías iguales
+   * (mismo portCount a ambos lados); solo se omite la regla de opuestos.
+   */
+  private validateSameGeometry(fromCell: Cell, toCell: Cell): void {
+    if (fromCell.getPortCount() !== toCell.getPortCount()) {
+      throw new ConnectionError("cells with different geometries cannot connect directly via standard rules");
+    }
   }
 
   private validateOppositePorts(fromCell: Cell, fromPort: number, toCell: Cell, toPort: number): void {

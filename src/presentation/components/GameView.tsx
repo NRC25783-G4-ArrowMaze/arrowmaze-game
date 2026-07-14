@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { BoardComponent } from './BoardComponent';
+import { BoardComponent3D } from './BoardComponent3D';
+import { BoardComponentVolume3D } from './BoardComponentVolume3D';
 import { GameOverlay } from './GameOverlay';
 import { PauseOverlay } from './PauseOverlay';
 import { SettingsOverlay } from './SettingsOverlay';
@@ -81,6 +83,33 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
   useEffect(() => {
     levelStartRef.current = Date.now();
   }, []);
+
+  const is3D = scene.mapMode === '3d';
+  // MODO CUBO: renderer three.js en lugar del SVG (misma fuente de datos:
+  // game.viewModel). Los niveles 2D/3D siguen con el SVG intacto.
+  const isCube = scene.mapMode === 'cube';
+  const isVolume = scene.mapMode === 'volume';
+  // Prólogo de victoria del cubo: la explosión corre ~1.5s ANTES de mostrar
+  // el overlay WON. El timeout garantiza que el overlay SIEMPRE llega
+  // (la celebración jamás bloquea el flujo real de victoria).
+  const [cubeCelebrationDone, setCubeCelebrationDone] = useState(false);
+  const cubeWon = isCube && game.status === 'WON';
+  useEffect(() => {
+    if (!cubeWon) {
+      return;
+    }
+    const timer = setTimeout(() => setCubeCelebrationDone(true), 1500);
+    return () => {
+      clearTimeout(timer);
+      setCubeCelebrationDone(false); // reset al salir de WON (restart/siguiente)
+    };
+  }, [cubeWon]);
+  const overlayStatus = cubeWon && !cubeCelebrationDone ? 'IN_PROGRESS' : game.status;
+  const [activeLayer, setActiveLayer] = useState(0);
+  const maxLayer = useMemo(
+    () => scene.cells.reduce((m, c) => Math.max(m, c.layer ?? 0), 0),
+    [scene],
+  );
 
   const layout = computeBoardLayout(game.viewModel.cells, BOARD_SIZE, BOARD_SIZE);
 
@@ -165,6 +194,28 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
           </div>
         </div>
       </header>
+      {/* Barra de capas Z (solo en 3D) */}
+      {is3D && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', padding: '8px', backgroundColor: '#e2e8f0', borderBottom: '1px solid #cbd5e1' }}>
+          <button
+            onClick={() => setActiveLayer((l) => Math.max(0, l - 1))}
+            disabled={activeLayer === 0}
+            style={{ padding: '4px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #94a3b8', backgroundColor: activeLayer === 0 ? '#f1f5f9' : '#fff', cursor: activeLayer === 0 ? 'not-allowed' : 'pointer' }}
+          >
+            ◀
+          </button>
+          <span style={{ fontSize: '14px', fontWeight: 'bold', color: '#334155' }}>
+            Capa {activeLayer + 1} / {maxLayer + 1}
+          </span>
+          <button
+            onClick={() => setActiveLayer((l) => Math.min(maxLayer, l + 1))}
+            disabled={activeLayer === maxLayer}
+            style={{ padding: '4px 12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #94a3b8', backgroundColor: activeLayer === maxLayer ? '#f1f5f9' : '#fff', cursor: activeLayer === maxLayer ? 'not-allowed' : 'pointer' }}
+          >
+            ▶
+          </button>
+        </div>
+      )}
       <main className="app-main">
         {/* El sizing fluido vive en .board-frame (App.css); BOARD_SIZE queda
             como tamaño lógico del viewBox del SVG. */}
@@ -175,18 +226,44 @@ export const GameView: React.FC<GameViewProps> = ({ scene, progressModule, reque
             aspectRatio: '1 / 1',
           }}
         >
-          <BoardComponent
-            board={game.viewModel}
-            width={BOARD_SIZE}
-            height={BOARD_SIZE}
-            onPointerDown={onPointerDown}
-            collision={game.collision ?? undefined}
-            vanishing={game.vanishing ?? undefined}
-            headDisintegrating={game.headDisintegrating ?? undefined}
-            hintCell={hintCell ?? undefined}
-          />
+          {isCube ? (
+            <BoardComponent3D
+              scene={scene}
+              board={game.viewModel}
+              interactive={boardInteractive}
+              onArrowTap={(arrowId) => {
+                notifyMove(arrowId);
+                game.playMove({ arrowId });
+              }}
+              vanishing={game.vanishing ?? undefined}
+              collision={game.collision ?? undefined}
+              won={game.status === 'WON'}
+            />
+          ) : isVolume ? (
+            <BoardComponentVolume3D
+              scene={scene}
+              board={game.viewModel}
+              interactive={boardInteractive}
+              onArrowTap={(arrowId) => {
+                notifyMove(arrowId);
+                game.playMove({ arrowId });
+              }}
+            />
+          ) : (
+            <BoardComponent
+              board={game.viewModel}
+              width={BOARD_SIZE}
+              height={BOARD_SIZE}
+              onPointerDown={onPointerDown}
+              collision={game.collision ?? undefined}
+              vanishing={game.vanishing ?? undefined}
+              headDisintegrating={game.headDisintegrating ?? undefined}
+              hintCell={hintCell ?? undefined}
+              activeLayer={is3D ? activeLayer : undefined}
+            />
+          )}
           <GameOverlay
-            status={game.status}
+            status={overlayStatus}
             score={game.score}
             timeSeconds={timeSeconds}
             onNextLevel={onNextLevel}

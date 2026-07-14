@@ -113,9 +113,37 @@ export function portDelta(port: number): GridDelta {
       return { dCol: 0, dRow: 1 } // S
     case 3:
       return { dCol: -1, dRow: 0 } // O
+    case 4:
+      return { dCol: -0.5, dRow: -0.5 } // Z+ (forward, esquina sup-izq del tile)
+    case 5:
+      return { dCol: 0.5, dRow: 0.5 }  // Z- (back, esquina inf-der del tile)
     default:
       throw new RangeError(
-        `portDelta: índice de puerto ${port} fuera de rango [0, 3]`,
+        `portDelta: índice de puerto ${port} fuera de rango [0, 5]`,
       )
+  }
+}
+
+/**
+ * Retorna true si el puerto conecta a una capa Z distinta.
+ * Port 4 = Z+ (forward / subir de capa).
+ * Port 5 = Z- (back   / bajar de capa).
+ * Estos puertos no tienen vecino en el plano XY; se visualizan de forma
+ * especial en el canvas 2D del Forge (ícono ▲/▼, línea punteada).
+ */
+export function isInterLayerPort(port: number): boolean {
+  return port === 4 || port === 5
+}
+
+export function portDelta3D(port: number): { dCol: number, dRow: number, dLayer: number } {
+  switch (port) {
+    case 0: return { dCol: 0, dRow: -1, dLayer: 0 } // Y-
+    case 1: return { dCol: 1, dRow: 0, dLayer: 0 }  // X+
+    case 2: return { dCol: 0, dRow: 1, dLayer: 0 }  // Y+
+    case 3: return { dCol: -1, dRow: 0, dLayer: 0 } // X-
+    case 4: return { dCol: 0, dRow: 0, dLayer: 1 }  // Z+
+    case 5: return { dCol: 0, dRow: 0, dLayer: -1 } // Z-
+    default:
+      throw new RangeError(`portDelta3D: índice de puerto ${port} fuera de rango [0, 5]`)
   }
 }

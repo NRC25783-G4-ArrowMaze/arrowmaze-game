@@ -1,6 +1,7 @@
 export interface LevelCellDTO {
   id: string
   portCount: number
+  layer?: number   // Índice Z de la capa (0-based). Ausente = 0 (niveles 2D).
 }
 
 export interface LevelConnectionDTO {
@@ -22,6 +23,7 @@ export interface LevelDataDTO {
   id: string
   name?: string
   difficulty?: string
+  mapMode?: '2d' | '3d' | 'cube' | 'volume'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: LevelCellDTO[]
   connections?: LevelConnectionDTO[]
@@ -42,6 +44,7 @@ export interface Scene {
   id: string
   name?: string
   difficulty?: string
+  mapMode?: '2d' | '3d' | 'cube' | 'volume'  // Modo del nivel. Ausente = '2d'.
   allowedMoves: number
   cells: SceneCell[]
   connections: LevelConnectionDTO[]
@@ -73,11 +76,17 @@ export function toLevelDataDTO(scene: Scene): LevelDataDTO {
     // con undefined en el payload.
     ...(scene.name !== undefined ? { name: scene.name } : {}),
     ...(scene.difficulty !== undefined ? { difficulty: scene.difficulty } : {}),
+    ...(scene.mapMode !== undefined ? { mapMode: scene.mapMode } : {}),
     ...(scene.collisionBehavior !== undefined
       ? { collisionBehavior: scene.collisionBehavior }
       : {}),
     allowedMoves: scene.allowedMoves,
-    cells: scene.cells.map((c) => ({ id: c.id, portCount: c.portCount })),
+    // layer se omite si es 0 (retrocompat: los niveles 2D no emiten el campo).
+    cells: scene.cells.map((c) => ({
+      id: c.id,
+      portCount: c.portCount,
+      ...((c.layer !== undefined && c.layer > 0) ? { layer: c.layer } : {}),
+    })),
     connections: scene.connections,
     arrows: scene.arrows.map((a) => ({
       id: a.id,
@@ -101,16 +110,23 @@ export function sceneFromLevelData(
     id: dto.id,
     ...(dto.name !== undefined ? { name: dto.name } : {}),
     ...(dto.difficulty !== undefined ? { difficulty: dto.difficulty } : {}),
+    ...(dto.mapMode !== undefined ? { mapMode: dto.mapMode } : {}),
     ...(dto.collisionBehavior !== undefined
       ? { collisionBehavior: dto.collisionBehavior }
       : {}),
     allowedMoves: dto.allowedMoves,
     cells: dto.cells.map((c) => {
-      const [col, row] = c.id.split(',').map(Number)
+      // Soportar ids como "1,2" o "1,2_Z1"
+      const parts = c.id.split('_Z');
+      const coordsPart = parts[0];
+      const [col, row] = coordsPart.split(',').map(Number);
       if (!Number.isFinite(col) || !Number.isFinite(row)) {
-        throw new Error(`id de celda sin posición "col,row": "${c.id}"`)
+        throw new Error(`id de celda sin posición "col,row": "${c.id}"`);
       }
-      return { id: c.id, col, row, portCount: c.portCount }
+      const parsedLayer = parts.length > 1 ? Number(parts[1]) : undefined;
+      
+      // layer defaultea a 0 para retrocompat con niveles 2D sin ese campo.
+      return { id: c.id, col, row, portCount: c.portCount, layer: parsedLayer ?? (c as any).layer ?? 0 };
     }),
     connections: dto.connections ?? [],
     arrows: dto.arrows.map((a, i) => ({

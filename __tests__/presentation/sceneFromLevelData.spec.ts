@@ -25,8 +25,8 @@ describe('sceneFromLevelData', () => {
   it('should_rebuild_col_row_from_cell_ids', () => {
     const scene = sceneFromLevelData(makeDTO());
 
-    expect(scene.cells[0]).toEqual({ id: '4,2', col: 4, row: 2, portCount: 4 });
-    expect(scene.cells[1]).toEqual({ id: '5,2', col: 5, row: 2, portCount: 4 });
+    expect(scene.cells[0]).toEqual({ id: '4,2', col: 4, row: 2, portCount: 4, layer: 0 });
+    expect(scene.cells[1]).toEqual({ id: '5,2', col: 5, row: 2, portCount: 4, layer: 0 });
   });
 
   it('should_assign_palette_colors_by_arrow_order', () => {

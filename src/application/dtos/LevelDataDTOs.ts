@@ -23,6 +23,12 @@ export interface LevelDataDTO {
   id: string;
   name?: string;
   difficulty?: string;
+  /**
+   * Modo del nivel. Ausente = '2d'. En '3d', 'cube' y 'volume' la topología deja de ser
+   * una rejilla plana, por lo que el builder omite la comprobación geométrica
+   * de puertos opuestos (el dominio sigue validando rango/libres/no-auto).
+   */
+  mapMode?: '2d' | '3d' | 'cube' | 'volume';
   allowedMoves: number;
   arrows: LevelArrowDTO[];
   cells: LevelCellDTO[];

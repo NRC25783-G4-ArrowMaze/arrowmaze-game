@@ -100,7 +100,10 @@ export class Arrow {
    *
    * Then calculates the new segment's entryPort:
    * - portFromTailToNext: the port index on tail.cell that connects to nextCell
-   * - entryPort of new segment: (portFromTailToNext + portCount/2) mod portCount
+   * - entryPort of new segment: the far-side port stored in the connection
+   *   (neighborPortIndex). On opposite-paired wiring (flat grids) this equals
+   *   (portFromTailToNext + portCount/2) mod portCount; on non-planar
+   *   topologies (3d/cube) the pair is arbitrary and only the graph knows it.
    *
    * @param nextCell - The cell the new Segment will occupy
    * @throws {ArrowCinematicError} if called during an in-flight transaction
@@ -134,9 +137,8 @@ export class Arrow {
       );
     }
 
-    // ── 3. Port arithmetic ─────────────────────
-    const portCount = tail.cell.getPortCount();
-    const entryPort = (portFromTailToNext + portCount / 2) % portCount;
+    // ── 3. Entry port from the graph ───────────
+    const entryPort = tail.cell.getConnection(portFromTailToNext)!.neighborPortIndex;
 
     // ── 4. Create and link new segment ─────────
     const newSegment = new Segment(nextCell, entryPort);
@@ -250,6 +252,29 @@ export class Arrow {
   }
 
   /**
+   * Retrieves the logical opposite port on a given cell topology.
+   * On flat grids (e.g., 4 ports), this is numerically (port + portCount/2) % portCount.
+   * On 3D topologies (6 ports) defined by the visual engine, the axes are mapped as:
+   * Y (North/South): 0 <-> 2
+   * X (East/West): 1 <-> 3
+   * Z (Up/Down): 4 <-> 5
+   */
+  private _getOppositePort(port: number, portCount: number): number {
+    if (portCount === 6) {
+      switch (port) {
+        case 0: return 2;
+        case 2: return 0;
+        case 1: return 3;
+        case 3: return 1;
+        case 4: return 5;
+        case 5: return 4;
+        default: return (port + 3) % 6; // fallback seguro
+      }
+    }
+    return (port + Math.floor(portCount / 2)) % portCount;
+  }
+
+  /**
    * For each segment in the chain, compute:
    * - exitDir: the port index on the current cell through which this segment will exit.
    * - targetCell: the neighboring cell in that direction, or null if it's an exit (sink).
@@ -284,7 +309,7 @@ export class Arrow {
         // Tail segment — exit through opposite of entry port
         const seg = segment as Segment;
         const portCount = segment.cell.getPortCount();
-        exitDir = (seg.entryPort + portCount / 2) % portCount;
+        exitDir = this._getOppositePort(seg.entryPort, portCount);
       }
 
       const targetCell = segment.cell.getNeighborAtPort(exitDir);
@@ -333,12 +358,14 @@ export class Arrow {
         newSegments.push(newHead);
       } else {
         // Rebuild body/tail segment in new cell.
-        // entryPort of new segment = opposite of the port on the PREVIOUS SEGMENT'S NEW CELL
-        // that connects to THIS segment's new cell.
+        // entryPort of new segment = the far-side port of the connection from
+        // the PREVIOUS SEGMENT'S NEW CELL to THIS segment's new cell
+        // (neighborPortIndex). Equals the numeric opposite on flat grids;
+        // differs on non-opposite wiring (3d/cube topologies).
         //
         // Example (curve): prev new cell = C1b, this new cell = C2b.
-        //   C1b[port2] → C2b[port0], so the prev exits via port2.
-        //   entryPort of this segment = (2 + P/2) % P = 0. ✓
+        //   C1b[port2] → C2b[port0], so the prev exits via port2 and this
+        //   segment's entryPort is the connection's far side: 0. ✓
         const prevTargetCell = targets[i - 1].targetCell!;
         const exitDirFromPrevToThis = this._findConnectingPort(prevTargetCell, targetCell);
         if (exitDirFromPrevToThis === null) {
@@ -346,7 +373,7 @@ export class Arrow {
             `cannot reconstruct chain — no connection from ${prevTargetCell.getId()} to ${targetCell.getId()}`
           );
         }
-        const entryPort = (exitDirFromPrevToThis + portCount / 2) % portCount;
+        const entryPort = prevTargetCell.getConnection(exitDirFromPrevToThis)!.neighborPortIndex;
         const newSeg = new Segment(targetCell, entryPort);
         newSegments.push(newSeg);
       }
@@ -368,9 +395,15 @@ export class Arrow {
         // If portToNext is null, the segment was just built so this shouldn't happen.
         // We keep the exitDir placeholder in that edge case.
       } else {
-        // Single head: exitPort = the direction it came from (the original exitDir)
-        // which is already set correctly in the Head constructor above.
-        // No recalculation needed for single-head case.
+        // Single head: exitPort = opposite of its entryPort in new cell.
+        // The real entry port is the far side of the connection it traveled
+        // (neighborPortIndex) — reusing the old cell's port number only works
+        // on opposite-paired wiring (flat grids), not on 3d/cube topologies.
+        const traveledConn = chain[0].cell.getConnection(targets[0].exitDir);
+        if (traveledConn !== null) {
+          const entryPort = traveledConn.neighborPortIndex;
+          newSegments[0] = new Head(newHead.cell, this._getOppositePort(entryPort, portCount));
+        }
       }
     }
 
