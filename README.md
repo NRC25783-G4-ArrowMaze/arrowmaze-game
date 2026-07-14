@@ -218,8 +218,11 @@ export interface ILocalProgressRepository {
 
 ## Diagrama de clases
 
-Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`. Versión navegable en SVG:
-[`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
+Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`.
+
+![Diagrama de clases UML de Arrow Maze](./doc/classes.svg)
+
+> Versión navegable SVG: [`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
 
 ---
 
