@@ -7,6 +7,7 @@
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
 ![Capacitor](https://img.shields.io/badge/Capacitor-Android-119EFF?logo=capacitor&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bdc4ce17-b68a-4194-83cb-60ddd50f532c/deploy-status)](https://app.netlify.com/projects/arrowmazegame/deploys)
 
 > Implementación del cliente (React + TypeScript + Vite + Capacitor) para el juego de puzzle de flechas. Especificaciones y decisiones centralizadas en [`arrowmaze-project-core`](https://github.com/NRC25783-G4-ArrowMaze/arrowmaze-project-core).
 
@@ -46,6 +47,16 @@ El cliente está construido como una aplicación web con soporte móvil nativo v
 | ![Partida con tema oscuro](./doc/screenshots/partida-tema-oscuro.png) | <img src="./doc/screenshots/movil-partida.png" alt="Partida en viewport móvil" width="280"> |
 
 > Capturas tomadas de la `v1.0.0` corriendo en local (Vite dev server). Más viewports en [`doc/screenshots/`](./doc/screenshots/).
+
+---
+
+## 🎲 El Reto 3D: La Singularidad
+
+Arrow Maze ha evolucionado más allá de los tableros planos (2D) con la introducción de mapas tridimensionales impulsados por nuestro nuevo *3D Glide Engine*:
+- **Superficie Cúbica (Semi-3D):** El tablero tradicional se pliega envolviendo las caras exteriores de un cubo, forzando a las flechas a transitar por las aristas de forma isométrica en un entorno bautizado como "La Singularidad".
+- **Topología Volumétrica (3x3x3):** Un desafío profundo donde el nivel abarca todo el volumen interno y externo del cubo, integrando controles de navegación avanzados en el eje Z.
+
+[![Demostración de ArrowMaze AcademicProject: Reto 3D](https://img.youtube.com/vi/fCi6SwsamF0/maxresdefault.jpg)](https://youtu.be/fCi6SwsamF0)
 
 ---
 
@@ -218,8 +229,11 @@ export interface ILocalProgressRepository {
 
 ## Diagrama de clases
 
-Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`. Versión navegable en SVG:
-[`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
+Generado con `pnpm gen-uml` (tplant) a partir de `src/**/*.ts`.
+
+![Diagrama de clases UML de Arrow Maze](./doc/classes.svg)
+
+> Versión navegable SVG: [`doc/classes.svg`](./doc/classes.svg) · fuente editable: [`classes.puml`](./classes.puml).
 
 ---
 
