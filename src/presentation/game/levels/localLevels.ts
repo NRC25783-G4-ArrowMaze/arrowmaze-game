@@ -17,6 +17,7 @@ import { LEVEL_MAPA_14 } from './levelMapa14';
 import { LEVEL_MAPA_15 } from './levelMapa15';
 import { LEVEL_CUBE } from './levelCube';
 import { LEVEL_SINGULARIDAD } from './levelSingularidad';
+import { LEVEL_EL_HUECO } from './levelElHueco';
 
 /**
  * localLevels — Catálogo de niveles locales del distribuible offline.
@@ -56,4 +57,7 @@ export const LOCAL_LEVELS: Record<string, Scene> = {
   // SINGULARIDAD — el gran final: primer nivel del MODO CUBO en el mapa
   // (post-Corazón). Pendiente registrarlo en el backend (ver doc de hallazgos).
   'singularidad': LEVEL_SINGULARIDAD,
+  // EL HUECO — el GRAN FINAL definitivo: cubo 6×6 con 28 flechas (post-Cube).
+  // Sigue disponible también como preview dev (?level=el-hueco).
+  'el-hueco': LEVEL_EL_HUECO,
 };

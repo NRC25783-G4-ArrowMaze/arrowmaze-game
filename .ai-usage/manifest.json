@@ -3146,10 +3146,37 @@
           "tests": "passed",
           "structure": "passed"
         }
+      },
+      {
+        "id": "2026-07-13-el-hueco-al-mapa",
+        "date": "2026-07-13",
+        "title": "El Hueco al mapa como gran final (umbrales medidos)",
+        "file": "2026-07-13-el-hueco-al-mapa.md",
+        "tool": "Claude Code",
+        "model": "Claude Fable 5",
+        "author": "Juan David",
+        "phase": "implementation",
+        "feature": "el-hueco-nivel-final",
+        "linked_session": "2026-07-13-modo-cubo-implementacion.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 6,
+          "tests_added": 1
+        },
+        "areas": [
+          "level-design",
+          "i18n",
+          "testing"
+        ],
+        "validation": {
+          "tests": "passed (685/685, 85 suites)",
+          "typecheck": "passed"
+        }
       }
     ],
     "statistics": {
-      "totalReports": 55,
+      "totalReports": 56,
       "lastUpdated": "2026-07-13T00:00:00Z",
       "toolsUsed": [
         "GitHub Copilot",
@@ -3175,17 +3202,17 @@
       "totalLinesGenerated": 8530,
       "totalFilesCreated": 175,
       "totalFilesDeleted": 16,
-      "totalTestsPassing": 678,
+      "totalTestsPassing": 685,
       "totalTestSuites": 85,
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones",
-      "totalEntries": 57,
-      "total_reports": 62
+      "totalEntries": 58,
+      "total_reports": 63
     },
     "lastEntry": {
-      "id": "2026-07-13-003",
-      "summary": "MODO CUBO: tablero 3D sobre la superficie de un cubo (riel 3D, arte Rubik + universo interior, niveles El Hueco y Singularidad)"
+      "id": "2026-07-13-el-hueco-al-mapa",
+      "summary": "El Hueco al mapa como GRAN FINAL (post-Cube): umbrales medidos [1227, 1372] sobre flawless 1444, replay de 28 flechas en la suite, i18n es/en"
     }
   }
 }
