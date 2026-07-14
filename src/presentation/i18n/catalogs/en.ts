@@ -92,6 +92,7 @@ export const en: Catalog = {
       'heart-preview': 'Heart',
       'singularidad': 'Singularity',
       'cube': 'Cube',
+      'el-hueco': 'The Hollow',
       'level-intermediate-b': 'Challenge B',
       'level-advanced': 'Advanced',
       'level-expert': 'Expert',

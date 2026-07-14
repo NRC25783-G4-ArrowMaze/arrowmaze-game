@@ -49,6 +49,7 @@ const LEVEL_METADATA: Record<string, { difficulty: string }> = {
   'cube': { difficulty: 'hard' },
   // El gran final (MODO CUBO): con la música hard de G1, como merece.
   'singularidad': { difficulty: 'hard' },
+  'el-hueco': { difficulty: 'veryHard' },
 };
 
 /**

@@ -125,6 +125,9 @@ const SOLVE_ORDERS: Record<string, string[]> = {
   // SINGULARIDAD (MODO CUBO, gran final): ola 1 vacía los carriles directos
   // al agujero negro; la ola 2 los recorre desde las caras profundas.
   'singularidad': SINGULARIDAD_SOLVE_ORDER,
+  // EL HUECO (MODO CUBO, gran final del mapa): 4 olas — carriles directos,
+  // tras-arista, profundos y cara de abajo (ver levelElHueco.ts).
+  'el-hueco': EL_HUECO_SOLVE_ORDER,
   // Anillo: circulaciones, radiales hacia el hueco, carriles y esquinas.
   'mapa-15': [
     'borde-left', 'borde-bottom', 'borde-right', 'borde-top', 'brocal-left',

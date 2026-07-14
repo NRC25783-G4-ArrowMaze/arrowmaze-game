@@ -92,6 +92,7 @@ export const es: Catalog = {
       'heart-preview': 'Corazón',
       'singularidad': 'Singularidad',
       'cube': 'Cubo',
+      'el-hueco': 'El Hueco',
       'level-intermediate-b': 'Desafío B',
       'level-advanced': 'Avanzado',
       'level-expert': 'Experto',

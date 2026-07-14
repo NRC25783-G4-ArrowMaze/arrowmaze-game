@@ -124,4 +124,13 @@ export const LEVEL_MAP: LevelMapDTO = [
     pathHint: { x: 50, y: 100 },
     starThresholds: [1500, 2000],
   },
+  // EL HUECO — el GRAN FINAL: cubo 6×6 con 28 flechas en 4 olas. Umbrales
+  // MEDIDOS contra el motor: flawless real del SOLVE_ORDER = 1444 (replay en
+  // localLevels.spec); [1227, 1372] ≈ 85% y 95% — estrellas ganables.
+  {
+    levelId: 'el-hueco',
+    prerequisites: ['cube'],
+    pathHint: { x: 50, y: 102 },
+    starThresholds: [1227, 1372],
+  },
 ];
