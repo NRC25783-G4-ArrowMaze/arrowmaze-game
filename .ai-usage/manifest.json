@@ -2,7 +2,7 @@
   "project": "arrow-maze-client",
   "aiUsageRegistry": {
     "version": "1.0",
-    "lastUpdated": "2026-07-13T15:05:22.055Z",
+    "lastUpdated": "2026-07-13T23:19:13.146927Z",
     "entries": [
       {
         "id": "2026-06-01-001",
@@ -147,16 +147,16 @@
         "validation": {
           "build": "not_run",
           "lint": "not_run",
-          "tests": "91/91 passed — 0 failures, 0 regressions",
+          "tests": "91/91 passed \u2014 0 failures, 0 regressions",
           "git_checks": "not_run",
           "structure": "passed"
         },
         "decisions": [
-          "Topología port-based: Cell(P puertos pares) sin Direction/Position — grafo genérico",
-          "Ports & Adapters (opción C): InMemoryRepository para tests, HttpRepository para producción",
-          "LevelData schema mínimo y extensible — sin definición final del formato de nivel"
+          "Topolog\u00eda port-based: Cell(P puertos pares) sin Direction/Position \u2014 grafo gen\u00e9rico",
+          "Ports & Adapters (opci\u00f3n C): InMemoryRepository para tests, HttpRepository para producci\u00f3n",
+          "LevelData schema m\u00ednimo y extensible \u2014 sin definici\u00f3n final del formato de nivel"
         ],
-        "notes": "Migración completa del modelo Direction-grid al modelo port-based. 91 tests pasando. Infrastructure layer con InMemory repos listos para tests sin red. HttpBoardRepository pendiente para It.3."
+        "notes": "Migraci\u00f3n completa del modelo Direction-grid al modelo port-based. 91 tests pasando. Infrastructure layer con InMemory repos listos para tests sin red. HttpBoardRepository pendiente para It.3."
       },
       {
         "id": "2026-06-02-001",
@@ -191,12 +191,12 @@
           "Escribir postprocess-uml.js en NodeJS para sanear la salida y arreglar las firmas de funciones top-level que rompen PlantUML",
           "Usar pnpm como gestor de paquetes para agregar la devDependency"
         ],
-        "notes": "Configurada la generación automatizada de UML con pnpm run gen-uml. Creado el documento doc/plantuml-generation.md con instrucciones completas."
+        "notes": "Configurada la generaci\u00f3n automatizada de UML con pnpm run gen-uml. Creado el documento doc/plantuml-generation.md con instrucciones completas."
       },
       {
         "id": "2026-06-02-002",
         "date": "2026-06-02",
-        "title": "Board Graph Engine — Architecture by Layer Documentation",
+        "title": "Board Graph Engine \u2014 Architecture by Layer Documentation",
         "file": "2026-06-02-board-graph-architecture.md",
         "tool": "Claude (web.claude.ai)",
         "model": "Claude Haiku 4.5",
@@ -256,22 +256,22 @@
           }
         },
         "validation": {
-          "bdd_coverage": "100% — todos los escenarios Gherkin mapeados a clases",
-          "dependency_direction": "passed — respeta las 4 capas de Clean Architecture",
-          "completeness": "passed — 31 clases/conceptos documentados",
-          "design_decisions": "traced — 3 decisiones de diseño explicadas y justificadas"
+          "bdd_coverage": "100% \u2014 todos los escenarios Gherkin mapeados a clases",
+          "dependency_direction": "passed \u2014 respeta las 4 capas de Clean Architecture",
+          "completeness": "passed \u2014 31 clases/conceptos documentados",
+          "design_decisions": "traced \u2014 3 decisiones de dise\u00f1o explicadas y justificadas"
         },
         "decisions": [
-          "ConnectionService en Capa 1 (Domain) en lugar de Capa 2: bidireccionalidad es regla de negocio, no orquestación",
-          "Port como Value Object embebido vs Entity: identidad relativa a su Cell padre, no autónoma",
-          "Validación de ArrowSegment en Cell.placeSegment(): invariante del dominio, no responsabilidad del caso de uso"
+          "ConnectionService en Capa 1 (Domain) en lugar de Capa 2: bidireccionalidad es regla de negocio, no orquestaci\u00f3n",
+          "Port como Value Object embebido vs Entity: identidad relativa a su Cell padre, no aut\u00f3noma",
+          "Validaci\u00f3n de ArrowSegment en Cell.placeSegment(): invariante del dominio, no responsabilidad del caso de uso"
         ],
-        "notes": "Documento README exhaustivo (ARCHITECTURE.md) que mapea la topología port-based BDD a una arquitectura limpia de 4 capas. Incluye diagramas ASCII y justificación de cada decisión. Acompañado de AI_USAGE_REPORT.md para trazabilidad auditable."
+        "notes": "Documento README exhaustivo (ARCHITECTURE.md) que mapea la topolog\u00eda port-based BDD a una arquitectura limpia de 4 capas. Incluye diagramas ASCII y justificaci\u00f3n de cada decisi\u00f3n. Acompa\u00f1ado de AI_USAGE_REPORT.md para trazabilidad auditable."
       },
       {
         "id": "2026-06-02-003",
         "date": "2026-06-02",
-        "title": "Auditoría, limpieza y refactorización — alineación con feature BDD",
+        "title": "Auditor\u00eda, limpieza y refactorizaci\u00f3n \u2014 alineaci\u00f3n con feature BDD",
         "file": "2026-06-02-cleanup-and-refactor-feature1.md",
         "tool": "Antigravity (Claude)",
         "model": "Claude Sonnet 4.6 (Thinking)",
@@ -328,7 +328,7 @@
           "infrastructure": {
             "status": "extended",
             "extended": [
-              "InMemoryBoardRepository — ahora implementa IBoardRepository + ILevelRepository"
+              "InMemoryBoardRepository \u2014 ahora implementa IBoardRepository + ILevelRepository"
             ],
             "deleted": [
               "InMemoryLevelRepository"
@@ -345,16 +345,16 @@
         "validation": {
           "build": "not_run",
           "lint": "not_run",
-          "tests": "not_run — pendiente verificar LoadLevelUseCase.spec.ts tras refactorización",
-          "import_check": "passed — 0 referencias rotas post-limpieza",
-          "structure": "passed — 13 archivos alineados con doc/feature1.md"
+          "tests": "not_run \u2014 pendiente verificar LoadLevelUseCase.spec.ts tras refactorizaci\u00f3n",
+          "import_check": "passed \u2014 0 referencias rotas post-limpieza",
+          "structure": "passed \u2014 13 archivos alineados con doc/feature1.md"
         },
         "decisions": [
-          "Eliminar todo código sin cobertura BDD en lugar de mantenerlo como infraestructura futura",
-          "Reinterpretar ILevelRepository como contrato de LevelData (topología) en vez de entidad Level",
-          "InMemoryBoardRepository implementa ambos contratos (IBoardRepository + ILevelRepository) sin duplicación"
+          "Eliminar todo c\u00f3digo sin cobertura BDD en lugar de mantenerlo como infraestructura futura",
+          "Reinterpretar ILevelRepository como contrato de LevelData (topolog\u00eda) en vez de entidad Level",
+          "InMemoryBoardRepository implementa ambos contratos (IBoardRepository + ILevelRepository) sin duplicaci\u00f3n"
         ],
-        "notes": "Sesión de auditoría: Direction.ts identificado como primer artefacto huérfano, desencadenando limpieza en cascada de 12 archivos. Restauración de LoadLevelUseCase/ILevelRepository derivó en refactorización limpia orientada a LevelData como fuente de verdad de topología."
+        "notes": "Sesi\u00f3n de auditor\u00eda: Direction.ts identificado como primer artefacto hu\u00e9rfano, desencadenando limpieza en cascada de 12 archivos. Restauraci\u00f3n de LoadLevelUseCase/ILevelRepository deriv\u00f3 en refactorizaci\u00f3n limpia orientada a LevelData como fuente de verdad de topolog\u00eda."
       },
       {
         "id": "2026-06-02-004",
@@ -383,10 +383,10 @@
           "tests": "passed"
         },
         "decisions": [
-          "Escribir especificación técnica detallada en español para Feature 1",
+          "Escribir especificaci\u00f3n t\u00e9cnica detallada en espa\u00f1ol para Feature 1",
           "Utilizar diagramas de clase Mermaid incrustados en Markdown para mayor claridad"
         ],
-        "notes": "Redactada especificación completa y diagrama de clases de Feature 1."
+        "notes": "Redactada especificaci\u00f3n completa y diagrama de clases de Feature 1."
       },
       {
         "id": "2026-06-02-005",
@@ -413,11 +413,11 @@
           "tests": "passed"
         },
         "decisions": [
-          "Migrar a imports explícitos 'import type' / 'type' inline para verbatimModuleSyntax",
-          "Eliminar parameter properties en constructor en favor de asignaciones de campo explícitas por erasableSyntaxOnly",
+          "Migrar a imports expl\u00edcitos 'import type' / 'type' inline para verbatimModuleSyntax",
+          "Eliminar parameter properties en constructor en favor de asignaciones de campo expl\u00edcitas por erasableSyntaxOnly",
           "Migrar de process.env a import.meta.env en api-config.ts para corregir tipos en Vite"
         ],
-        "notes": "Corregidos 12 errores de compilación TypeScript. Build de Vite verificado con éxito."
+        "notes": "Corregidos 12 errores de compilaci\u00f3n TypeScript. Build de Vite verificado con \u00e9xito."
       },
       {
         "id": "2026-06-03-001",
@@ -474,14 +474,14 @@
         "validation": {
           "build": "passed",
           "lint": "passed",
-          "tests": "112/112 passed — 0 failures, 0 regressions",
+          "tests": "112/112 passed \u2014 0 failures, 0 regressions",
           "git_checks": "not_run",
           "structure": "passed"
         },
         "decisions": [
           "DTO delgado en Cell para desacoplar ArrowSegment rico y evitar loops circulares.",
-          "Arrow como Rich Domain Entity responsable de la topología y validez estructural.",
-          "Relajar validaciones estáticas en Cell.ts para delegarlas en la lógica de camino/conectores de Arrow."
+          "Arrow como Rich Domain Entity responsable de la topolog\u00eda y validez estructural.",
+          "Relajar validaciones est\u00e1ticas en Cell.ts para delegarlas en la l\u00f3gica de camino/conectores de Arrow."
         ],
         "notes": "Funcionalidad de Arrow Placement completamente implementada y probada bajo Clean Architecture con 112 tests pasando en total (17 nuevos de Arrow)."
       },
@@ -522,20 +522,20 @@
         "validation": {
           "build": "passed",
           "lint": "passed",
-          "tests": "112/112 passed — 0 failures, 0 regressions",
+          "tests": "112/112 passed \u2014 0 failures, 0 regressions",
           "structure": "passed"
         },
         "decisions": [
           "Simplificar ArrowSegment para quitarle del todo fromPort, toPort y abstract exitPort.",
-          "Asignar entryPort a Segment solo al nacer de manera de lectura únicamente (readonly).",
-          "La cabeza no hereda entryPort y mantiene exitPort de manera única."
+          "Asignar entryPort a Segment solo al nacer de manera de lectura \u00fanicamente (readonly).",
+          "La cabeza no hereda entryPort y mantiene exitPort de manera \u00fanica."
         ],
-        "notes": "Se corrigieron las inconsistencias de diseño conceptual en el modelo de flechas. Las pruebas pasaron completamente tras adaptar las aserciones a la nueva interfaz limpia."
+        "notes": "Se corrigieron las inconsistencias de dise\u00f1o conceptual en el modelo de flechas. Las pruebas pasaron completamente tras adaptar las aserciones a la nueva interfaz limpia."
       },
       {
         "id": "2026-06-04-001",
         "date": "2026-06-04",
-        "title": "Propagación de refactor del dominio de ArrowSegment a aplicación e infra",
+        "title": "Propagaci\u00f3n de refactor del dominio de ArrowSegment a aplicaci\u00f3n e infra",
         "file": "2026-06-04-refactor-arrow-propagation.md",
         "tool": "Antigravity (Gemini / Claude)",
         "model": "Claude Sonnet 4.6 (Thinking)",
@@ -574,7 +574,7 @@
           "Reflejar entryPort y exitPort en ArrowSegmentDTO",
           "Usar instanceof Head / casting a Segment en PlaceArrowUseCase._projectChain"
         ],
-        "notes": "Se propagó el diseño limpio del dominio a las capas externas, corrigiendo errores de compilación TypeScript y actualizando el diagrama de clases UML."
+        "notes": "Se propag\u00f3 el dise\u00f1o limpio del dominio a las capas externas, corrigiendo errores de compilaci\u00f3n TypeScript y actualizando el diagrama de clases UML."
       },
       {
         "id": "2026-06-09-001",
@@ -630,16 +630,16 @@
         "validation": {
           "build": "passed",
           "lint": "passed",
-          "tests": "131/131 passed — 0 failures, 0 regressions",
+          "tests": "131/131 passed \u2014 0 failures, 0 regressions",
           "structure": "passed"
         },
         "decisions": [
           "AdvanceResult es Value Object, DTO en Capa 2",
           "La flecha gestiona in-flight nativamente con flag privado",
-          "Algoritmo matemático predecible Head-push sin mutar la topología activa por error",
+          "Algoritmo matem\u00e1tico predecible Head-push sin mutar la topolog\u00eda activa por error",
           "Prioridad de rollback inmutable si se encuentra el destino bloqueado"
         ],
-        "notes": "Motor de avance cinemático implementado en dominio y application layer. Todos los tests BDD en verde (131/131 total tests passing)."
+        "notes": "Motor de avance cinem\u00e1tico implementado en dominio y application layer. Todos los tests BDD en verde (131/131 total tests passing)."
       },
       {
         "id": "2026-06-12-001",
@@ -667,19 +667,19 @@
           "build": "not_run",
           "lint": "not_run",
           "tests": "not_run",
-          "structure": "passed — revisión manual contra doc/, features/, .ai-usage/"
+          "structure": "passed \u2014 revisi\u00f3n manual contra doc/, features/, .ai-usage/"
         },
         "decisions": [
-          "CLAUDE.md en la raíz del repositorio (no dentro de .claude/) para detección automática por Claude Code",
+          "CLAUDE.md en la ra\u00edz del repositorio (no dentro de .claude/) para detecci\u00f3n autom\u00e1tica por Claude Code",
           "Incluir protocolo de AI usage dentro de CLAUDE.md con referencia al skill existente",
-          "Dos comandos personalizados: /run-tests y /new-feature para las operaciones más frecuentes"
+          "Dos comandos personalizados: /run-tests y /new-feature para las operaciones m\u00e1s frecuentes"
         ],
-        "notes": "Consolidación de reglas dispersas del repositorio en CLAUDE.md. Sin modificación de código fuente ni tests."
+        "notes": "Consolidaci\u00f3n de reglas dispersas del repositorio en CLAUDE.md. Sin modificaci\u00f3n de c\u00f3digo fuente ni tests."
       },
       {
         "id": "2026-06-12-002",
         "date": "2026-06-12",
-        "title": "Planning del Roadmap Maestro — Análisis de 13 features (A1–A5, B1–B3, C1–C4, D1–D2)",
+        "title": "Planning del Roadmap Maestro \u2014 An\u00e1lisis de 13 features (A1\u2013A5, B1\u2013B3, C1\u2013C4, D1\u2013D2)",
         "file": "2026-06-12-master-roadmap-planning.md",
         "tool": "Antigravity (Claude)",
         "model": "Claude Sonnet 4.6 (Thinking)",
@@ -770,15 +770,15 @@
         "validation": {
           "build": "not_run",
           "lint": "not_run",
-          "tests": "not_run — sesion de planning, sin cambios de codigo",
-          "structure": "passed — analysis against real code"
+          "tests": "not_run \u2014 sesion de planning, sin cambios de codigo",
+          "structure": "passed \u2014 analysis against real code"
         },
         "notes": "Plan maestro generado tras analisis de 131 tests pasando, 9 suites, 13 features. Pendiente aprobacion del plan y respuesta a 7 open questions antes de iniciar Fase 1 (A4)."
       },
       {
         "id": "2026-06-12-003",
         "date": "2026-06-12",
-        "title": "README.md del proyecto Arrow Maze — documentación real del repositorio",
+        "title": "README.md del proyecto Arrow Maze \u2014 documentaci\u00f3n real del repositorio",
         "file": "2026-06-12-master-roadmap-planning.md",
         "tool": "Antigravity (Claude)",
         "model": "Claude Sonnet 4.6 (Thinking)",
@@ -801,7 +801,7 @@
         "validation": {
           "build": "not_run",
           "lint": "not_run",
-          "tests": "not_run — cambio de documentacion",
+          "tests": "not_run \u2014 cambio de documentacion",
           "structure": "passed"
         },
         "notes": "README.md reemplazado: template Vite eliminado, reemplazado por documentacion real del proyecto con arquitectura, features, conceptos de dominio, comandos y links a docs tecnicos."
@@ -809,7 +809,7 @@
       {
         "id": "2026-06-13-001",
         "date": "2026-06-13",
-        "title": "A4 — Game End Detection: GameSession + PlayMoveUseCase",
+        "title": "A4 \u2014 Game End Detection: GameSession + PlayMoveUseCase",
         "file": "2026-06-13-game-end-detection-a4.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Sonnet 4.6",
@@ -865,22 +865,22 @@
         },
         "validation": {
           "build": "not_run",
-          "lint": "passed — archivos nuevos sin errores",
-          "tests": "154/154 passed — 23 nuevos, 0 regresiones",
-          "gen_uml": "passed — classes.puml actualizado",
-          "structure": "passed — separación de capas respetada"
+          "lint": "passed \u2014 archivos nuevos sin errores",
+          "tests": "154/154 passed \u2014 23 nuevos, 0 regresiones",
+          "gen_uml": "passed \u2014 classes.puml actualizado",
+          "structure": "passed \u2014 separaci\u00f3n de capas respetada"
         },
         "decisions": [
-          "allowedMoves como campo obligatorio (no opcional) en LevelData — consistente con el plan pre-aprobado",
-          "Técnica de corrupción de cadena para probar success=false sin mocks — ArrowCinematicError inducida desconectando puerto post-extend",
-          "WON check antes de LOST en evaluateStatus — garantiza precedencia cuando movesRemaining=0 y board vacío simultaneamente"
+          "allowedMoves como campo obligatorio (no opcional) en LevelData \u2014 consistente con el plan pre-aprobado",
+          "T\u00e9cnica de corrupci\u00f3n de cadena para probar success=false sin mocks \u2014 ArrowCinematicError inducida desconectando puerto post-extend",
+          "WON check antes de LOST en evaluateStatus \u2014 garantiza precedencia cuando movesRemaining=0 y board vac\u00edo simultaneamente"
         ],
-        "notes": "Implementación literal del plan feature4_plan.md. TDD estricto: errores → entidad → tests dominio → DTOs → tests aplicación → use case. 154 tests en verde. Branch: feature4/game-end-detection."
+        "notes": "Implementaci\u00f3n literal del plan feature4_plan.md. TDD estricto: errores \u2192 entidad \u2192 tests dominio \u2192 DTOs \u2192 tests aplicaci\u00f3n \u2192 use case. 154 tests en verde. Branch: feature4/game-end-detection."
       },
       {
         "id": "2026-06-14-001",
         "date": "2026-06-14",
-        "title": "A5 — Game Session Scoring: Planning",
+        "title": "A5 \u2014 Game Session Scoring: Planning",
         "file": "2026-06-14-game-session-scoring-a5-planning.md",
         "tool": "Antigravity (Claude)",
         "model": "Claude Sonnet 4.6 (Thinking)",
@@ -907,14 +907,14 @@
           "bdd"
         ],
         "designDecisions": [
-          "ScoringConstants como objeto congelado en domain/value-objects/ — agnóstico a tecnología",
-          "ScoringTracker como componente interno mutable del aggregate GameSession (composición)",
-          "Score como VO inmutable con factory Score.compute(tracker) — se crea una única vez al transicionar a WON",
-          "blocked = falla (incrementa racha); advanced/destroyed = éxito (resetean racha consecutiva)",
-          "Punto de inserción en PlayMoveUseCase: paso 4.5 session.recordMoveOutcome() entre consumeMove() y evaluateStatus()",
-          "PlayMoveResult.score?: number opcional — presente solo cuando gameStatus === 'WON'",
-          "Sin GetScoreUseCase — basta exponer session.score como propiedad del aggregate",
-          "Constructor GameSession sin nuevos parámetros — impacto cero en tests existentes"
+          "ScoringConstants como objeto congelado en domain/value-objects/ \u2014 agn\u00f3stico a tecnolog\u00eda",
+          "ScoringTracker como componente interno mutable del aggregate GameSession (composici\u00f3n)",
+          "Score como VO inmutable con factory Score.compute(tracker) \u2014 se crea una \u00fanica vez al transicionar a WON",
+          "blocked = falla (incrementa racha); advanced/destroyed = \u00e9xito (resetean racha consecutiva)",
+          "Punto de inserci\u00f3n en PlayMoveUseCase: paso 4.5 session.recordMoveOutcome() entre consumeMove() y evaluateStatus()",
+          "PlayMoveResult.score?: number opcional \u2014 presente solo cuando gameStatus === 'WON'",
+          "Sin GetScoreUseCase \u2014 basta exponer session.score como propiedad del aggregate",
+          "Constructor GameSession sin nuevos par\u00e1metros \u2014 impacto cero en tests existentes"
         ],
         "plannedDeliverables": {
           "new_files": [
@@ -934,17 +934,17 @@
           "implementation_steps": 16
         },
         "validation": {
-          "build": "not_run — planning only",
-          "lint": "not_run — planning only",
-          "tests": "not_run — planning only",
-          "structure": "passed — plan validated against checklist pre-handoff"
+          "build": "not_run \u2014 planning only",
+          "lint": "not_run \u2014 planning only",
+          "tests": "not_run \u2014 planning only",
+          "structure": "passed \u2014 plan validated against checklist pre-handoff"
         },
-        "notes": "Sesión de planning para A5. 8 preguntas de diseño resueltas, plan de 16 pasos TDD generado en doc/game-session-scoring_implementation_plan.md. Pendiente implementación por Claude Code (Haiku)."
+        "notes": "Sesi\u00f3n de planning para A5. 8 preguntas de dise\u00f1o resueltas, plan de 16 pasos TDD generado en doc/game-session-scoring_implementation_plan.md. Pendiente implementaci\u00f3n por Claude Code (Haiku)."
       },
       {
         "id": "2026-06-14-002",
         "date": "2026-06-14",
-        "title": "A5 — Game Session Scoring: Evaluation & Implementation",
+        "title": "A5 \u2014 Game Session Scoring: Evaluation & Implementation",
         "file": "2026-06-14-game-session-scoring-evaluation-implementation.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (evaluation) + Sonnet 4.6 (impl init) + Haiku 4.5 (impl final)",
@@ -1000,30 +1000,30 @@
         },
         "validation": {
           "build": "passed",
-          "lint": "passed — 0 errores en archivos nuevos/modificados",
-          "tests": "214/214 passed — 71 nuevos, 0 regresiones",
-          "gen_uml": "passed — classes.puml actualizado",
-          "structure": "passed — separación de capas respetada"
+          "lint": "passed \u2014 0 errores en archivos nuevos/modificados",
+          "tests": "214/214 passed \u2014 71 nuevos, 0 regresiones",
+          "gen_uml": "passed \u2014 classes.puml actualizado",
+          "structure": "passed \u2014 separaci\u00f3n de capas respetada"
         },
         "decisions": [
           "Mantener scoring 100% RAM-resident (sin persistencia, repos ni infrastructure)",
-          "Aplicar correcciones bloqueantes del addendum B-1 (aritmética) y B-2 (testabilidad)",
+          "Aplicar correcciones bloqueantes del addendum B-1 (aritm\u00e9tica) y B-2 (testabilidad)",
           "Object.freeze en Score + expect().toThrow(TypeError) para test de immutabilidad en strict mode",
           "Tests de 'registro de outcomes' asertan sobre finalScore observable (no contadores internos)"
         ],
         "addendumFindings": {
           "bloqueantes": [
-            "B-1 aritmética en test use-case (1300→1498)",
+            "B-1 aritm\u00e9tica en test use-case (1300\u21921498)",
             "B-2 testabilidad de contadores internos ocultos"
           ],
           "menores": [
             "M-1 Object.freeze + @ts-expect-error",
             "M-2 flawlessVictory=false cobertura",
-            "M-3 Grupo 4 tautológico",
+            "M-3 Grupo 4 tautol\u00f3gico",
             "M-4 Score.compute acople opcional"
           ]
         },
-        "notes": "Implementación literalTDD: evaluación del plan (hallazgos B-1, B-2) → addendum con correcciones → implementación según plan + correcciones → validación exhaustiva. 214 tests en verde, requisito crítico (RAM-resident) confirmado. Branch: feature5/game-session-scoring."
+        "notes": "Implementaci\u00f3n literalTDD: evaluaci\u00f3n del plan (hallazgos B-1, B-2) \u2192 addendum con correcciones \u2192 implementaci\u00f3n seg\u00fan plan + correcciones \u2192 validaci\u00f3n exhaustiva. 214 tests en verde, requisito cr\u00edtico (RAM-resident) confirmado. Branch: feature5/game-session-scoring."
       },
       {
         "id": "2026-06-15-001",
@@ -1031,7 +1031,7 @@
         "title": "Motor de Juego: Constructores de Tablero y Flechas (Frontend)",
         "file": "2026-06-15-level-load.md",
         "tool": "Gemini",
-        "model": "Gemini (versión no especificada)",
+        "model": "Gemini (versi\u00f3n no especificada)",
         "author": "@SantiagoChirinos",
         "phase": "implementation",
         "feature": "level-load",
@@ -1054,12 +1054,12 @@
           "tests": "passed",
           "structure": "passed"
         },
-        "notes": "Separación de Agregados (SRP) en constructores. Contratos compartidos (LevelDataDTO) para monorepo. Validación geométrica defensiva. NOTA: el spec __tests__/application/LevelDataBoardBuilder.spec.ts introducido con esta feature no compilaba en dev (un \"});\" sobrante); corregido en la sesión 2026-06-22-001."
+        "notes": "Separaci\u00f3n de Agregados (SRP) en constructores. Contratos compartidos (LevelDataDTO) para monorepo. Validaci\u00f3n geom\u00e9trica defensiva. NOTA: el spec __tests__/application/LevelDataBoardBuilder.spec.ts introducido con esta feature no compilaba en dev (un \"});\" sobrante); corregido en la sesi\u00f3n 2026-06-22-001."
       },
       {
         "id": "2026-06-22-001",
         "date": "2026-06-22",
-        "title": "Validación PR #10 + saneo registro AI usage + spec movimiento continuo",
+        "title": "Validaci\u00f3n PR #10 + saneo registro AI usage + spec movimiento continuo",
         "file": "2026-06-22-pr10-validation-ai-usage-cleanup.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8",
@@ -1083,15 +1083,15 @@
         "validation": {
           "build": "pending",
           "lint": "pending",
-          "tests": "passed — 197/197 tras corregir LevelDataBoardBuilder.spec.ts",
+          "tests": "passed \u2014 197/197 tras corregir LevelDataBoardBuilder.spec.ts",
           "structure": "passed"
         },
-        "notes": "Validación del PR #10 (presentación B1–B4). Fix de compilación en LevelDataBoardBuilder.spec.ts (\"});\" sobrante línea 108). Reparación del manifest.json (JSON inválido por doble bloque statistics + entradas A5 huérfanas) restaurando la base a1b7e6e y reinsertando limpio. Spec de movimiento continuo documentada sin implementar."
+        "notes": "Validaci\u00f3n del PR #10 (presentaci\u00f3n B1\u2013B4). Fix de compilaci\u00f3n en LevelDataBoardBuilder.spec.ts (\"});\" sobrante l\u00ednea 108). Reparaci\u00f3n del manifest.json (JSON inv\u00e1lido por doble bloque statistics + entradas A5 hu\u00e9rfanas) restaurando la base a1b7e6e y reinsertando limpio. Spec de movimiento continuo documentada sin implementar."
       },
       {
         "id": "2026-06-26-001",
         "date": "2026-06-26",
-        "title": "Planning de fixes de movimiento — FIX-1 (slide, aplicación) + FIX-2 (colisión de cola, dominio)",
+        "title": "Planning de fixes de movimiento \u2014 FIX-1 (slide, aplicaci\u00f3n) + FIX-2 (colisi\u00f3n de cola, dominio)",
         "file": "2026-06-26-movement-fixes-planning.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8",
@@ -1115,23 +1115,23 @@
           "collision-detection"
         ],
         "validation": {
-          "build": "not_run — planning only",
-          "lint": "not_run — planning only",
-          "tests": "not_run — planning only",
-          "structure": "passed — specs validados contra el código del dominio"
+          "build": "not_run \u2014 planning only",
+          "lint": "not_run \u2014 planning only",
+          "tests": "not_run \u2014 planning only",
+          "structure": "passed \u2014 specs validados contra el c\u00f3digo del dominio"
         },
         "decisions": [
           "Slide (FIX-1): 1 click = 1 movimiento; 1 registro de scoring por slide; no toca dominio ni PlayMoveUseCase",
-          "Colisión de cola (FIX-2): único cambio de dominio — validar el destino de la cola en Arrow.advance() fase 3",
-          "Modelo head-push confirmado: cabeza atrás (empuja), cola adelante (frente que entra a celdas nuevas)",
+          "Colisi\u00f3n de cola (FIX-2): \u00fanico cambio de dominio \u2014 validar el destino de la cola en Arrow.advance() fase 3",
+          "Modelo head-push confirmado: cabeza atr\u00e1s (empuja), cola adelante (frente que entra a celdas nuevas)",
           "Estructura de ramas: fix/movement/base (planes + AI-usage) -> sub-ramas fix/movement/slide y fix/movement/tail"
         ],
-        "notes": "Sesión de planning de dos fixes. FIX-1 (aplicación): SlideArrowUseCase encadena advance() hasta terminal (1 click = ticks). FIX-2 (dominio): cierra el hueco de colisión en la cola (advance solo validaba la cabeza; Cell.placeArrowSegment sobre-escribía en silencio). Entregados 2 Gherkin + 2 planes. Implementación pendiente en las sub-ramas."
+        "notes": "Sesi\u00f3n de planning de dos fixes. FIX-1 (aplicaci\u00f3n): SlideArrowUseCase encadena advance() hasta terminal (1 click = ticks). FIX-2 (dominio): cierra el hueco de colisi\u00f3n en la cola (advance solo validaba la cabeza; Cell.placeArrowSegment sobre-escrib\u00eda en silencio). Entregados 2 Gherkin + 2 planes. Implementaci\u00f3n pendiente en las sub-ramas."
       },
       {
         "id": "2026-06-26-002",
         "date": "2026-06-26",
-        "title": "FIX-1 slide-arrow-movement — implementación de SlideArrowUseCase",
+        "title": "FIX-1 slide-arrow-movement \u2014 implementaci\u00f3n de SlideArrowUseCase",
         "file": "2026-06-26-slide-arrow-movement-impl.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8",
@@ -1171,23 +1171,23 @@
         },
         "validation": {
           "build": "not_run",
-          "lint": "passed — exit 0",
-          "tests": "225/225 passed — 9 nuevos, 0 regresiones",
-          "gen_uml": "passed — classes.puml actualizado",
-          "structure": "passed — sin tocar dominio ni PlayMoveUseCase"
+          "lint": "passed \u2014 exit 0",
+          "tests": "225/225 passed \u2014 9 nuevos, 0 regresiones",
+          "gen_uml": "passed \u2014 classes.puml actualizado",
+          "structure": "passed \u2014 sin tocar dominio ni PlayMoveUseCase"
         },
         "decisions": [
           "1 click = 1 movimiento: el bucle hace N ticks pero consumeMove()/recordMoveOutcome() se llaman una vez",
           "Slide se detiene en blocked/destroyed; fallo de infra no consume movimiento",
-          "Cota defensiva maxTicks = nº celdas + 1 (el dominio ya garantiza terminación)",
-          "Reutiliza AdvanceArrowUseCase; no reimplementa trayectoria ni colisión"
+          "Cota defensiva maxTicks = n\u00ba celdas + 1 (el dominio ya garantiza terminaci\u00f3n)",
+          "Reutiliza AdvanceArrowUseCase; no reimplementa trayectoria ni colisi\u00f3n"
         ],
-        "notes": "Implementación TDD del plan FIX-1 en rama fix/movement/slide. SlideArrowUseCase encadena advance() hasta terminal y consolida la jugada (1 movimiento, 1 registro de scoring). Colisión de serpientes pendiente de FIX-2. Pendiente cableado de animación en el preview (solo presentación)."
+        "notes": "Implementaci\u00f3n TDD del plan FIX-1 en rama fix/movement/slide. SlideArrowUseCase encadena advance() hasta terminal y consolida la jugada (1 movimiento, 1 registro de scoring). Colisi\u00f3n de serpientes pendiente de FIX-2. Pendiente cableado de animaci\u00f3n en el preview (solo presentaci\u00f3n)."
       },
       {
         "id": "2026-06-26-003",
         "date": "2026-06-26",
-        "title": "FIX-2 tail-collision-detection — validación del destino de la cola en Arrow.advance (dominio)",
+        "title": "FIX-2 tail-collision-detection \u2014 validaci\u00f3n del destino de la cola en Arrow.advance (dominio)",
         "file": "2026-06-26-tail-collision-detection-impl.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8",
@@ -1224,24 +1224,24 @@
         },
         "validation": {
           "build": "not_run",
-          "lint": "passed — exit 0",
-          "tests": "233/233 passed — 8 nuevos, 0 regresiones",
-          "gen_uml": "passed — classes.puml sin cambios de contenido (API pública intacta)",
-          "structure": "passed — único cambio de dominio, sin tocar use cases ni Cell"
+          "lint": "passed \u2014 exit 0",
+          "tests": "233/233 passed \u2014 8 nuevos, 0 regresiones",
+          "gen_uml": "passed \u2014 classes.puml sin cambios de contenido (API p\u00fablica intacta)",
+          "structure": "passed \u2014 \u00fanico cambio de dominio, sin tocar use cases ni Cell"
         },
         "decisions": [
-          "Alcance cola-only: en head-push la cola es el único segmento que entra a celda nueva",
+          "Alcance cola-only: en head-push la cola es el \u00fanico segmento que entra a celda nueva",
           "Sumidero (targetCell null) no bloquea: la cola se purga en el commit",
           "self nunca bloquea (reutiliza _cellBelongsToSelf)",
-          "Rollback = no hacer nada: el chequeo es pre-commit, ningún contenedor fue mutado",
-          "No se tocó _calculateTargets, _commitAdvance, Cell ni ningún use case"
+          "Rollback = no hacer nada: el chequeo es pre-commit, ning\u00fan contenedor fue mutado",
+          "No se toc\u00f3 _calculateTargets, _commitAdvance, Cell ni ning\u00fan use case"
         ],
-        "notes": "Implementación TDD del plan FIX-2 en rama fix/movement/tail. Cierra el hueco de colisión en la cola: advance() solo validaba la cabeza (self en flechas multi-celda) y Cell.placeArrowSegment sobre-escribía en silencio. Fase 3.5 valida el destino de la cola contra ocupación ajena. Scenario 7 'Lazy checking' verificado intacto. Con FIX-2 el slide de FIX-1 ya se detiene ante serpientes sin tocar SlideArrowUseCase."
+        "notes": "Implementaci\u00f3n TDD del plan FIX-2 en rama fix/movement/tail. Cierra el hueco de colisi\u00f3n en la cola: advance() solo validaba la cabeza (self en flechas multi-celda) y Cell.placeArrowSegment sobre-escrib\u00eda en silencio. Fase 3.5 valida el destino de la cola contra ocupaci\u00f3n ajena. Scenario 7 'Lazy checking' verificado intacto. Con FIX-2 el slide de FIX-1 ya se detiene ante serpientes sin tocar SlideArrowUseCase."
       },
       {
         "id": "2026-06-27-001",
         "date": "2026-06-27",
-        "title": "Animación de slide tick-a-tick + recoil de colisión (presentación)",
+        "title": "Animaci\u00f3n de slide tick-a-tick + recoil de colisi\u00f3n (presentaci\u00f3n)",
         "file": "2026-06-27-slide-animation-recoil-presentation.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Sonnet 4.6 (slide tick-a-tick) + Claude Opus 4.8 (recoil + cierre)",
@@ -1272,8 +1272,8 @@
             "status": "extended",
             "modified": [
               "GameController (advanceTick + commitSlide)",
-              "useGameController (bucle tick-a-tick + señal collision)",
-              "ArrowComponent (render estático + recoil collideNonce)",
+              "useGameController (bucle tick-a-tick + se\u00f1al collision)",
+              "ArrowComponent (render est\u00e1tico + recoil collideNonce)",
               "BoardComponent",
               "App.tsx",
               "NeonInteractiveBoard"
@@ -1287,28 +1287,28 @@
         },
         "validation": {
           "build": "not_run",
-          "typecheck": "passed — tsc --noEmit exit 0",
+          "typecheck": "passed \u2014 tsc --noEmit exit 0",
           "lint": "not_run",
-          "tests": "228/228 passed — 0 regresiones (−7 del animation.spec.ts B2 eliminado)",
-          "runtime": "verificado en preview neón: cian curva 6 formas distintas tick-a-tick; recoil amarillo transform 0→43.2px→none; 0 errores de consola en fresh mount",
-          "structure": "passed — dominio y SlideArrowUseCase intactos"
+          "tests": "228/228 passed \u2014 0 regresiones (\u22127 del animation.spec.ts B2 eliminado)",
+          "runtime": "verificado en preview ne\u00f3n: cian curva 6 formas distintas tick-a-tick; recoil amarillo transform 0\u219243.2px\u2192none; 0 errores de consola en fresh mount",
+          "structure": "passed \u2014 dominio y SlideArrowUseCase intactos"
         },
         "decisions": [
-          "Animar el slide simulando clicks: encadenar AdvanceArrowUseCase espaciado en el tiempo (TICK_MS=90) y reproyectar la forma real del dominio en cada tick — resuelve las figuras curvas",
+          "Animar el slide simulando clicks: encadenar AdvanceArrowUseCase espaciado en el tiempo (TICK_MS=90) y reproyectar la forma real del dominio en cada tick \u2014 resuelve las figuras curvas",
           "Eliminar la maquinaria de translate/stepOffset/keyframes (motion.ts, useTickAnimation.ts) por innecesaria",
-          "Recoil de colisión como transform efímero disparado por collideNonce cuando el slide termina en blocked",
+          "Recoil de colisi\u00f3n como transform ef\u00edmero disparado por collideNonce cuando el slide termina en blocked",
           "1 click = 1 jugada: commitSlide consolida al final, espejando SlideArrowUseCase",
-          "Dominio y SlideArrowUseCase intactos (revertido un intento de cambio de dominio a petición del autor)"
+          "Dominio y SlideArrowUseCase intactos (revertido un intento de cambio de dominio a petici\u00f3n del autor)"
         ],
         "knownIssues": [
-          "RESUELTO (commit ef3783a, issue #13 cerrado): el recoil ahora sigue la forma — cada vértice amaga su avance hacia su propio tramo (la L amaga 'en L'), animado vía estado recoilF. La versión inicial trasladaba toda la figura hacia la punta y levantaba el tramo horizontal."
+          "RESUELTO (commit ef3783a, issue #13 cerrado): el recoil ahora sigue la forma \u2014 cada v\u00e9rtice amaga su avance hacia su propio tramo (la L amaga 'en L'), animado v\u00eda estado recoilF. La versi\u00f3n inicial trasladaba toda la figura hacia la punta y levantaba el tramo horizontal."
         ],
-        "notes": "Seguimiento de FIX-1: cablea el slide en el preview con animación tick-a-tick reusando el motor (sin translate). Reintroduce el rebote de colisión que se había eliminado con la maquinaria. Verificación en runtime (navegador) además de tests/typecheck. Rama feature/animaciones."
+        "notes": "Seguimiento de FIX-1: cablea el slide en el preview con animaci\u00f3n tick-a-tick reusando el motor (sin translate). Reintroduce el rebote de colisi\u00f3n que se hab\u00eda eliminado con la maquinaria. Verificaci\u00f3n en runtime (navegador) adem\u00e1s de tests/typecheck. Rama feature/animaciones."
       },
       {
         "id": "2026-06-27-003",
         "date": "2026-06-27",
-        "title": "Animaciones desaparición, deformación colisión, UI mejorado",
+        "title": "Animaciones desaparici\u00f3n, deformaci\u00f3n colisi\u00f3n, UI mejorado",
         "file": "2026-06-27-animaciones-desaparicion-deformacion-ui.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Haiku 4.5 + Claude Opus 4.8",
@@ -1335,13 +1335,13 @@
           "visual-effects"
         ],
         "animations": [
-          "ArrowBurst: 9 partículas radiales 350ms",
+          "ArrowBurst: 9 part\u00edculas radiales 350ms",
           "ArrowHeadDisintegrate: grietas radiales 150ms pre-burst",
-          "ArrowComponent deformación: cuerpo +50% stroke, punta -40% tamaño en colisión"
+          "ArrowComponent deformaci\u00f3n: cuerpo +50% stroke, punta -40% tama\u00f1o en colisi\u00f3n"
         ],
         "uiImprovements": [
-          "BOARD_SIZE: 420px → 560px",
-          "Número movimientos: 36px azul font-weight 800",
+          "BOARD_SIZE: 420px \u2192 560px",
+          "N\u00famero movimientos: 36px azul font-weight 800",
           "Header con gradiente + sombra",
           "Layout limpio stat-moves + stat-status"
         ],
@@ -1353,8 +1353,8 @@
               "ArrowHeadDisintegrate.tsx"
             ],
             "modified": [
-              "ArrowComponent.tsx (deformación)",
-              "useGameController.ts (señal headDisintegrating)",
+              "ArrowComponent.tsx (deformaci\u00f3n)",
+              "useGameController.ts (se\u00f1al headDisintegrating)",
               "BoardComponent.tsx (render burst + disintegrate)",
               "NeonInteractiveBoard.tsx (render con glow)",
               "App.tsx/App.css (UI mejorado)"
@@ -1362,25 +1362,25 @@
           }
         },
         "validation": {
-          "build": "passed — Vite 57 módulos",
-          "lint": "passed — ESLint exit 0",
-          "tests": "228/228 passed — 0 regresiones",
-          "visual": "screenshot verificado: tablero 560px, número 30 azul prominente",
-          "dom": "verificado: 9 chispas + 4 grietas en DOM durante desaparición",
-          "runtime": "ambos tableros (claro + neón) funcionales sin errores"
+          "build": "passed \u2014 Vite 57 m\u00f3dulos",
+          "lint": "passed \u2014 ESLint exit 0",
+          "tests": "228/228 passed \u2014 0 regresiones",
+          "visual": "screenshot verificado: tablero 560px, n\u00famero 30 azul prominente",
+          "dom": "verificado: 9 chispas + 4 grietas en DOM durante desaparici\u00f3n",
+          "runtime": "ambos tableros (claro + ne\u00f3n) funcionales sin errores"
         },
         "decisions": [
-          "Estallido + desintegración en secuencia (150ms + 350ms) para transición visual clara",
-          "Deformación de colisión: factor² para pico en impacto, easing suave",
+          "Estallido + desintegraci\u00f3n en secuencia (150ms + 350ms) para transici\u00f3n visual clara",
+          "Deformaci\u00f3n de colisi\u00f3n: factor\u00b2 para pico en impacto, easing suave",
           "Timing sincronizado: headDisintegrating inicia al mismo tiempo que vanishing",
-          "UI: BOARD_SIZE aumentado, número de movimientos en 36px azul con label arriba"
+          "UI: BOARD_SIZE aumentado, n\u00famero de movimientos en 36px azul con label arriba"
         ],
-        "notes": "Sesión de 4 animaciones visuales + mejora de UI principal. Puro código de presentación. ArrowBurst y ArrowHeadDisintegrate nuevos componentes SVG. ArrowComponent mejorado con deformación. Timing de desintegración (150ms) antes de burst (350ms) crea efecto visual cohesivo. Ambos tableros (claro + neón con glow) funcionales. Verificación visual en screenshot + DOM."
+        "notes": "Sesi\u00f3n de 4 animaciones visuales + mejora de UI principal. Puro c\u00f3digo de presentaci\u00f3n. ArrowBurst y ArrowHeadDisintegrate nuevos componentes SVG. ArrowComponent mejorado con deformaci\u00f3n. Timing de desintegraci\u00f3n (150ms) antes de burst (350ms) crea efecto visual cohesivo. Ambos tableros (claro + ne\u00f3n con glow) funcionales. Verificaci\u00f3n visual en screenshot + DOM."
       },
       {
         "id": "2026-06-27-002",
         "date": "2026-06-27",
-        "title": "Mapa de preview 'corazón': tablero-grafo esquemático y resoluble",
+        "title": "Mapa de preview 'coraz\u00f3n': tablero-grafo esquem\u00e1tico y resoluble",
         "file": "2026-06-27-heart-preview-map.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8",
@@ -1416,27 +1416,27 @@
         },
         "validation": {
           "build": "not_run",
-          "typecheck": "passed — tsc --noEmit exit 0",
+          "typecheck": "passed \u2014 tsc --noEmit exit 0",
           "lint": "not_run",
-          "tests": "no afecta la suite (código solo de preview)",
+          "tests": "no afecta la suite (c\u00f3digo solo de preview)",
           "solver": "SOLVABLE en 5 slides (yellow->green->white->magenta->orange); 26 nodos, 5 flechas",
-          "runtime": "verificado en preview: la secuencia vacía el tablero (5->0) y el estado llega a WON (99->94); sin errores de consola"
+          "runtime": "verificado en preview: la secuencia vac\u00eda el tablero (5->0) y el estado llega a WON (99->94); sin errores de consola"
         },
         "decisions": [
-          "Tablero-GRAFO, no matriz: solo los nodos del corazón conectados a sus vecinos existentes",
-          "Flechas apuntando hacia afuera (lóbulos N, centro S) para garantizar resolubilidad",
+          "Tablero-GRAFO, no matriz: solo los nodos del coraz\u00f3n conectados a sus vecinos existentes",
+          "Flechas apuntando hacia afuera (l\u00f3bulos N, centro S) para garantizar resolubilidad",
           "Solver DFS headless (memoizado por firma de estado) para confirmar resolubilidad antes del navegador",
-          "Corazón esquemático (5 flechas, colores del icono), no réplica fiel"
+          "Coraz\u00f3n esquem\u00e1tico (5 flechas, colores del icono), no r\u00e9plica fiel"
         ],
-        "notes": "Mapa de preview con forma de corazón. El autor corrigió el enfoque (matriz -> grafo) y la coherencia de direcciones, y fijó el alcance (jugable/resoluble + esquemático) vía preguntas. Verificación headless (solver) + runtime (WON)."
+        "notes": "Mapa de preview con forma de coraz\u00f3n. El autor corrigi\u00f3 el enfoque (matriz -> grafo) y la coherencia de direcciones, y fij\u00f3 el alcance (jugable/resoluble + esquem\u00e1tico) v\u00eda preguntas. Verificaci\u00f3n headless (solver) + runtime (WON)."
       },
       {
         "id": "2026-06-27-004",
         "date": "2026-06-27",
-        "title": "Persistencia local del progreso (Offline-First) + sincronización bidireccional",
+        "title": "Persistencia local del progreso (Offline-First) + sincronizaci\u00f3n bidireccional",
         "file": "2026-06-27-progreso-local.md",
         "tool": "Gemini",
-        "model": "Gemini (versión no especificada)",
+        "model": "Gemini (versi\u00f3n no especificada)",
         "author": "@SantiagoChirinos",
         "phase": "implementation",
         "feature": "feature13-persistencia-local",
@@ -1490,17 +1490,17 @@
           }
         },
         "validation": {
-          "build": "passed — tsc -b exit 0",
-          "lint": "pending — 1 error preserve-caught-error en LocalProgressModuleFactory.ts",
-          "tests": "passed — 3 suites nuevas (LevelProgress, SaveLocalProgress, SyncProgress)",
-          "structure": "pending — puertos en domain/repositories/ en lugar de application/ports/ (convención del repo)"
+          "build": "passed \u2014 tsc -b exit 0",
+          "lint": "pending \u2014 1 error preserve-caught-error en LocalProgressModuleFactory.ts",
+          "tests": "passed \u2014 3 suites nuevas (LevelProgress, SaveLocalProgress, SyncProgress)",
+          "structure": "pending \u2014 puertos en domain/repositories/ en lugar de application/ports/ (convenci\u00f3n del repo)"
         },
-        "notes": "Entrada registrada retroactivamente durante la resolución de conflictos del PR #16: el reporte .md existía en la rama pero nunca se indexó en README/manifest. Deuda pendiente declarada: falta features/*.feature y doc/<feature>_plan.md; timeElapsedSeconds provisional (45s) en App.tsx; puertos por mover a application/ports."
+        "notes": "Entrada registrada retroactivamente durante la resoluci\u00f3n de conflictos del PR #16: el reporte .md exist\u00eda en la rama pero nunca se index\u00f3 en README/manifest. Deuda pendiente declarada: falta features/*.feature y doc/<feature>_plan.md; timeElapsedSeconds provisional (45s) en App.tsx; puertos por mover a application/ports."
       },
       {
         "id": "2026-06-28-001",
         "date": "2026-06-28",
-        "title": "Colisión configurable (return por defecto) + mapa decorado 6×6",
+        "title": "Colisi\u00f3n configurable (return por defecto) + mapa decorado 6\u00d76",
         "file": "2026-06-28-colision-return-y-mapa-decorado.md",
         "tool": "Claude Code (Cursor)",
         "model": "Claude Opus 4.8",
@@ -1540,20 +1540,20 @@
         "validation": {
           "build": "passed",
           "lint": "passed",
-          "tests": "228/228 passed — 0 regresiones",
-          "runtime": "verificado en preview: colisión return funciona, mapa 6×6 lleno (36 nodos, 8 flechas), amber apunta al Este"
+          "tests": "228/228 passed \u2014 0 regresiones",
+          "runtime": "verificado en preview: colisi\u00f3n return funciona, mapa 6\u00d76 lleno (36 nodos, 8 flechas), amber apunta al Este"
         },
         "decisions": [
-          "return como DEFAULT (no opt-in) — solo escenas excepcionales usan stay",
-          "Lógica 100% en presentación — reconstrucción con API pública del motor",
+          "return como DEFAULT (no opt-in) \u2014 solo escenas excepcionales usan stay",
+          "L\u00f3gica 100% en presentaci\u00f3n \u2014 reconstrucci\u00f3n con API p\u00fablica del motor",
           "sampleLevel2.ts separado para no afectar los 228 tests existentes"
         ],
-        "notes": "Entrada reconstruida el 2026-07-03: el reporte y el índice existían pero faltaba en el manifest. Colisión configurable return/stay con glide de regreso tick-a-tick + nivel 6×6 decorado."
+        "notes": "Entrada reconstruida el 2026-07-03: el reporte y el \u00edndice exist\u00edan pero faltaba en el manifest. Colisi\u00f3n configurable return/stay con glide de regreso tick-a-tick + nivel 6\u00d76 decorado."
       },
       {
         "id": "2026-07-03-001",
         "date": "2026-07-03",
-        "title": "Pulido visual de animaciones: glide entre ticks, recoil asimétrico, burst orgánico, fractura de punta",
+        "title": "Pulido visual de animaciones: glide entre ticks, recoil asim\u00e9trico, burst org\u00e1nico, fractura de punta",
         "file": "2026-07-03-pulido-visual-animaciones.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Fable 5",
@@ -1580,29 +1580,29 @@
           "presentation": {
             "status": "extended",
             "modified": [
-              "components/ArrowComponent.tsx (glide SLIDE_MS 85ms + recoil asimétrico sin(p^0.7·π))",
+              "components/ArrowComponent.tsx (glide SLIDE_MS 85ms + recoil asim\u00e9trico sin(p^0.7\u00b7\u03c0))",
               "components/ArrowBurst.tsx (12 chispas en 2 anillos + onda expansiva, fade (1-p)^1.5)",
-              "components/ArrowHeadDisintegrate.tsx (fractura en 3 fragmentos con deriva radial y giro ±24°)"
+              "components/ArrowHeadDisintegrate.tsx (fractura en 3 fragmentos con deriva radial y giro \u00b124\u00b0)"
             ]
           }
         },
         "validation": {
-          "build": "passed — tsc strict + Vite",
-          "lint": "passed — ESLint exit 0 (fix react-hooks/refs durante la sesión)",
-          "tests": "228/228 passed — 0 regresiones",
-          "structure": "passed — domain y application intactos; testids, duraciones espejadas (150/350 ms) y fallback sin rAF preservados"
+          "build": "passed \u2014 tsc strict + Vite",
+          "lint": "passed \u2014 ESLint exit 0 (fix react-hooks/refs durante la sesi\u00f3n)",
+          "tests": "228/228 passed \u2014 0 regresiones",
+          "structure": "passed \u2014 domain y application intactos; testids, duraciones espejadas (150/350 ms) y fallback sin rAF preservados"
         },
         "decisions": [
-          "Detección previa de 4 puntos débiles (slide a saltos, recoil simétrico, burst mecánico, desintegración plana) antes de implementar — libertad creativa delegada por el humano",
-          "Interpolación desde la última posición DIBUJADA (drawnRef) con arranque síncrono pre-paint para evitar parpadeo",
+          "Detecci\u00f3n previa de 4 puntos d\u00e9biles (slide a saltos, recoil sim\u00e9trico, burst mec\u00e1nico, desintegraci\u00f3n plana) antes de implementar \u2014 libertad creativa delegada por el humano",
+          "Interpolaci\u00f3n desde la \u00faltima posici\u00f3n DIBUJADA (drawnRef) con arranque s\u00edncrono pre-paint para evitar parpadeo",
           "Determinismo preservado en todas las animaciones (sin aleatoriedad) para tests y replays"
         ],
-        "notes": "Sesión corta de pulido puramente visual en src/presentation/components/. El slide ahora se lee continuo (glide 85ms < TICK_MS 90ms), el impacto de colisión pica rápido y se recupera lento, el burst es orgánico (2 anillos + onda) y la punta se fractura en fragmentos que derivan y rotan."
+        "notes": "Sesi\u00f3n corta de pulido puramente visual en src/presentation/components/. El slide ahora se lee continuo (glide 85ms < TICK_MS 90ms), el impacto de colisi\u00f3n pica r\u00e1pido y se recupera lento, el burst es org\u00e1nico (2 anillos + onda) y la punta se fractura en fragmentos que derivan y rotan."
       },
       {
         "id": "2026-07-03-002",
         "date": "2026-07-03",
-        "title": "Auditoría del repo: reglas sincronizadas y tooling corregido",
+        "title": "Auditor\u00eda del repo: reglas sincronizadas y tooling corregido",
         "file": "2026-07-03-analisis-repo-sync-reglas-tooling.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "claude-fable-5",
@@ -1629,24 +1629,24 @@
           "eslint-config"
         ],
         "validation": {
-          "build": "passed — tsc + Vite sin errores",
-          "lint": "passed — regla de fronteras de capas probada con archivo sonda",
-          "tests": "228/228 passed — sin warnings de ts-jest tras migración a transform",
-          "gen_uml": "passed — classes.puml regenerado"
+          "build": "passed \u2014 tsc + Vite sin errores",
+          "lint": "passed \u2014 regla de fronteras de capas probada con archivo sonda",
+          "tests": "228/228 passed \u2014 sin warnings de ts-jest tras migraci\u00f3n a transform",
+          "gen_uml": "passed \u2014 classes.puml regenerado"
         },
         "decisions": [
-          "Fronteras de capas verificadas en pnpm lint via no-restricted-imports (antes solo documentación)",
-          "Desviación application → infrastructure/shared/contracts resuelta: LevelDataDTOs movido a application/dtos (15 imports), huérfano LevelData.ts eliminado, carve-out del lint retirado",
-          "Rename InMemoryBoardRepository.ts → InMemoryLevelRepository.ts (archivo = clase exportada)",
+          "Fronteras de capas verificadas en pnpm lint via no-restricted-imports (antes solo documentaci\u00f3n)",
+          "Desviaci\u00f3n application \u2192 infrastructure/shared/contracts resuelta: LevelDataDTOs movido a application/dtos (15 imports), hu\u00e9rfano LevelData.ts eliminado, carve-out del lint retirado",
+          "Rename InMemoryBoardRepository.ts \u2192 InMemoryLevelRepository.ts (archivo = clase exportada)",
           "Flag de Jest 30 corregido en docs: --testPathPatterns (plural)",
           "CLAUDE.md, README.md y .agents/rules/arrow-game.md sincronizados con la estructura real de src/"
         ],
-        "notes": "Auditoría general: 228/228 tests y lint limpios de partida, pero deriva severa docs↔código. Se detectó y documentó código muerto (application/dtos/LevelData.ts) y la violación de capas type-only de LevelDataDTOs (6 imports). main sigue en el commit inicial (higiene de repo, sin acción). También se reinsertó en este manifest la entrada faltante 2026-06-28-001."
+        "notes": "Auditor\u00eda general: 228/228 tests y lint limpios de partida, pero deriva severa docs\u2194c\u00f3digo. Se detect\u00f3 y document\u00f3 c\u00f3digo muerto (application/dtos/LevelData.ts) y la violaci\u00f3n de capas type-only de LevelDataDTOs (6 imports). main sigue en el commit inicial (higiene de repo, sin acci\u00f3n). Tambi\u00e9n se reinsert\u00f3 en este manifest la entrada faltante 2026-06-28-001."
       },
       {
         "id": "2026-07-04-001",
         "date": "2026-07-04",
-        "title": "Resolución de conflictos PR #16 + matriz de decisiones",
+        "title": "Resoluci\u00f3n de conflictos PR #16 + matriz de decisiones",
         "file": "2026-07-04-resolucion-conflictos-pr16.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Fable 5 + Haiku 4.5",
@@ -1674,7 +1674,7 @@
         "layers": {
           "application": {
             "status": "resolved",
-            "notes": "SaveLocalProgress, GetLocalProgress, SyncProgress u otros use-cases de feature13 integrados sin fricción en el árbol de dev"
+            "notes": "SaveLocalProgress, GetLocalProgress, SyncProgress u otros use-cases de feature13 integrados sin fricci\u00f3n en el \u00e1rbol de dev"
           },
           "infrastructure": {
             "status": "resolved",
@@ -1686,24 +1686,24 @@
           }
         },
         "validation": {
-          "build": "passed — tsc -b exit 0",
-          "lint": "passed — ESLint exit 0 (including preserve-caught-error fix)",
-          "tests": "passed — 247/247 (dev base 228 + feature13 nouvelles 19)",
-          "merge": "tested with local worktree — cero regresiones",
-          "runtime": "verified — navegador: 13 movimientos, input habilitado, tablero renderiza"
+          "build": "passed \u2014 tsc -b exit 0",
+          "lint": "passed \u2014 ESLint exit 0 (including preserve-caught-error fix)",
+          "tests": "passed \u2014 247/247 (dev base 228 + feature13 nouvelles 19)",
+          "merge": "tested with local worktree \u2014 cero regresiones",
+          "runtime": "verified \u2014 navegador: 13 movimientos, input habilitado, tablero renderiza"
         },
         "decisions": [
-          "Presentación: CONSERVAR dev (7 archivos add/add eran idénticos byte-a-byte con PR#10 squasheado; dev evolucionó con #12/#14)",
-          "App.tsx: COMBINAR (base dev de B1-B3 + reinserción de persistencia sin casts; score !== null para evitar pérdida de 0)",
+          "Presentaci\u00f3n: CONSERVAR dev (7 archivos add/add eran id\u00e9nticos byte-a-byte con PR#10 squasheado; dev evolucion\u00f3 con #12/#14)",
+          "App.tsx: COMBINAR (base dev de B1-B3 + reinserci\u00f3n de persistencia sin casts; score !== null para evitar p\u00e9rdida de 0)",
           "AI usage: COMBINAR (base dev + retroactiva 2026-06-27-004 con metadatos completados)",
           "DTOs / dirs: ELIMINAR (LeaderboardDTO, ProgressDTO muertos; src/infrastructure/shared/contracts/ violaba fronteras de #14)"
         ],
-        "notes": "Sesión de resolución exhaustiva con matriz de decisiones explícita. Todos los conflictos eran resolubles sin pérdida de lógica. Segunda fase de la misma sesión: deuda de revisión saldada — puertos movidos a application/ports/ (12 imports), InvalidLevelProgressError tipado (+2 tests), renombres archivo=clase con git mv, timer de presentación real en App.tsx (reemplaza 45s hardcodeado), classes.puml regenerado. Pendiente de Santiago: Gherkin y plan en doc/."
+        "notes": "Sesi\u00f3n de resoluci\u00f3n exhaustiva con matriz de decisiones expl\u00edcita. Todos los conflictos eran resolubles sin p\u00e9rdida de l\u00f3gica. Segunda fase de la misma sesi\u00f3n: deuda de revisi\u00f3n saldada \u2014 puertos movidos a application/ports/ (12 imports), InvalidLevelProgressError tipado (+2 tests), renombres archivo=clase con git mv, timer de presentaci\u00f3n real en App.tsx (reemplaza 45s hardcodeado), classes.puml regenerado. Pendiente de Santiago: Gherkin y plan en doc/."
       },
       {
         "id": "2026-07-06-001",
         "date": "2026-07-06",
-        "title": "Sincronización de especificaciones con arrowmaze-project-core",
+        "title": "Sincronizaci\u00f3n de especificaciones con arrowmaze-project-core",
         "file": "2026-07-06-sincronizar-specs-con-project-core.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "claude-haiku-4-5-20251001",
@@ -1728,22 +1728,22 @@
           "architecture-alignment"
         ],
         "validation": {
-          "feature_files_sync": "passed — 18 files de project-core copiados a arrowmaze-game",
-          "git_status": "passed — working tree clean",
-          "documentation_consistency": "passed — README y CLAUDE.md actualizados con referencias a project-core"
+          "feature_files_sync": "passed \u2014 18 files de project-core copiados a arrowmaze-game",
+          "git_status": "passed \u2014 working tree clean",
+          "documentation_consistency": "passed \u2014 README y CLAUDE.md actualizados con referencias a project-core"
         },
         "decisions": [
-          "Copiar ALL feature files (A1-G3) aunque no estén implementados en arrowmaze-game",
-          "Usar patrón de nomenclatura estándar de project-core (A1-*, A2-*, etc.) para todos los features",
-          "Establecer project-core como fuente única de especificaciones en documentación",
-          "Eliminar 11 archivos duplicados con nombres antiguos para evitar confusión"
+          "Copiar ALL feature files (A1-G3) aunque no est\u00e9n implementados en arrowmaze-game",
+          "Usar patr\u00f3n de nomenclatura est\u00e1ndar de project-core (A1-*, A2-*, etc.) para todos los features",
+          "Establecer project-core como fuente \u00fanica de especificaciones en documentaci\u00f3n",
+          "Eliminar 11 archivos duplicados con nombres antiguos para evitar confusi\u00f3n"
         ],
-        "notes": "Sesión de alineación de documentación entre arrowmaze-game y arrowmaze-project-core. El objetivo fue establecer project-core como único repositorio de especificaciones (Gherkin, decisiones arquitectónicas, SDD historial). Todos los feature files ahora tienen versión única, sincronizados desde project-core."
+        "notes": "Sesi\u00f3n de alineaci\u00f3n de documentaci\u00f3n entre arrowmaze-game y arrowmaze-project-core. El objetivo fue establecer project-core como \u00fanico repositorio de especificaciones (Gherkin, decisiones arquitect\u00f3nicas, SDD historial). Todos los feature files ahora tienen versi\u00f3n \u00fanica, sincronizados desde project-core."
       },
       {
         "id": "2026-07-07-001",
         "date": "2026-07-07",
-        "title": "Sesión SDD e implementación de C1 (GameFlowController) + fix de infraestructura de tests",
+        "title": "Sesi\u00f3n SDD e implementaci\u00f3n de C1 (GameFlowController) + fix de infraestructura de tests",
         "file": "2026-07-07-c1-game-flow-controller.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "claude-sonnet-5 / claude-fable-5",
@@ -1768,26 +1768,26 @@
           "testing-infrastructure-fix"
         ],
         "validation": {
-          "tests": "passed — 29 suites / 292 tests (18 nuevos de GameFlowController; 12 de C3 corren por primera vez)",
-          "type_check": "passed — tsc --noEmit limpio",
-          "lint": "passed en archivos nuevos — 8 errores globales preexistentes ajenos a esta sesión",
-          "gen_uml": "passed — classes.puml regenerado con GameFlowController"
+          "tests": "passed \u2014 29 suites / 292 tests (18 nuevos de GameFlowController; 12 de C3 corren por primera vez)",
+          "type_check": "passed \u2014 tsc --noEmit limpio",
+          "lint": "passed en archivos nuevos \u2014 8 errores globales preexistentes ajenos a esta sesi\u00f3n",
+          "gen_uml": "passed \u2014 classes.puml regenerado con GameFlowController"
         },
         "decisions": [
-          "PAUSED como autómata de pila en Aplicación/Presentación, NO en GameStatus de Dominio (reconciliado con spec G3 ya cerrada)",
+          "PAUSED como aut\u00f3mata de pila en Aplicaci\u00f3n/Presentaci\u00f3n, NO en GameStatus de Dominio (reconciliado con spec G3 ya cerrada)",
           "MENU fuera de la FSM: 'no hay partida' = ausencia de GameFlowController (routing de C3)",
           "Reloj se congela al pausar; salidas de PAUSED: resume/restart/exit; SETTINGS solo sobre PAUSED",
-          "Restaurar package.json pre-FORGE: el commit c4ab239a había eliminado scripts de test y dependencias que src aún importa"
+          "Restaurar package.json pre-FORGE: el commit c4ab239a hab\u00eda eliminado scripts de test y dependencias que src a\u00fan importa"
         ],
-        "notes": "C1 figuraba como '✅ Implementado' sin .feature (implementación ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesión cerró la deuda SDD: spec formal en project-core, plan TDD e implementación del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) — nadie podía correr pnpm test."
+        "notes": "C1 figuraba como '\u2705 Implementado' sin .feature (implementaci\u00f3n ad-hoc en GameSession.ts, commits d7d1b5bf/a1b7e6eb). Esta sesi\u00f3n cerr\u00f3 la deuda SDD: spec formal en project-core, plan TDD e implementaci\u00f3n del GameFlowController. Hallazgo colateral: la infraestructura de tests estaba rota desde el merge del FORGE (PR #19) \u2014 nadie pod\u00eda correr pnpm test."
       },
       {
         "id": "2026-07-07-002",
         "date": "2026-07-07",
-        "title": "Servicio de Inicio de Sesión (LoginUser) — Autenticación del Cliente Móvil",
+        "title": "Servicio de Inicio de Sesi\u00f3n (LoginUser) \u2014 Autenticaci\u00f3n del Cliente M\u00f3vil",
         "file": "2026-07-07-login-service.md",
         "tool": "Gemini",
-        "model": "Gemini (versión no especificada)",
+        "model": "Gemini (versi\u00f3n no especificada)",
         "author": "@SantiagoChirinos",
         "phase": "implementation",
         "feature": "login-service",
@@ -1807,15 +1807,15 @@
           "testing"
         ],
         "validation": {
-          "tests": "passed — 3 tests nuevos en LoginUser.spec.ts (éxito, credenciales inválidas, error de red)",
-          "type_check": "passed — ajuste de IAuthTokenProvider tras error TS2551 (setToken/removeToken)"
+          "tests": "passed \u2014 3 tests nuevos en LoginUser.spec.ts (\u00e9xito, credenciales inv\u00e1lidas, error de red)",
+          "type_check": "passed \u2014 ajuste de IAuthTokenProvider tras error TS2551 (setToken/removeToken)"
         },
         "decisions": [
-          "Autenticación tratada como obtención de credenciales a nivel de infraestructura/aplicación; no se modela entidad de usuario en el cliente para esta etapa",
-          "LoginUser no captura errores de negocio ni de red: los propaga para que la capa de presentación (React) los maneje",
-          "DTO de respuesta simplificado a { token }, delegando la validación de éxito al código de estado HTTP"
+          "Autenticaci\u00f3n tratada como obtenci\u00f3n de credenciales a nivel de infraestructura/aplicaci\u00f3n; no se modela entidad de usuario en el cliente para esta etapa",
+          "LoginUser no captura errores de negocio ni de red: los propaga para que la capa de presentaci\u00f3n (React) los maneje",
+          "DTO de respuesta simplificado a { token }, delegando la validaci\u00f3n de \u00e9xito al c\u00f3digo de estado HTTP"
         ],
-        "notes": "Añade el caso de uso LoginUser, el adaptador FetchAuthApiClient y el contrato IAuthApiClient, extendiendo IAuthTokenProvider con setToken/removeToken. Aún no conectado a la UI (App.tsx conserva el TODO pendiente de redirección a Login)."
+        "notes": "A\u00f1ade el caso de uso LoginUser, el adaptador FetchAuthApiClient y el contrato IAuthApiClient, extendiendo IAuthTokenProvider con setToken/removeToken. A\u00fan no conectado a la UI (App.tsx conserva el TODO pendiente de redirecci\u00f3n a Login)."
       },
       {
         "id": "2026-07-08-001",
@@ -1842,20 +1842,20 @@
           "documentation"
         ],
         "validation": {
-          "tests": "passed — 35 suites / 324 tests (4 nuevos de FetchAuthApiClient)",
-          "type_check": "passed — tsc --noEmit limpio",
-          "diff_review": "passed — solo archivos esperados modificados"
+          "tests": "passed \u2014 35 suites / 324 tests (4 nuevos de FetchAuthApiClient)",
+          "type_check": "passed \u2014 tsc --noEmit limpio",
+          "diff_review": "passed \u2014 solo archivos esperados modificados"
         },
         "decisions": [
-          "Guard de NetworkError replica patrón de FetchLevelApiClient para consistencia inter-adaptadores",
-          "Test del caso 200-sin-token verifica que el Error genérico se re-envuelve como NetworkError"
+          "Guard de NetworkError replica patr\u00f3n de FetchLevelApiClient para consistencia inter-adaptadores",
+          "Test del caso 200-sin-token verifica que el Error gen\u00e9rico se re-envuelve como NetworkError"
         ],
-        "notes": "Resolución de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
+        "notes": "Resoluci\u00f3n de 3 hallazgos menores del PR review: (1) re-envoltura redundante de NetworkError, (2) test de infraestructura faltante para FetchAuthApiClient, (3) EOF newlines y rutas incorrectas en doc de AI usage."
       },
       {
         "id": "2026-07-08-002",
         "date": "2026-07-08",
-        "title": "Diagnóstico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2)",
+        "title": "Diagn\u00f3stico y fix: progreso perdido al volver al mapa tras avanzar de nivel (post v0.1.2)",
         "file": "2026-07-08-fix-avance-siguiente-nivel-progreso-perdido.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "claude-sonnet-5",
@@ -1876,20 +1876,20 @@
           "navigation"
         ],
         "validation": {
-          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
-          "type_check": "passed — tsc --noEmit limpio"
+          "tests": "passed \u2014 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed \u2014 tsc --noEmit limpio"
         },
         "decisions": [
           "handleNextLevel falla cerrado (vuelve al mapa) si no puede verificar el desbloqueo, en vez de avanzar a ciegas",
           "Fix aplicado sobre una rama basada en dev (base real del flujo del equipo)",
-          "Causa raíz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
+          "Causa ra\u00edz de un posible fallo real de SQLite en el dispositivo se documenta como pendiente en vez de especularse, a falta de adb logcat"
         ],
-        "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo botón funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md."
+        "notes": "Bug reportado por el usuario en el APK offline release v0.1.2: avanzar de nivel con el nuevo bot\u00f3n funciona, pero volver al mapa muestra todo bloqueado. Ver doc/bug-progreso-perdido-siguiente-nivel.md."
       },
       {
         "id": "2026-07-08-003",
         "date": "2026-07-08",
-        "title": "Quitar el botón \"Volver\" redundante del header de partida",
+        "title": "Quitar el bot\u00f3n \"Volver\" redundante del header de partida",
         "file": "2026-07-08-fix-boton-volver-header-redundante.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "claude-sonnet-5",
@@ -1908,20 +1908,20 @@
           "navigation"
         ],
         "validation": {
-          "tests": "passed — 36 suites / 330 tests en verde sobre dev, sin regresiones",
-          "type_check": "passed — tsc --noEmit limpio",
-          "lint": "passed — eslint sin hallazgos en el archivo modificado"
+          "tests": "passed \u2014 36 suites / 330 tests en verde sobre dev, sin regresiones",
+          "type_check": "passed \u2014 tsc --noEmit limpio",
+          "lint": "passed \u2014 eslint sin hallazgos en el archivo modificado"
         },
         "decisions": [
-          "Quitar el botón Volver del header de GameView por quedar duplicado con Salir (PauseOverlay) y Volver al mapa (GameOverlay)",
-          "Conservar el botón de Pausa en el header, sin equivalente en otro lugar durante la partida en curso"
+          "Quitar el bot\u00f3n Volver del header de GameView por quedar duplicado con Salir (PauseOverlay) y Volver al mapa (GameOverlay)",
+          "Conservar el bot\u00f3n de Pausa en el header, sin equivalente en otro lugar durante la partida en curso"
         ],
-        "notes": "Continuación directa de la sesión 2026-07-08-002 (fix de avance de nivel)."
+        "notes": "Continuaci\u00f3n directa de la sesi\u00f3n 2026-07-08-002 (fix de avance de nivel)."
       },
       {
         "id": "2026-07-08-004",
         "date": "2026-07-08",
-        "title": "Fix del bug de ruta del login en PR #30 (/api/v1/auth/login) + corrección de su test",
+        "title": "Fix del bug de ruta del login en PR #30 (/api/v1/auth/login) + correcci\u00f3n de su test",
         "file": "2026-07-08-fix-ruta-login-v1.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (1M context)",
@@ -1943,21 +1943,21 @@
           "auth"
         ],
         "validation": {
-          "tests": "passed — 35 suites / 324 tests (7/7 en el módulo login)",
-          "type_check": "passed — tsc --noEmit exit 0",
-          "diff_review": "passed — solo 2 archivos del fix (ruido de Git LFS en android/*.png excluido)"
+          "tests": "passed \u2014 35 suites / 324 tests (7/7 en el m\u00f3dulo login)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
+          "diff_review": "passed \u2014 solo 2 archivos del fix (ruido de Git LFS en android/*.png excluido)"
         },
         "decisions": [
           "Resguardar el trabajo local en backup/pr30-fix-local y resetear a origin antes de re-aplicar el fix, evitando divergencia y conflictos con el push paralelo de Santiago",
           "Ruta verificada contra el backend real (arrowmaze-backend src/index.ts, app.use('/api/v1/auth'))",
-          "Corregir la aserción del test de Santiago (fijaba /api/auth/login) para que proteja de la regresión en vez de codificarla"
+          "Corregir la aserci\u00f3n del test de Santiago (fijaba /api/auth/login) para que proteja de la regresi\u00f3n en vez de codificarla"
         ],
-        "notes": "El follow-up de Santiago (2026-07-08-001) cerró 3 hallazgos menores pero omitió el bug de ruta (404) y su test aseguraba la URL incorrecta. Como revisor se re-aplicó el fix de ruta sobre su versión y se corrigió la aserción; suite en verde."
+        "notes": "El follow-up de Santiago (2026-07-08-001) cerr\u00f3 3 hallazgos menores pero omiti\u00f3 el bug de ruta (404) y su test aseguraba la URL incorrecta. Como revisor se re-aplic\u00f3 el fix de ruta sobre su versi\u00f3n y se corrigi\u00f3 la aserci\u00f3n; suite en verde."
       },
       {
         "id": "2026-07-08-005",
         "date": "2026-07-08",
-        "title": "G2: Internacionalización ES/EN (SDD)",
+        "title": "G2: Internacionalizaci\u00f3n ES/EN (SDD)",
         "file": "2026-07-08-g2-internacionalizacion.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (1M context)",
@@ -2004,7 +2004,7 @@
               "i18n/I18nProvider.tsx"
             ],
             "modified": [
-              "i18n/i18n.ts (motor: translate+fallback+interpolación+resolución)",
+              "i18n/i18n.ts (motor: translate+fallback+interpolaci\u00f3n+resoluci\u00f3n)",
               "GameOverlay",
               "GameView",
               "PauseOverlay",
@@ -2017,19 +2017,19 @@
           }
         },
         "validation": {
-          "tests": "passed — 40 suites / 351 tests (base dev 36/330 → +4 suites, +21 tests; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
-          "lint": "passed en archivos nuevos/modificados — queda 1 error preexistente en LevelSelectScreen (set-state-in-effect), ajeno a G2"
+          "tests": "passed \u2014 40 suites / 351 tests (base dev 36/330 \u2192 +4 suites, +21 tests; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
+          "lint": "passed en archivos nuevos/modificados \u2014 queda 1 error preexistente en LevelSelectScreen (set-state-in-effect), ajeno a G2"
         },
         "decisions": [
-          "i18n exclusivamente en presentación (invariante del spec): cero cambios en domain y application/services; único puerto nuevo en application/ports + impl en infrastructure",
-          "Test de paridad de claves ES/EN primero (sello QA del Background); fallback a EN (D4); interpolación {param}",
-          "Resolución D1/D2: preferencia guardada > locale (es* → ES, resto → EN), con puerto persistido patrón IAuthTokenProvider",
+          "i18n exclusivamente en presentaci\u00f3n (invariante del spec): cero cambios en domain y application/services; \u00fanico puerto nuevo en application/ports + impl en infrastructure",
+          "Test de paridad de claves ES/EN primero (sello QA del Background); fallback a EN (D4); interpolaci\u00f3n {param}",
+          "Resoluci\u00f3n D1/D2: preferencia guardada > locale (es* \u2192 ES, resto \u2192 EN), con puerto persistido patr\u00f3n IAuthTokenProvider",
           "Cambio en caliente (D3) con Context + hook useTranslation; probado end-to-end (re-render sin perder estado + persistencia)",
-          "c3.* → levelSelect.*; LEVEL_METADATA.difficulty a clave semántica; nombres de nivel NO se traducen (P24)",
-          "Trade-off de tests: patrón puro incompatible con hooks → render() solo en los 4 specs con contexto i18n; lógica pura como función pura"
+          "c3.* \u2192 levelSelect.*; LEVEL_METADATA.difficulty a clave sem\u00e1ntica; nombres de nivel NO se traducen (P24)",
+          "Trade-off de tests: patr\u00f3n puro incompatible con hooks \u2192 render() solo en los 4 specs con contexto i18n; l\u00f3gica pura como funci\u00f3n pura"
         ],
-        "notes": "Implementación SDD de G2 con parada obligatoria en la tabla de inventario antes de tocar código. FORGE fuera de alcance (follow-up H1). Fuente: features/G2-internacionalizacion.feature (idéntico a project-core main, verificado por el autor)."
+        "notes": "Implementaci\u00f3n SDD de G2 con parada obligatoria en la tabla de inventario antes de tocar c\u00f3digo. FORGE fuera de alcance (follow-up H1). Fuente: features/G2-internacionalizacion.feature (id\u00e9ntico a project-core main, verificado por el autor)."
       },
       {
         "id": "2026-07-08-006",
@@ -2088,23 +2088,23 @@
           }
         },
         "validation": {
-          "tests": "passed — 43 suites / 370 tests (base dev 40/351 → +3 suites, +19 tests; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
-          "lint": "passed en archivos G3 (eslint-disable puntual react-hooks/set-state-in-effect en useLevelTimer, patrón del repo)"
+          "tests": "passed \u2014 43 suites / 370 tests (base dev 40/351 \u2192 +3 suites, +19 tests; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
+          "lint": "passed en archivos G3 (eslint-disable puntual react-hooks/set-state-in-effect en useLevelTimer, patr\u00f3n del repo)"
         },
         "decisions": [
-          "Timer como proyección de presentación: cuenta hacia arriba mm:ss, nunca causa derrota, no toca dominio ni score (P23 fuera)",
-          "Puerto IClock inyectable (D3): SystemClock en infra, FakeClock en tests; el tiempo pausado NO se acumula (bug clásico cubierto)",
-          "Congela en PAUSED y detiene en WON/LOST conservando el valor; restart → 00:00; tiempo final visible en el overlay",
-          "El Date.now() preexistente de la marca de tiempo del score queda INTACTO (P23 fuera, persistencia bajo investigación); follow-up documentado",
-          "Trade-off de tests: lógica pura con FakeClock; render() para componentes con contexto i18n"
+          "Timer como proyecci\u00f3n de presentaci\u00f3n: cuenta hacia arriba mm:ss, nunca causa derrota, no toca dominio ni score (P23 fuera)",
+          "Puerto IClock inyectable (D3): SystemClock en infra, FakeClock en tests; el tiempo pausado NO se acumula (bug cl\u00e1sico cubierto)",
+          "Congela en PAUSED y detiene en WON/LOST conservando el valor; restart \u2192 00:00; tiempo final visible en el overlay",
+          "El Date.now() preexistente de la marca de tiempo del score queda INTACTO (P23 fuera, persistencia bajo investigaci\u00f3n); follow-up documentado",
+          "Trade-off de tests: l\u00f3gica pura con FakeClock; render() para componentes con contexto i18n"
         ],
-        "notes": "SDD con parada obligatoria en la tabla de diseño antes de tocar código. Claves i18n nuevas (game.time, game.timeElapsed, overlay.time) en ambos catálogos. Follow-ups: cerrar P23 (tiempo→score, enmienda A5) y migrar la marca de tiempo del score a IClock cuando termine la investigación de persistencia."
+        "notes": "SDD con parada obligatoria en la tabla de dise\u00f1o antes de tocar c\u00f3digo. Claves i18n nuevas (game.time, game.timeElapsed, overlay.time) en ambos cat\u00e1logos. Follow-ups: cerrar P23 (tiempo\u2192score, enmienda A5) y migrar la marca de tiempo del score a IClock cuando termine la investigaci\u00f3n de persistencia."
       },
       {
         "id": "2026-07-09-001",
         "date": "2026-07-09",
-        "title": "G1: Audio (SFX + música) (SDD)",
+        "title": "G1: Audio (SFX + m\u00fasica) (SDD)",
         "file": "2026-07-09-g1-audio-sfx-musica.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (1M context)",
@@ -2157,7 +2157,7 @@
             "modified": [
               "game/useGameController.ts (+signal tickOutcome)",
               "components/GameView.tsx (monta audio + prop difficulty)",
-              "components/SettingsOverlay.tsx (controles + créditos)",
+              "components/SettingsOverlay.tsx (controles + cr\u00e9ditos)",
               "App.tsx (difficulty desde LEVEL_METADATA)",
               "main.tsx (AudioProvider)",
               "i18n/catalogs/es.ts",
@@ -2166,20 +2166,20 @@
           }
         },
         "validation": {
-          "tests": "passed — 47 suites / 396 tests (base dev 43/370 → +4 suites, +26 tests; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 47 suites / 396 tests (base dev 43/370 \u2192 +4 suites, +26 tests; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "passed en archivos G1",
           "assets": "8 mp3 royalty-free (~3.6MB, P22 <10MB) versionados en Git LFS"
         },
         "decisions": [
-          "Audio como proyección de SOLO LECTURA: cero cambios en domain/application-services; el audio observa, nunca escribe",
-          "SFX por outcome del motor (destroyed→exited); prioridad exited>blocked>advanced para no encimar SFX por tick",
-          "Música por dificultad (pool de 3): veryHard→hard, desconocida→easy; solo en gameplay, pausa sin reiniciar",
-          "Puerto IAudioPreferences + impl Capacitor; mute global + volúmenes independientes; autoplay tras 1ª interacción (D4)",
-          "Robustez: asset ausente / play() rechazado = no-op silencioso (try/catch en el engine), el juego jamás se rompe",
-          "signal tickOutcome en useGameController = extensión solo de presentación; créditos desde LICENCIAS.txt (contenido, no i18n)"
+          "Audio como proyecci\u00f3n de SOLO LECTURA: cero cambios en domain/application-services; el audio observa, nunca escribe",
+          "SFX por outcome del motor (destroyed\u2192exited); prioridad exited>blocked>advanced para no encimar SFX por tick",
+          "M\u00fasica por dificultad (pool de 3): veryHard\u2192hard, desconocida\u2192easy; solo en gameplay, pausa sin reiniciar",
+          "Puerto IAudioPreferences + impl Capacitor; mute global + vol\u00famenes independientes; autoplay tras 1\u00aa interacci\u00f3n (D4)",
+          "Robustez: asset ausente / play() rechazado = no-op silencioso (try/catch en el engine), el juego jam\u00e1s se rompe",
+          "signal tickOutcome en useGameController = extensi\u00f3n solo de presentaci\u00f3n; cr\u00e9ditos desde LICENCIAS.txt (contenido, no i18n)"
         ],
-        "notes": "Rama apilada sobre G3 (PR #36); el PR de G1 se abre tras mergear #36 con rebase --onto origin/dev. Base de assets '/audio' (Vite raíz + Capacitor); prefijar con BASE_URL si el build usa base no-raíz (follow-up menor). Assets nombrados corto (easy/medium/hard.mp3)."
+        "notes": "Rama apilada sobre G3 (PR #36); el PR de G1 se abre tras mergear #36 con rebase --onto origin/dev. Base de assets '/audio' (Vite ra\u00edz + Capacitor); prefijar con BASE_URL si el build usa base no-ra\u00edz (follow-up menor). Assets nombrados corto (easy/medium/hard.mp3)."
       },
       {
         "id": "2026-07-09-002",
@@ -2235,27 +2235,27 @@
               "components/AccountOverlay.tsx"
             ],
             "modified": [
-              "App.tsx (composition root auth + botón Cuenta + estado de sesión)",
+              "App.tsx (composition root auth + bot\u00f3n Cuenta + estado de sesi\u00f3n)",
               "i18n/catalogs/es.ts (account.*)",
               "i18n/catalogs/en.ts (account.*)"
             ]
           }
         },
         "validation": {
-          "tests": "passed — 51 suites / 438 tests (base G1 47/396 → +4 suites, +42 tests; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 51 suites / 438 tests (base G1 47/396 \u2192 +4 suites, +42 tests; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "passed en archivos nuevos/modificados (deuda de lint preexistente fuera de alcance)",
-          "security": "el password nunca se persiste ni se loguea; la sesión es el token (sin datos personales nuevos)"
+          "security": "el password nunca se persiste ni se loguea; la sesi\u00f3n es el token (sin datos personales nuevos)"
         },
         "decisions": [
-          "Validadores puros en application/services/credentialPolicy (política E1 literal), consumidos por RegisterUser y por el overlay; LoginUser intacto",
-          "Contrato F1 gana: register devuelve 201 sin token ⇒ sin auto-login; post-registro vuelve a login con mensaje de éxito",
-          "LogoutUser fail-open local: removeToken() en finally aunque la red falle (el JTI expira solo en 7 días)",
-          "Anti-enumeración E1: credenciales inválidas y usuario inexistente comparten un único mensaje i18n",
+          "Validadores puros en application/services/credentialPolicy (pol\u00edtica E1 literal), consumidos por RegisterUser y por el overlay; LoginUser intacto",
+          "Contrato F1 gana: register devuelve 201 sin token \u21d2 sin auto-login; post-registro vuelve a login con mensaje de \u00e9xito",
+          "LogoutUser fail-open local: removeToken() en finally aunque la red falle (el JTI expira solo en 7 d\u00edas)",
+          "Anti-enumeraci\u00f3n E1: credenciales inv\u00e1lidas y usuario inexistente comparten un \u00fanico mensaje i18n",
           "Errores mapeados a i18n por TIPO (ValidationError.field, EmailAlreadyInUseError, InvalidCredentialsError, NetworkError); nunca el mensaje crudo",
-          "AccountOverlay indistinguible de PauseOverlay/SettingsOverlay (btn-primary, paleta del repo); botón Cuenta en App, LevelSelectScreen intacto"
+          "AccountOverlay indistinguible de PauseOverlay/SettingsOverlay (btn-primary, paleta del repo); bot\u00f3n Cuenta en App, LevelSelectScreen intacto"
         ],
-        "notes": "Rama apilada sobre G1 (PR #37); el PR de E se abre tras mergear #37 con rebase --onto origin/dev feature/g1-audio-sfx-musica feature/e-ui-cuenta. Spec del adapter asserta URL+method+Bearer+status (red de seguridad #30). Pendiente acumulado el docs: de gen-uml + árbol de arquitectura."
+        "notes": "Rama apilada sobre G1 (PR #37); el PR de E se abre tras mergear #37 con rebase --onto origin/dev feature/g1-audio-sfx-musica feature/e-ui-cuenta. Spec del adapter asserta URL+method+Bearer+status (red de seguridad #30). Pendiente acumulado el docs: de gen-uml + \u00e1rbol de arquitectura."
       },
       {
         "id": "2026-07-09-003",
@@ -2285,7 +2285,7 @@
           "infrastructure": {
             "status": "fixed",
             "modified": [
-              "api/FetchProgressApiClient.ts (/api/progress → /api/v1/progress en pushProgress y fetchUserProgress)"
+              "api/FetchProgressApiClient.ts (/api/progress \u2192 /api/v1/progress en pushProgress y fetchUserProgress)"
             ],
             "created": [
               "__tests__/infrastructure/FetchProgressApiClient.spec.ts (red de seguridad: URL+method+Bearer)"
@@ -2293,15 +2293,15 @@
           }
         },
         "validation": {
-          "tests": "passed — 48 suites / 400 tests (dev-base 47/396 → +1 suite, +4 tests; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 48 suites / 400 tests (dev-base 47/396 \u2192 +1 suite, +4 tests; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "sin cambios de estilo relevantes"
         },
         "decisions": [
-          "Ruta corregida en AMBOS métodos (upload POST + download GET); verificada contra el backend (ProgressRoutes monta POST / y GET / bajo /api/v1/progress)",
-          "Red de seguridad: spec de adapter que fija la URL exacta con /v1, el método y el header Bearer, con fetch mockeado (lección #33)",
-          "Alcance estricto: solo adapter + spec + ai-usage; sin tocar dominio/aplicación/presentación ni la rama E",
-          "Id 2026-07-09-003: se salta el -002 reservado por la rama E (sin mergear) para evitar colisión al integrar"
+          "Ruta corregida en AMBOS m\u00e9todos (upload POST + download GET); verificada contra el backend (ProgressRoutes monta POST / y GET / bajo /api/v1/progress)",
+          "Red de seguridad: spec de adapter que fija la URL exacta con /v1, el m\u00e9todo y el header Bearer, con fetch mockeado (lecci\u00f3n #33)",
+          "Alcance estricto: solo adapter + spec + ai-usage; sin tocar dominio/aplicaci\u00f3n/presentaci\u00f3n ni la rama E",
+          "Id 2026-07-09-003: se salta el -002 reservado por la rama E (sin mergear) para evitar colisi\u00f3n al integrar"
         ],
         "notes": "Rama fix/ruta-progress-v1 nace de dev; PR hacia dev (no abierto). El sync D2 daba 404 silencioso porque el adapter apuntaba a /api/progress."
       },
@@ -2340,14 +2340,14 @@
           }
         },
         "validation": {
-          "tests": "passed — 442 tests / 52 suites, 0 regresiones",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 442 tests / 52 suites, 0 regresiones",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "sin cambios de estilo relevantes"
         },
         "decisions": [
           "Escala aplicada en la DEFINICION (theme): ARROW_GLYPH expone los 4 ratios ya multiplicados por ARROW_SCALE; los componentes no acumulan multiplicaciones",
           "El hit-area NO se toca: el input resuelve por celda (screenToCell), independiente del glifo; encoger la flecha no reduce la zona tocable",
-          "ArrowHeadDisintegrate apunta a ARROW_GLYPH (tamaño, no timing) para que la desintegracion nazca al 55% y no suelte fragmentos al 100%",
+          "ArrowHeadDisintegrate apunta a ARROW_GLYPH (tama\u00f1o, no timing) para que la desintegracion nazca al 55% y no suelte fragmentos al 100%",
           "Valor final 0.55 calibrado visualmente en caliente (0.75 -> 0.6 -> 0.5 -> 0.55)",
           "Alcance estricto a presentacion; dominio y aplicacion intactos"
         ],
@@ -2394,8 +2394,8 @@
           }
         },
         "validation": {
-          "tests": "passed — 485 tests / 57 suites (base 442/52 -> +43 tests, +5 suites; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 485 tests / 57 suites (base 442/52 -> +43 tests, +5 suites; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados"
         },
         "decisions": [
@@ -2461,8 +2461,8 @@
           }
         },
         "validation": {
-          "tests": "passed — 504 tests / 60 suites (base dev 485/57 -> +19 tests, +3 suites; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 504 tests / 60 suites (base dev 485/57 -> +19 tests, +3 suites; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados"
         },
         "decisions": [
@@ -2530,9 +2530,9 @@
           }
         },
         "validation": {
-          "tests": "passed — 489 tests / 57 suites (base 485; +4 tests)",
-          "type_check": "passed — tsc --noEmit exit 0",
-          "lint": "0 problemas (antes: 6 — 5 errores + 1 warning)"
+          "tests": "passed \u2014 489 tests / 57 suites (base 485; +4 tests)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
+          "lint": "0 problemas (antes: 6 \u2014 5 errores + 1 warning)"
         },
         "decisions": [
           "Fix de la salida fantasma: guard geometrico wasLeavingBoard + restriccion a flechas de 1 celda (las de >=2 ya se deduplican via shrink)",
@@ -2598,14 +2598,14 @@
           }
         },
         "validation": {
-          "tests": "passed — 531 tests / 64 suites post-rebase sobre dev con #44 (0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 531 tests / 64 suites post-rebase sobre dev con #44 (0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados",
           "e2e": "backend real: 200 vacio en nivel sin records; 404 en nivel no registrado; QA visual de los 4 flujos aprobado"
         },
         "decisions": [
           "Contrato verificado contra el backend real: vacio = 200 topPlayers:[] (no 404); 404 solo si el nivel no existe en el registro",
-          "El adapter distingue 404 (LevelNotRegisteredError) del vacio; la equivalencia visual 404≡vacio la decide el overlay (+console.warn) por el gap del seed",
+          "El adapter distingue 404 (LevelNotRegisteredError) del vacio; la equivalencia visual 404\u2261vacio la decide el overlay (+console.warn) por el gap del seed",
           "Trofeo en TODAS las cards incl. bloqueadas (informacion social) con stopPropagation y aria-label",
           "currentRecord null -> hint sutil (leaderboard.noRecord); achievedAt oculto en v1; tiempo reutiliza formatDuration (G3)",
           "No logueado / 401 en vuelo -> CTA que cierra el leaderboard y abre AccountOverlay",
@@ -2651,8 +2651,8 @@
           }
         },
         "validation": {
-          "tests": "passed — 536 tests / 65 suites (base 531/64 -> +5; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 536 tests / 65 suites (base 531/64 -> +5; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados",
           "qa": "visual aprobado: cierre automatico login/logout, alias en el toast, click-para-cerrar, reemplazo sin colas"
         },
@@ -2667,7 +2667,7 @@
       {
         "id": "2026-07-10-005",
         "date": "2026-07-10",
-        "title": "Checklist de verificación v1.0.0 + sincronización de docs desfasadas (README/FEATURES.md)",
+        "title": "Checklist de verificaci\u00f3n v1.0.0 + sincronizaci\u00f3n de docs desfasadas (README/FEATURES.md)",
         "file": "2026-07-10-verification-checklist-v1.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (1M context)",
@@ -2692,7 +2692,7 @@
           "docs": {
             "status": "created",
             "created": [
-              "doc/VERIFICATION_CHECKLIST.md (12 categorías, roadmap priorizado)"
+              "doc/VERIFICATION_CHECKLIST.md (12 categor\u00edas, roadmap priorizado)"
             ],
             "modified": [
               "README.md (tabla de features grupos C-G)",
@@ -2702,24 +2702,24 @@
           }
         },
         "validation": {
-          "tests": "passed — 531 tests / 64 suites (evidencia citada dentro de la checklist)",
-          "type_check": "no aplica (cambios solo de documentación)",
+          "tests": "passed \u2014 531 tests / 64 suites (evidencia citada dentro de la checklist)",
+          "type_check": "no aplica (cambios solo de documentaci\u00f3n)",
           "lint": "no aplica",
-          "e2e": "verificación cruzada en código (grep de wiring real en App.tsx, SyncProgress.ts, GameFlowController.ts, GetLevelLeaderboard.ts) antes de marcar cada feature como implementada, en vez de confiar en la documentación previa"
+          "e2e": "verificaci\u00f3n cruzada en c\u00f3digo (grep de wiring real en App.tsx, SyncProgress.ts, GameFlowController.ts, GetLevelLeaderboard.ts) antes de marcar cada feature como implementada, en vez de confiar en la documentaci\u00f3n previa"
         },
         "decisions": [
-          "Fase 1 acotada por el usuario a solo generar la checklist, sin CI/LICENSE/CHANGELOG todavía",
+          "Fase 1 acotada por el usuario a solo generar la checklist, sin CI/LICENSE/CHANGELOG todav\u00eda",
           "Rama nueva docs/verification-checklist-v1 desde dev (no dev directo, no release/)",
-          "Priorizar corregir la documentación desfasada (README + FEATURES.md) antes de seguir con infraestructura de release, a pedido explícito del usuario",
-          "C1/C3/D1/D2/F4/G1/G2 confirmados como implementados con evidencia de código; P20 y P21 marcados como resueltos",
-          "BORRADOR-features-pendientes.md no reescrito por completo — marcado 🔒 CERRADO y preservado como contexto histórico"
+          "Priorizar corregir la documentaci\u00f3n desfasada (README + FEATURES.md) antes de seguir con infraestructura de release, a pedido expl\u00edcito del usuario",
+          "C1/C3/D1/D2/F4/G1/G2 confirmados como implementados con evidencia de c\u00f3digo; P20 y P21 marcados como resueltos",
+          "BORRADOR-features-pendientes.md no reescrito por completo \u2014 marcado \ud83d\udd12 CERRADO y preservado como contexto hist\u00f3rico"
         ],
         "notes": "Rama sin commitear hasta este punto; main y dev quedaron intactos. Cambios en arrowmaze-project-core viven en un repo externo al working directory principal."
       },
       {
         "id": "2026-07-10-006",
         "date": "2026-07-10",
-        "title": "LICENSE, CHANGELOG, bump de versión y GoF/SOLID en README",
+        "title": "LICENSE, CHANGELOG, bump de versi\u00f3n y GoF/SOLID en README",
         "file": "2026-07-10-release-scaffolding-gof-solid.md",
         "tool": "Claude Code (claude.ai/code)",
         "model": "Claude Opus 4.8 (1M context)",
@@ -2758,18 +2758,18 @@
           }
         },
         "validation": {
-          "tests": "passed — 531 tests / 64 suites con arrowmaze-game@1.0.0",
-          "type_check": "no aplica (cambios de documentación/config)",
+          "tests": "passed \u2014 531 tests / 64 suites con arrowmaze-game@1.0.0",
+          "type_check": "no aplica (cambios de documentaci\u00f3n/config)",
           "lint": "no aplica",
           "e2e": "verificacion del SVG generado (120 clases/interfaces renderizadas, sin errores de sintaxis PlantUML); CHANGELOG.md contrastado contra git log --oneline por rango de tags"
         },
         "decisions": [
-          "MIT confirmado explícitamente por el usuario antes de crear LICENSE",
-          "CHANGELOG.md generado tras explicar su propósito (Keep a Changelog) porque el usuario no tenía claro para qué servía",
-          "Segunda fuente de versión descubierta en el camino (android/app/build.gradle) y corregida junto con package.json, siguiendo el patrón del backend (swagger.ts)",
+          "MIT confirmado expl\u00edcitamente por el usuario antes de crear LICENSE",
+          "CHANGELOG.md generado tras explicar su prop\u00f3sito (Keep a Changelog) porque el usuario no ten\u00eda claro para qu\u00e9 serv\u00eda",
+          "Segunda fuente de versi\u00f3n descubierta en el camino (android/app/build.gradle) y corregida junto con package.json, siguiendo el patr\u00f3n del backend (swagger.ts)",
           "Diagrama exportado con el plantuml.jar ya vendorizado por node-plantuml, sin depender de internet"
         ],
-        "notes": "Continuación de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap crítico/importante de la checklist solo queda pendiente el CI."
+        "notes": "Continuaci\u00f3n de la misma rama docs/verification-checklist-v1, sin commitear hasta este punto. Del roadmap cr\u00edtico/importante de la checklist solo queda pendiente el CI."
       },
       {
         "id": "2026-07-10-007",
@@ -2806,13 +2806,13 @@
           "tests": "no aplica (solo git push + gh pr create)",
           "type_check": "no aplica",
           "lint": "no aplica",
-          "e2e": "git log --oneline dev..docs/verification-checklist-v1 confirmado antes de abrir el PR; URL de PR #48 devuelta por gh como confirmación"
+          "e2e": "git log --oneline dev..docs/verification-checklist-v1 confirmado antes de abrir el PR; URL de PR #48 devuelta por gh como confirmaci\u00f3n"
         },
         "decisions": [
-          "PR #48 abierto contra dev (no main), confirmado explícitamente por el usuario",
-          "Se distinguió 'documentación lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
+          "PR #48 abierto contra dev (no main), confirmado expl\u00edcitamente por el usuario",
+          "Se distingui\u00f3 'documentaci\u00f3n lista' de 'release listo': quedan pasos operativos reales pendientes (merge de prueba, APK, smoke test, tag) antes de considerar el release montado"
         ],
-        "notes": "PR #48 abierto sin mergear, pendiente de revisión. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tomó el id -004 durante este merge con dev."
+        "notes": "PR #48 abierto sin mergear, pendiente de revisi\u00f3n. Renumerado de -006 a -007 al integrar el PR #47 (login-bienvenida), que tom\u00f3 el id -004 durante este merge con dev."
       },
       {
         "id": "2026-07-10-008",
@@ -2851,8 +2851,8 @@
           }
         },
         "validation": {
-          "tests": "passed — 544 tests / 66 suites (base 537/65 -> +7; 0 regresiones)",
-          "type_check": "passed — tsc --noEmit exit 0",
+          "tests": "passed \u2014 544 tests / 66 suites (base 537/65 -> +7; 0 regresiones)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
           "lint": "0 en los archivos tocados"
         },
         "decisions": [
@@ -2860,7 +2860,7 @@
           "Single-flight + coalescing: N pedidos durante un vuelo colapsan en UNA re-ejecucion; el gate se re-verifica antes del re-run",
           "Fallos -> console.warn; el scheduler nunca se atasca",
           "SyncProgress/adapter/dominio intactos; el sync del bootstrap queda fuera por alcance (residual anotado)",
-          "DEUDA DOCUMENTADA: progreso local = dispositivo, no cuenta (tabla sin usuario) — la resuelve D1.5 (paso 3)"
+          "DEUDA DOCUMENTADA: progreso local = dispositivo, no cuenta (tabla sin usuario) \u2014 la resuelve D1.5 (paso 3)"
         ],
         "notes": "Correccion de hechos: el disparo tras ganar ya existia (GameView, D2); esta mision es higiene, no el fix del sintoma de QA. Id 2026-07-10-008 (renumerado de -005 al integrar #48/#49/#51 durante el rebase)."
       },
@@ -2916,17 +2916,17 @@
           }
         },
         "validation": {
-          "tests": "passed — 559 tests / 70 suites (base 544/66 -> +15; 0 regresiones; paridad i18n cubre las claves nuevas)",
-          "type_check": "passed — tsc --noEmit exit 0",
-          "lint": "passed — eslint . limpio",
+          "tests": "passed \u2014 559 tests / 70 suites (base 544/66 -> +15; 0 regresiones; paridad i18n cubre las claves nuevas)",
+          "type_check": "passed \u2014 tsc --noEmit exit 0",
+          "lint": "passed \u2014 eslint . limpio",
           "qa": "PENDIENTE QA visual del usuario: el focal del mapa cambia sutilmente de verde en claro (#4CAF50 -> --success #16a34a, consolidacion aprobada)"
         },
         "decisions": [
-          "Nomenclatura: se conservan los tokens existentes (--text/--text-muted/--primary, capa original de Jesus en /preview) — continuidad de equipo sobre renombre",
-          "DECISION CONSCIENTE — 2 opciones sin 'sistema': elegir manualmente un tema desactiva el seguimiento de prefers-color-scheme para siempre (sin 'volver a auto'); precedente del selector de idioma",
+          "Nomenclatura: se conservan los tokens existentes (--text/--text-muted/--primary, capa original de Jesus en /preview) \u2014 continuidad de equipo sobre renombre",
+          "DECISION CONSCIENTE \u2014 2 opciones sin 'sistema': elegir manualmente un tema desactiva el seguimiento de prefers-color-scheme para siempre (sin 'volver a auto'); precedente del selector de idioma",
           "Forge (H1) y /preview fuera del v1; /preview (pagina de Jesus) intocada y citada como referencia",
           "Regla B1: colores de flechas = dato del nivel, NO migran; contraste verificado sobre --board-bg oscuro (peor caso blue #3b82f6 ~3:1)",
-          "Glifos del toggle: emoji directo — patron que el #49 establecio para los iconos del header (⚙️/👤), nitido en ambos temas sin assets",
+          "Glifos del toggle: emoji directo \u2014 patron que el #49 establecio para los iconos del header (\u2699\ufe0f/\ud83d\udc64), nitido en ambos temas sin assets",
           "Fix emergente cazado por el spec del provider: la carga async de la preferencia pisaba una eleccion previa del usuario (ref userChose: la eleccion explicita gana)"
         ],
         "notes": "Rama feat/modo-oscuro desde 76f5571 (tip de fix/higiene-sync rebasado sobre dev post-#51 en el Paso A de esta sesion). Falta espejar G4-modo-oscuro.feature en arrowmaze-project-core. Id 2026-07-10-009."
@@ -2970,8 +2970,8 @@
           }
         },
         "validation": {
-          "tests": "passed — 561/561 en 71 suites, 0 regresiones",
-          "type_check": "passed — tsc --noEmit exit 0"
+          "tests": "passed \u2014 561/561 en 71 suites, 0 regresiones",
+          "type_check": "passed \u2014 tsc --noEmit exit 0"
         },
         "decisions": [
           "NO tocar dominio (restriccion dura del humano): el 'regreso al origen' es 100% presentacion (useGameController glide-back + snapshot/restore); Arrow.advance() solo hace no-op en blocked",
@@ -3004,12 +3004,148 @@
       {
         "id": "2026-07-13-003",
         "date": "2026-07-13",
-        "title": "Implementation: MODO CUBO — tablero 3D sobre la superficie de un cubo",
+        "title": "Implementation: MODO CUBO \u2014 tablero 3D sobre la superficie de un cubo",
         "file": "2026-07-13-modo-cubo-implementacion.md",
         "tool": "Claude Code",
         "model": "Claude Fable 5",
         "author": "@Jrgil20",
         "status": "completed"
+      },
+      {
+        "id": "2026-07-13-cube-level-planning",
+        "date": "2026-07-13",
+        "title": "Planning: Nivel Cube 3D (3x3x3) y controles Z",
+        "file": "2026-07-13-cube-level-planning.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.2",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "level-cube",
+        "linked_session": null,
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 2
+        },
+        "areas": [
+          "planning",
+          "3d-level",
+          "levels"
+        ],
+        "validation": {
+          "tests": "not_run",
+          "structure": "passed"
+        }
+      },
+      {
+        "id": "2026-07-13-cube-level-implementation",
+        "date": "2026-07-13",
+        "title": "Implementation: Nivel Cube 3D (3x3x3) y controles Z",
+        "file": "2026-07-13-cube-level-implementation.md",
+        "tool": "Antigravity (Claude)",
+        "model": "Claude Sonnet 4.2",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "level-cube",
+        "linked_session": "2026-07-13-cube-level-planning",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 4,
+          "tests_passing": 681
+        },
+        "areas": [
+          "implementation",
+          "3d-level",
+          "levels",
+          "backend-seeds"
+        ],
+        "validation": {
+          "tests": "passed",
+          "structure": "passed"
+        }
+      },
+      {
+        "id": "2026-07-13-arrow-3d-topology-fix-planning",
+        "date": "2026-07-13",
+        "title": "Planning: Fix Arrow.ts exitDir calculation for 3D Topology (6 ports)",
+        "file": "2026-07-13-arrow-3d-topology-fix-planning.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "planning",
+        "feature": "arrow-cinematics-3d",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 2,
+          "files_modified": 0,
+          "tests_passing": 0
+        },
+        "areas": [
+          "planning",
+          "domain",
+          "arrow-cinematics"
+        ],
+        "validation": {
+          "tests": "pending",
+          "structure": "passed"
+        }
+      },
+      {
+        "id": "2026-07-13-arrow-3d-topology-fix-implementation",
+        "date": "2026-07-13",
+        "title": "Implementation: Fix Arrow.ts exitDir calculation for 3D Topology",
+        "file": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "arrow-cinematics-3d",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-planning.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 0,
+          "files_modified": 2,
+          "tests_passing": 12
+        },
+        "areas": [
+          "implementation",
+          "domain",
+          "arrow-cinematics"
+        ],
+        "validation": {
+          "tests": "passed",
+          "structure": "passed"
+        }
+      },
+      {
+        "id": "2026-07-13-3d-glide-engine",
+        "date": "2026-07-13",
+        "title": "3D Glide Engine Implementation & Level Redesign",
+        "file": "2026-07-13-3d-glide-engine.md",
+        "tool": "antigravity",
+        "model": "claude-sonnet-4-20250514",
+        "author": "@Jrgil20",
+        "phase": "implementation",
+        "feature": "3d-glide-engine",
+        "linked_session": "2026-07-13-arrow-3d-topology-fix-implementation.md",
+        "status": "completed",
+        "deliverables": {
+          "files_created": 1,
+          "files_modified": 5,
+          "tests_passing": 1
+        },
+        "areas": [
+          "implementation",
+          "presentation",
+          "3d-engine",
+          "level-design"
+        ],
+        "validation": {
+          "tests": "passed",
+          "structure": "passed"
+        }
       }
     ],
     "statistics": {
@@ -3033,7 +3169,7 @@
         "Claude Sonnet 4.6",
         "Gemini 3.5 Flash (Medium)",
         "Gemini 3.5 Flash (Low)",
-        "Gemini (versión no especificada)",
+        "Gemini (versi\u00f3n no especificada)",
         "Claude Sonnet 5"
       ],
       "totalLinesGenerated": 8530,
@@ -3044,7 +3180,8 @@
       "totalClassesDocumented": 31,
       "averageCompletionTime": "~20 minutes per session",
       "scoringFeatureNote": "A5 completada: 71 tests nuevos, scoring 100% RAM-resident, 0 regresiones",
-      "totalEntries": 57
+      "totalEntries": 57,
+      "total_reports": 62
     },
     "lastEntry": {
       "id": "2026-07-13-003",

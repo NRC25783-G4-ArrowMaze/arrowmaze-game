@@ -15,6 +15,7 @@ import { LEVEL_MAPA_12 } from './levelMapa12';
 import { LEVEL_MAPA_13 } from './levelMapa13';
 import { LEVEL_MAPA_14 } from './levelMapa14';
 import { LEVEL_MAPA_15 } from './levelMapa15';
+import { LEVEL_CUBE } from './levelCube';
 import { LEVEL_SINGULARIDAD } from './levelSingularidad';
 
 /**
@@ -50,6 +51,8 @@ export const LOCAL_LEVELS: Record<string, Scene> = {
   // Corazón (13 flechas, diseñado en el FORGE). Su id es
   // 'heart-preview' (registrado en el backend → leaderboards sin 404).
   'heart-preview': sceneFromLevelData(LEVEL_HEART),
+  // CUBE — nivel 3D con paginación Z
+  'cube': sceneFromLevelData(LEVEL_CUBE),
   // SINGULARIDAD — el gran final: primer nivel del MODO CUBO en el mapa
   // (post-Corazón). Pendiente registrarlo en el backend (ver doc de hallazgos).
   'singularidad': LEVEL_SINGULARIDAD,

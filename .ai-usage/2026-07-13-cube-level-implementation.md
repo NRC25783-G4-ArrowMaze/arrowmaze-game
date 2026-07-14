@@ -1,0 +1,13 @@
+### 2026-07-13 — Implementation: Nivel Cube 3D (3x3x3) y controles Z
+- **Herramienta:** Antigravity (Claude)
+- **Modelo / versión:** Claude Sonnet 4.2
+- **Autor humano responsable:** @Jrgil20
+- **Prompt(s) representativo(s):**
+  - "salta eso e implementa directamente con este modelo"
+- **Salida tomada de la IA:** 
+  - `src/presentation/game/levels/levelCube.ts`
+  - `__tests__/presentation/levelCube.spec.ts`
+  - `src/presentation/game/scene.ts` (fix de parsing)
+  - `arrowmaze-backend/seeds/levels.seed.json` (actualizado)
+- **Modificaciones manuales del equipo:** N/A
+- **Validación realizada:** Suite de tests pnpm pasaron completos (681/681) sin fallas. Verificada la integridad isométrica y las conexiones Z.

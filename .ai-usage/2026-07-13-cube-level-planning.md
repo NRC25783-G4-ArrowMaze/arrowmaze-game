@@ -1,0 +1,12 @@
+### 2026-07-13 — Planning: Nivel Cube 3D (3x3x3) y controles Z
+- **Herramienta:** Antigravity (Claude)
+- **Modelo / versión:** Claude Sonnet 4.2
+- **Autor humano responsable:** @Jrgil20
+- **Prompt(s) representativo(s):**
+  - "escuchame necesito un plan para un nivel 3d que sera de 3x33, es decir 3 celdas en cada z level conectadas como un cubo, leyendo forge debes entender la idea..."
+  - "si controles decamio de nivel z, return, exactamentes eso 3x3 en 3 niveles z... unas 5 minimo pero debe verse que atraviezan claramente niveles z."
+- **Salida tomada de la IA:** 
+  - `features/cube-level.feature`
+  - `doc/cube_level_plan.md`
+- **Modificaciones manuales del equipo:** N/A (Fase de handoff)
+- **Validación realizada:** Aprobación explícita del plan de implementación y verificación de dependencias en `levelMap.ts`.

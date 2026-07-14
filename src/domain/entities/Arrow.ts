@@ -252,6 +252,29 @@ export class Arrow {
   }
 
   /**
+   * Retrieves the logical opposite port on a given cell topology.
+   * On flat grids (e.g., 4 ports), this is numerically (port + portCount/2) % portCount.
+   * On 3D topologies (6 ports) defined by the visual engine, the axes are mapped as:
+   * Y (North/South): 0 <-> 2
+   * X (East/West): 1 <-> 3
+   * Z (Up/Down): 4 <-> 5
+   */
+  private _getOppositePort(port: number, portCount: number): number {
+    if (portCount === 6) {
+      switch (port) {
+        case 0: return 2;
+        case 2: return 0;
+        case 1: return 3;
+        case 3: return 1;
+        case 4: return 5;
+        case 5: return 4;
+        default: return (port + 3) % 6; // fallback seguro
+      }
+    }
+    return (port + Math.floor(portCount / 2)) % portCount;
+  }
+
+  /**
    * For each segment in the chain, compute:
    * - exitDir: the port index on the current cell through which this segment will exit.
    * - targetCell: the neighboring cell in that direction, or null if it's an exit (sink).
@@ -286,7 +309,7 @@ export class Arrow {
         // Tail segment — exit through opposite of entry port
         const seg = segment as Segment;
         const portCount = segment.cell.getPortCount();
-        exitDir = (seg.entryPort + portCount / 2) % portCount;
+        exitDir = this._getOppositePort(seg.entryPort, portCount);
       }
 
       const targetCell = segment.cell.getNeighborAtPort(exitDir);
@@ -379,7 +402,7 @@ export class Arrow {
         const traveledConn = chain[0].cell.getConnection(targets[0].exitDir);
         if (traveledConn !== null) {
           const entryPort = traveledConn.neighborPortIndex;
-          newSegments[0] = new Head(newHead.cell, (entryPort + portCount / 2) % portCount);
+          newSegments[0] = new Head(newHead.cell, this._getOppositePort(entryPort, portCount));
         }
       }
     }
