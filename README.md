@@ -49,6 +49,16 @@ El cliente está construido como una aplicación web con soporte móvil nativo v
 
 ---
 
+## 🎲 El Reto 3D: La Singularidad
+
+Arrow Maze ha evolucionado más allá de los tableros planos (2D) con la introducción de mapas tridimensionales impulsados por nuestro nuevo *3D Glide Engine*:
+- **Superficie Cúbica (Semi-3D):** El tablero tradicional se pliega envolviendo las caras exteriores de un cubo, forzando a las flechas a transitar por las aristas de forma isométrica en un entorno bautizado como "La Singularidad".
+- **Topología Volumétrica (3x3x3):** Un desafío profundo donde el nivel abarca todo el volumen interno y externo del cubo, integrando controles de navegación avanzados en el eje Z.
+
+[![Demostración de ArrowMaze AcademicProject: Reto 3D](https://img.youtube.com/vi/fCi6SwsamF0/maxresdefault.jpg)](https://youtu.be/fCi6SwsamF0)
+
+---
+
 ## Stack tecnológico
 
 | Herramienta | Rol |
